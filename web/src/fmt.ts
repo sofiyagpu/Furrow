@@ -27,6 +27,7 @@ const ML_CROPS: Record<string, [string, string]> = {
   barley: ['Barley', 'Ячмень'],
   wheat: ['Wheat', 'Пшеница'],
   small_grains: ['Small grains', 'Зерновые'],
+  cropped: ['Green cropland', 'Пашня под культурой'], // vko: cropland green in peak season, crop unknown
 }
 export const mlCrop = (key: string, l: Lang) => ML_CROPS[key]?.[l === 'ru' ? 1 : 0] ?? key
 // a composition "fallow 29%, corn 19% (низкая достоверность)": translate the class keys and the low-confidence mark
@@ -36,7 +37,7 @@ export const mlText = (text: string, l: Lang) =>
 export const mlValidation = (r: Region, l: Lang) => (l === 'en' ? r.ml?.validation_en ?? r.ml?.validation : r.ml?.validation)
 
 // detail map colours by crop_top; other keys fall back to grey
-export const ML_COLOURS: Record<string, string> = { alfalfa: '#8e6cf0', corn: '#f5b301', cotton: '#f2f2f2', fallow: '#9c5a2e', small_grains: '#ef7fa8', barley: '#ef7fa8', wheat: '#e3d26f' }
+export const ML_COLOURS: Record<string, string> = { alfalfa: '#8e6cf0', corn: '#f5b301', cotton: '#f2f2f2', fallow: '#9c5a2e', small_grains: '#ef7fa8', barley: '#ef7fa8', wheat: '#e3d26f', cropped: '#3fbf8f' }
 export const ML_OTHER_COLOUR = '#8a8a8a'
 
 const MONTHS: [string, string][] = [['Jan', 'янв'], ['Feb', 'фев'], ['Mar', 'мар'], ['Apr', 'апр'], ['May', 'май'], ['Jun', 'июн'], ['Jul', 'июл'], ['Aug', 'авг'], ['Sep', 'сен'], ['Oct', 'окт'], ['Nov', 'ноя'], ['Dec', 'дек']]

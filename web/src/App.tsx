@@ -895,8 +895,10 @@ function MlSection({ r }: { r: Region }) {
           sub={t('Satellites see the district; ML brings it down to the field. Results appear in the map panel when you click a cell.', 'Спутник видит район, ML доводит до поля. Результат виден в панели карты при клике на ячейку.')} />
         <div className="two ml-grid">
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Crop map', 'Карта культур')}</h3><span className={`status ${n ? 'on' : ''}`}>{n ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
-            <p className="small muted">{t('Classifies the current crop of each cell from HLS / MODIS time series, so "current practice" comes from the field, not a guess.', 'Определяет текущую культуру ячейки по рядам HLS / MODIS, чтобы «текущая практика» бралась с поля, а не из догадки.')}</p>
+            <div className="row-between"><h3 className="h-sm">{r.id === 'vko' ? t('Bare-land map', 'Карта голой земли') : t('Crop map', 'Карта культур')}</h3><span className={`status ${n ? 'on' : ''}`}>{n ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
+            <p className="small muted">{r.id === 'vko'
+              ? t('No crop labels exist here, so crops are not classified. Landsat (HLS) shows where cropland lay bare through the peak of summer (black fallow) in 2019–2021: bare soil is where erosion starts.', 'Разметки культур здесь нет, поэтому культуры не классифицируются. Landsat (HLS) показывает, где пашня стояла голой в разгар лета (чёрный пар) в 2019–2021: с голой земли начинается эрозия.')
+              : t('Zoom into any field: ~0.7 km² plots show what actually grew, three years of history and when the soil lay bare. Trained and checked on USDA crop maps.', 'Приблизьте поле: участки ~0,7 км² показывают, что на самом деле росло, историю за три года и когда земля стояла голой. Обучено и проверено по картам USDA.')}</p>
           </div>
           <div className="panel">
             <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Awaiting model', 'Ждёт модель')}</span></div>
@@ -928,7 +930,7 @@ function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; deta
   if (!c || !mlHas(c)) {
     return <div className="ml-box"><span className="badge">ML</span><span className="muted">{t('No ML data for this cell', 'ML-данных для ячейки нет')}</span></div>
   }
-  const src = (s?: string) => (s === 'model' ? t('model', 'модель') : s)
+  const src = (s?: string) => (s === 'model' ? t('model', 'модель') : s === 'satellite' ? t('satellite', 'спутник') : s)
   return (
     <div className="ml-box ml-cell">
       <span className="badge">ML</span>

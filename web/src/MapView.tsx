@@ -151,7 +151,8 @@ export default function MapView(props: P) {
         {(mlCells(props.region).length > 0 || detailCells.length > 0) && <p className="map-legend-ml small"><i />{t('cell has ML data', 'есть ML-данные')}</p>}
         {detailCells.length > 0 && (
           <div className="map-legend-detail">
-            <label className="small"><input type="checkbox" checked={showDetail} onChange={(e) => setShowDetail(e.target.checked)} /> {t('ML crop map, field scale', 'ML-карта культур, масштаб поля')}</label>
+            <label className="small"><input type="checkbox" checked={showDetail} onChange={(e) => setShowDetail(e.target.checked)} />
+              {props.region.id === 'vko' ? t('Satellite: where cropland lay bare all summer', 'Спутник: где пашня стояла голой всё лето') : t('Satellite field view: what grew', 'Спутник: что росло на полях')}</label>
             {detailOn && (
               <>
                 <ul className="map-legend-crops">
