@@ -116,13 +116,13 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
 {
   const s = slide("Title", null, null, "Starfield blank");
   s.background = { path: B("globe_poster.png") };
-  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 0.6, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
-  s.addText("NASA SPACE APPS 2026  ·  CHALLENGE", T({ objectName: "kick", x: M, y: 2.0, w: 5.6, h: 0.35, fontSize: 13, bold: true, color: C.accent2, charSpacing: 4 }));
-  s.addText("Field Shift: Adapting Farms with NASA Data", T({ objectName: "case", x: M, y: 2.4, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
-  s.addText("FURROW", T({ objectName: "logo", x: M, y: 3.55, w: 5.6, h: 1.2, fontSize: 80, color: C.accent1, charSpacing: 6, fontFace: THEME.headFontFace }));
-  s.addText("Crop rotation planner on NASA data", T({ objectName: "sub", x: M, y: 4.75, w: 5.6, h: 0.5, fontSize: 20, color: C.background1 }));
+  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 0.55, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
+  s.addText("NASA SPACE APPS 2026  ·  CHALLENGE", T({ objectName: "kick", x: M, y: 1.75, w: 6.3, h: 0.35, fontSize: 13, bold: true, color: C.accent2, charSpacing: 3, valign: "top" }));
+  s.addText("Field Shift: Adapting Farms with NASA Data", T({ objectName: "case", x: M, y: 2.15, w: 6.3, h: 1.0, fontSize: 24, color: C.background1, valign: "top" }));
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 3.35, w: 7.0, h: 1.15, fontSize: 66, color: C.accent1, charSpacing: 3, fontFace: THEME.headFontFace, valign: "top", wrap: false }));
+  s.addText("Crop rotation planner on NASA data", T({ objectName: "sub", x: M, y: 4.6, w: 6.3, h: 0.45, fontSize: 20, color: C.background1, valign: "top" }));
   s.addText([{ text: "TEAM  ", options: { color: C.background2, charSpacing: 4, fontSize: 13, bold: true } }, { text: "Rogue One", options: { color: C.accent1, fontSize: 22, bold: true } }],
-    T({ objectName: "team", x: M, y: 5.75, w: 5.6, h: 0.55, valign: "middle" }));
+    T({ objectName: "team", x: M, y: 5.55, w: 6.3, h: 0.55, valign: "middle" }));
   s.addNotes("0:00–0:10. Introduce the team and the challenge, then click: the crawl starts.");
   TRANS[s._n] = "fade";
 }
@@ -250,14 +250,13 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
 {
   const s = slide("Close", null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("globe.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("globe_poster.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "globe" });
-  s.addText("FURROW", T({ objectName: "logo", x: M, y: 0.8, w: 6.2, h: 1.1, fontSize: 72, color: C.accent1, charSpacing: 6, fontFace: THEME.headFontFace }));
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 0.8, w: 7.0, h: 1.1, fontSize: 66, color: C.accent1, charSpacing: 3, fontFace: THEME.headFontFace, valign: "top", wrap: false }));
   s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 2.05, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
   s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 3.15, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
   const q = 2.1, qy = 4.15;
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { objectName: "qbg", x: M, y: qy, w: q, h: q, rectRadius: 0.1, fill: { color: "FFFFFF" }, line: { type: "none" } });
   s.addImage({ path: path.join(__dirname, "img/qr.png"), objectName: "qr", x: M + 0.12, y: qy + 0.12, w: q - 0.24, h: q - 0.24, altText: "QR code: open Furrow" });
-  s.addText([{ text: "Try it on your field", options: { fontSize: 18, bold: true, color: C.background1, breakLine: true } },
-    { text: QR_TEXT, options: { fontSize: 14, color: C.accent2 } }], T({ objectName: "qt", x: M + q + 0.3, y: qy + 0.05, w: 3.2, h: 0.9, valign: "top", paraSpaceAfter: 4 }));
+  s.addText(QR_TEXT, T({ objectName: "qt", x: M + q + 0.3, y: qy + 0.05, w: 3.2, h: 0.45, fontSize: 16, color: C.accent2, valign: "top" }));
   s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M + q + 0.3, y: qy + q - 2.2 * 600 / 1527, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
   s.addNotes("2:40–3:00. Furrow shows what each choice would have cost and kept, on real NASA data. Scan the code to try it on your field. The farmer decides.");
   anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 500 }, { fx: "fade", names: ["l2"], dur: 500 },
