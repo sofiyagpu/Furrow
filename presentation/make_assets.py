@@ -1,4 +1,4 @@
-"""Deck art: starfield, the planet (a real MODIS frame of the VKO fields), app screenshot crops, the opening crawl video.
+"""Deck art: starfield, the opening crawl video, the closing rotating Earth (NASA Blue Marble).
 Needs pillow, numpy, imageio-ffmpeg. Fonts in ./fonts (Google Fonts).
     python make_assets.py
 """
@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 HERE = Path(__file__).resolve().parent
-IMG, SHOTS = HERE / "img", HERE.parent / "shots" / "tiles"
+IMG = HERE / "img"
 OUT = HERE / "build"
 OUT.mkdir(exist_ok=True)
 FONTS = HERE / "fonts"  # Google Fonts, OFL: News Cycle (News Gothic revival), Libre Franklin (Franklin Gothic revival)
@@ -41,50 +41,15 @@ def stars(seed=7):
     return Image.fromarray(np.maximum(np.asarray(im), (np.asarray(glow) * 1.1).clip(0, 255).astype(np.uint8)))
 
 
-def planet():
-    """A sphere wrapped in the real MODIS frame of the East Kazakhstan fields, with a lit rim."""
-    S = 1400
-    src = Image.open(IMG / "vko_true.jpg").convert("RGB").resize((1600, 900))
-    tex = np.asarray(src.crop((150, 0, 1050, 900)).resize((S, S)), np.float32)
-    yy, xx = (np.mgrid[0:S, 0:S] - S / 2 + 0.5) / (S / 2 - 40)
-    rr = np.sqrt(xx ** 2 + yy ** 2)
-    inside = rr < 1
-    z = np.sqrt(np.clip(1 - rr ** 2, 0, 1))
-    # spherical lookup so the fields bend over the limb
-    u = ((np.arcsin(np.clip(xx, -1, 1)) / np.pi + 0.5) * (S - 1)).astype(int)
-    v = ((np.arcsin(np.clip(yy, -1, 1)) / np.pi + 0.5) * (S - 1)).astype(int)
-    col = tex[v.clip(0, S - 1), u.clip(0, S - 1)] * 1.25
-    light = np.clip(0.25 + 0.95 * (z * 0.6 + (-xx * 0.55 - yy * 0.45)), 0.04, 1.2)
-    col = col * light[..., None]
-    rim = np.exp(-((1 - rr) / 0.035) ** 2) * inside * np.clip(-xx - yy + 0.6, 0, 1.4)
-    col += rim[..., None] * np.array([40, 70, 95])
-    out = np.zeros((S, S, 4), np.float32)
-    out[..., :3] = col
-    out[..., 3] = inside * 255
-    # atmosphere halo outside the disc
-    halo = np.exp(-((rr - 1) / 0.03) ** 2) * (rr >= 1) * np.clip(-xx - yy + 0.8, 0, 1.5)
-    out[..., :3] += (halo[..., None] * np.array([60, 110, 150])) * (rr >= 1)[..., None]
-    out[..., 3] = np.maximum(out[..., 3], halo * 90)
-    Image.fromarray(out.clip(0, 255).astype(np.uint8), "RGBA").save(OUT / "planet.png")
-
-
-def crops():
-    boxes = {  # app screenshots at 1440x900, nav and section headings cut off
-        "shot_map.jpg": ("desktop-sec-03-a.jpg", (100, 130, 1340, 822)),
-        "shot_cards.jpg": ("desktop-sec-04-a.jpg", (100, 262, 1340, 830)),
-        "shot_time.jpg": ("desktop-sec-05-a.jpg", (100, 256, 1340, 784)),
-        "shot_trade.jpg": ("desktop-sec-07-a.jpg", (100, 290, 1340, 900)),
-    }
-    for name, (src, box) in boxes.items():
-        Image.open(SHOTS / src).convert("RGB").crop(box).save(OUT / name, quality=92)
-
-
 # ---------- crawl ----------
 INTRO = ["Not long ago, on a field", "not so far away...."]
 HEAD = ["SPACE APPS 2026", "THE BARE FIELD"]
 BODY = [
-    "Rain comes late or not at all. On the Kazakh steppe, every third summer a field lies bare as black fallow, "
-    "and the wind carries its soil away. In Arizona, wells drain an aquifer that GRACE-FO watches from orbit.",
+    "It is a time of shifting seasons. Temperatures climb, rain comes late or not at all, "
+    "and the heat arrives just as the wheat flowers. Year after year the soil grows thinner.",
+    "On the steppe of East Kazakhstan, every third summer a field lies bare as black fallow. "
+    "The wind carries its soil away, and four seasons in ten lose money. In the Arizona desert, "
+    "fields stand bare 229 days a year while wells pump an aquifer that the GRACE-FO satellites watch drain from orbit.",
     "Farmers know other rotations exist. What they lack is proof from their own field, in their own weather. "
     "Armed with twenty-two seasons of NASA data, a small crew sets out to build FURROW....",
 ]
@@ -169,14 +134,14 @@ def crawl():
     # outline only: stroke minus glyph interior
     logo = Image.fromarray(np.where(np.asarray(hollow) > 128, 0, np.asarray(lg)).astype(np.uint8))
 
-    T_INTRO, T_LOGO, T_CRAWL, T_END = 3.6, 4.0, 7.5, 27.0
+    T_INTRO, T_LOGO, T_CRAWL, T_END = 3.4, 3.8, 6.5, 60.0  # one minute; ~124 words read aloud at ~140 wpm
     n = int(T_END * FPS)
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     proc = subprocess.Popen([ff, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
                              "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "medium",
                              "-movflags", "+faststart", str(OUT / "crawl.mp4")], stdin=subprocess.PIPE)
     yel = np.array(YELLOW, np.float32)
-    poster_t = 14.0
+    poster_t = 25.0
     for k in range(n):
         t = k / FPS
         fr = bg_a.copy()
@@ -197,11 +162,11 @@ def crawl():
                 full[dy0:dy0 + hv, dx0:dx0 + wv] = la[sy0:sy0 + hv, sx0:sx0 + wv]
                 fr = fr * (1 - full) + full * yel
         if t >= T_CRAWL:
-            total = text_a.height - win
-            s = min(total, (t - T_CRAWL) / (T_END - T_CRAWL - 1) * total)
+            total = text_a.height - win - int(win * 0.72)  # stop with the last lines still on screen
+            s = min(total, (t - T_CRAWL) / (T_END - T_CRAWL - 3) * total)
             src = [(0, s), (pw, s), (pw, s + win), (0, s + win)]
             warped = text_a.transform((W, H), Image.PERSPECTIVE, coeffs(dst, src), Image.BICUBIC)
-            m = np.asarray(warped, np.float32)[..., None] / 255 * fade[..., None]
+            m = np.asarray(warped, np.float32)[..., None] / 255 * fade[..., None] * min(1, (T_END - t) / 2)
             fr = fr * (1 - m) + m * yel
         frame = fr.clip(0, 255).astype(np.uint8)
         proc.stdin.write(frame.tobytes())
@@ -211,8 +176,108 @@ def crawl():
     proc.wait()
 
 
+# ---------- closing globe ----------
+GLOBE_T, GLOBE_R, GLOBE_C = 20.0, 380, (1370, 540)
+PINS = [(50.5, 82.0, "EAST KAZAKHSTAN"), (32.9, -111.7, "PINAL COUNTY, ARIZONA")]
+
+
+def blue_marble():
+    f = IMG / "bluemarble.jpg"
+    if not f.exists():
+        import urllib.request
+        url = ("https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&CRS=EPSG:4326"
+               "&FORMAT=image/jpeg&LAYERS=BlueMarble_NextGeneration&BBOX=-90,-180,90,180&WIDTH=4096&HEIGHT=2048")
+        urllib.request.urlretrieve(url, f)
+    return np.asarray(Image.open(f).convert("RGB"), np.float32)
+
+
+def globe():
+    """A 20 s seamless loop: Earth turning once, seen from 25 N, the two demo regions pulsing as they pass,
+    one satellite on an inclined orbit going round twice."""
+    tex = blue_marble()
+    th, tw = tex.shape[:2]
+    bg = np.asarray(Image.open(OUT / "stars.png").convert("RGB"), np.float32)
+    R, (cx, cy) = GLOBE_R, GLOBE_C
+    S = 2 * R + 4
+    yy, xx = np.mgrid[0:S, 0:S].astype(np.float32)
+    x, y = (xx - S / 2 + 0.5) / R, -(yy - S / 2 + 0.5) / R
+    rr = np.sqrt(x * x + y * y)
+    edge = np.clip((1 - rr) * R + 0.5, 0, 1)[..., None]  # antialiased limb
+    z = np.sqrt(np.clip(1 - rr * rr, 0, 1))
+    tilt = np.radians(25)
+    X, Y, Z = x, y * np.cos(tilt) + z * np.sin(tilt), -y * np.sin(tilt) + z * np.cos(tilt)
+    lat = np.degrees(np.arcsin(np.clip(Y, -1, 1)))
+    lon0 = np.degrees(np.arctan2(X, Z))
+    L = np.array([-0.55, 0.35, 0.76])
+    L /= np.linalg.norm(L)
+    shade = np.clip((x * L[0] + y * L[1] + z * L[2]) * 1.15 + 0.12, 0.05, 1.0)[..., None]
+    rim = (np.exp(-((1 - rr) * R / 5) ** 2) * (rr <= 1) * 0.35)[..., None] * np.array([90, 150, 210])
+    py = np.clip((90 - lat) / 180 * (th - 1), 0, th - 1)
+
+    def sample(lon):
+        px = ((lon + 180) % 360) / 360 * (tw - 1)
+        x0, y0 = px.astype(int), py.astype(int)
+        x1, y1 = (x0 + 1) % tw, np.minimum(y0 + 1, th - 1)
+        fx, fy = (px - x0)[..., None], (py - y0)[..., None]
+        top = tex[y0, x0] * (1 - fx) + tex[y0, x1] * fx
+        bot = tex[y1, x0] * (1 - fx) + tex[y1, x1] * fx
+        return top * (1 - fy) + bot * fy
+
+    f_lab = ImageFont.truetype(str(NEWS_B), 26)
+    inc = np.radians(55)
+    ff = imageio_ffmpeg.get_ffmpeg_exe()
+    proc = subprocess.Popen([ff, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
+                             "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "21", "-preset", "medium",
+                             "-movflags", "+faststart", str(OUT / "globe.mp4")], stdin=subprocess.PIPE)
+    n = int(GLOBE_T * FPS)
+    for k in range(n):
+        t = k / n
+        lc = 60 - 360 * t  # centre longitude: features drift west to east across the face
+        disc = sample(lon0 + lc) * shade + rim
+        fr = bg.copy()
+        sl = (slice(cy - S // 2, cy - S // 2 + S), slice(cx - S // 2, cx - S // 2 + S))
+        fr[sl] = fr[sl] * (1 - edge) + disc * edge
+        im = Image.fromarray(fr.clip(0, 255).astype(np.uint8))
+        d = ImageDraw.Draw(im, "RGBA")
+        # satellite orbit: two laps per loop, hidden behind the globe
+        pts = []
+        for a in np.linspace(0, 2 * np.pi, 240):
+            ox, oy, oz = np.cos(a), np.sin(a) * np.sin(inc), np.sin(a) * np.cos(inc)
+            pts.append((cx + ox * R * 1.28, cy - oy * R * 1.28, oz))
+        for (x1, y1, z1), (x2, y2, z2) in zip(pts, pts[1:]):
+            behind = z1 < 0 and (x1 - cx) ** 2 + (y1 - cy) ** 2 < R * R
+            if not behind:
+                d.line([(x1, y1), (x2, y2)], fill=(170, 190, 220, 70), width=2)
+        a = 2 * np.pi * 2 * t
+        sx, sy, sz = np.cos(a), np.sin(a) * np.sin(inc), np.sin(a) * np.cos(inc)
+        px_, py_ = cx + sx * R * 1.28, cy - sy * R * 1.28
+        if not (sz < 0 and (px_ - cx) ** 2 + (py_ - cy) ** 2 < R * R):
+            d.ellipse([px_ - 5, py_ - 5, px_ + 5, py_ + 5], fill=(255, 255, 255, 255))
+        # the two regions
+        for la, lo, name in PINS:
+            phi, lam = np.radians(la), np.radians(lo - lc)
+            Xw, Yw, Zw = np.cos(phi) * np.sin(lam), np.sin(phi), np.cos(phi) * np.cos(lam)
+            vy, vz = Yw * np.cos(tilt) - Zw * np.sin(tilt), Yw * np.sin(tilt) + Zw * np.cos(tilt)
+            if vz < 0.3:
+                continue
+            al = min(1, (vz - 0.3) / 0.2)
+            qx, qy = cx + Xw * R, cy - vy * R
+            ph = (t * 10) % 1  # 10 pulses per loop
+            rp = 6 + 26 * ph
+            d.ellipse([qx - rp, qy - rp, qx + rp, qy + rp], outline=(255, 232, 31, int(220 * (1 - ph) * al)), width=3)
+            d.ellipse([qx - 6, qy - 6, qx + 6, qy + 6], fill=(255, 232, 31, int(255 * al)))
+            g = -1 if Xw > 0.1 else 1  # label points away from the near limb
+            d.line([(qx + 10 * g, qy - 10), (qx + 46 * g, qy - 46), (qx + 66 * g, qy - 46)], fill=(255, 232, 31, int(200 * al)), width=2)
+            lx = qx + 74 if g > 0 else qx - 74 - d.textlength(name, font=f_lab)
+            d.text((lx, qy - 62), name, font=f_lab, fill=(255, 255, 255, int(255 * al)))
+        proc.stdin.write(im.tobytes())
+        if k == int(n * 0.08):
+            im.save(OUT / "globe_poster.png")
+    proc.stdin.close()
+    proc.wait()
+
+
 if __name__ == "__main__":
-    planet()
-    crops()
     crawl()
+    globe()
     print("assets in", OUT)

@@ -1,17 +1,28 @@
-# Furrow pitch deck (3 min, 7 slides)
+# Furrow pitch deck (3 min, 8 slides, English)
 
-`Furrow.pptx`: opening crawl video (~26 s, plays on its own), then 6 slides with Fly Through transitions
-(PowerPoint 2010+, plain fade elsewhere) and auto-playing builds. Speaker notes carry the timing (0:00–3:00). Numbers come from `web/public/data/*.json`.
+`Furrow.pptx`:
+
+| Slide | Time | What |
+|---|---|---|
+| 1 | 0:00–1:00 | Opening crawl video: the problem and why it matters. Read it aloud; it moves on by itself |
+| 2–5 | 1:00–2:15 | Live app screenshots: map, rotations and time machine, climate twin and trade-offs, Arizona water |
+| 6 | 2:15–2:30 | The assistant |
+| 7 | 2:30–2:45 | Models and the carver-ml pipeline |
+| 8 | 2:45–3:00 | Close over a looping video of the Earth turning (NASA Blue Marble), both regions marked |
+
+Fly Through transitions between slides (PowerPoint 2010+, plain fade elsewhere), auto-playing builds, speaker notes
+with timings. Numbers come from `web/public/data/*.json`.
 
 Rebuild:
 
 ```bash
 npm install pptxgenjs
 ../.venv/bin/python deck_data.py          # numbers from the app build
-python make_assets.py                     # needs pillow numpy imageio-ffmpeg: stars, planet, crawl.mp4
+(cd ../web && npx vite --port 5199) &     # then:
+node shoot.mjs                            # app screenshots at 2x through headless Chrome -> build/app_*.jpg
+python make_assets.py                     # pillow numpy imageio-ffmpeg: stars, crawl.mp4, globe.mp4
 node build.js && python3 animate.py       # -> Furrow.pptx
 ```
 
 Fonts (Google Fonts, SIL OFL): the slides use Libre Franklin, which Microsoft 365 also serves as a cloud font, so it
-shows on any machine with Office. The crawl video is set in News Cycle and Libre Franklin Black from `fonts/`,
-baked into the frames.
+shows on any machine with Office. The videos are set in News Cycle and Libre Franklin Black from `fonts/`.

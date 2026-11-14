@@ -65,7 +65,8 @@ def timing(xml, steps):
         if "media" in st:
             spid = ids[st["media"]]
             pars.append(media(nid, spid, st["dur"]))
-            extra = (f'<p:video><p:cMediaNode vol="80000"><p:cTn id="{{VID}}" fill="hold" display="0"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst>'
+            rep = ' repeatCount="indefinite"' if st.get("loop") else ""
+            extra = (f'<p:video><p:cMediaNode vol="80000"><p:cTn id="{{VID}}"{rep} fill="hold" display="0"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst>'
                      f'</p:cTn>{tgt(spid)}</p:cMediaNode></p:video>')
             first = False
             continue
@@ -105,7 +106,8 @@ def transition(n):
     """PowerPoint 2010+ 'Fly Through' between slides, like a jump to hyperspace; fade through black on the ends.
     Older readers take the plain fade in mc:Fallback."""
     if cfg["trans"].get(str(n)) == "fade":
-        return '<p:transition spd="slow"><p:fade thruBlk="1"/></p:transition>'
+        adv = cfg.get("adv", {}).get(str(n))
+        return f'<p:transition spd="slow"{f" advTm={chr(34)}{adv}{chr(34)}" if adv else ""}><p:fade thruBlk="1"/></p:transition>'
     return (f'<mc:AlternateContent {MC}><mc:Choice {P14} Requires="p14">'
             '<p:transition spd="slow" p14:dur="1400"><p14:flythrough/></p:transition></mc:Choice>'
             '<mc:Fallback><p:transition spd="slow"><p:fade/></p:transition></mc:Fallback></mc:AlternateContent>')
