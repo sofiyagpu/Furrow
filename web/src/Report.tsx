@@ -57,7 +57,7 @@ export default function Report({ r }: { r: Region }) {
           <div className="export">
             <div className="panel export-main">
               <h3 className="h-sm">{t('One-page report for the agronomist', 'Отчёт на одну страницу для агронома')}</h3>
-              <p className="small muted">{t('Strategies, worst year, +2 °C scenario, carbon, prices and limits. Opens the print dialog: choose Save as PDF.', 'Стратегии, худший год, сценарий +2 °C, углерод, цены и ограничения. Откроется печать: выберите «Сохранить как PDF».')}</p>
+              <p className="small muted">{t('Strategies, worst year, +2 °C scenario, carbon and prices. Opens the print dialog: choose Save as PDF.', 'Стратегии, худший год, сценарий +2 °C, углерод и цены. Откроется печать: выберите «Сохранить как PDF».')}</p>
               <button className="btn btn-solid" onClick={() => print()}>{t('Save the report as PDF', 'Сохранить отчёт в PDF')}</button>
             </div>
             <div className="panel">
@@ -141,7 +141,7 @@ export default function Report({ r }: { r: Region }) {
             </tbody>
           </table>
 
-          <h4>5. {t('Price and cost assumptions', 'Допущения по ценам и затратам')}</h4>
+          <h4>5. {t('Prices and costs', 'Цены и затраты')}</h4>
           <table className="tbl">
             <thead><tr><th>{t('Crop', 'Культура')}</th><th>{t('Price, $/t', 'Цена, $/т')}</th><th>{t('Cost, $/ha', 'Затраты, $/га')}</th><th>{t('Attainable yield, t/ha', 'Достижимый урожай, т/га')}</th></tr></thead>
             <tbody>
@@ -151,16 +151,8 @@ export default function Report({ r }: { r: Region }) {
             </tbody>
           </table>
 
-          <h4>6. {t('Read before you act', 'Прочитайте до решения')}</h4>
-          <ul className="list-plain small">
-            <li>{t('Model comparison over real weather years, not a yield or income promise.', 'Сравнение моделей на реальных годах погоды, а не обещание урожая или дохода.')}</li>
-            <li>{t("Replace prices and costs with this season's local numbers.", 'Замените цены и затраты местными цифрами этого сезона.')}</li>
-            <li>{t('Carbon credits need soil sampling and a registry audit (e.g. Verra VM0042).', 'Углеродные кредиты требуют отбора проб почвы и аудита реестра (например, Verra VM0042).')}</li>
-            <li>{t('Soil loss compares rotations; it is not an absolute measurement.', 'Эрозия сравнивает севообороты, это не абсолютное измерение.')}</li>
-          </ul>
           <p className="small doc-foot">
             NASA POWER, ISRIC SoilGrids 2.0, NASA GIBS (MODIS, SMAP, GPM IMERG, GRACE-FO). FAO-56, FAO-33, RWEQ/RUSLE, RothC-26.3, NSGA-II.
-            {' '}{t("Furrow supports the farmer's decision; it does not make it.", 'Furrow помогает фермеру решить, но не решает за него.')}
           </p>
         </article>
       </div>

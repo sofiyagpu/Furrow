@@ -212,7 +212,7 @@ function Page({ r }: { r: Region }) {
 
       <section className="sec" id="strategies">
         <div className="wrap">
-          <SecHead n="2" title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives. Hypotheses with assumed prices, not advice.', 'Текущая практика против трёх альтернатив. Гипотезы с допущенными ценами, не советы.')} />
+          <SecHead n="2" title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives.', 'Текущая практика против трёх альтернатив.')} />
           <div className="cards">
             {ref.map((s) => <StrategyCard key={s.id} r={r} s={s} />)}
           </div>
@@ -401,7 +401,7 @@ function Twin({ r }: { r: Region }) {
   return (
     <section className="sec" id="twin">
       <div className="wrap">
-        <SecHead n="4" title={t('Climate twin: the same field, warmer and drier', 'Климатический двойник: то же поле, теплее и суше')} sub={t('Historical weather shifted by a temperature and rainfall change. A scenario, not a forecast.', 'Историческая погода, сдвинутая по температуре и осадкам. Сценарий, а не прогноз.')} />
+        <SecHead n="4" title={t('Climate twin: the same field, warmer and drier', 'Климатический двойник: то же поле, теплее и суше')} sub={t('Historical weather shifted by a temperature and rainfall change.', 'Историческая погода, сдвинутая по температуре и осадкам.')} />
         <div className="two">
           <div className="panel">
             <Field label={`${t('Warming', 'Потепление')}: +${dT} °C`}>
@@ -550,8 +550,8 @@ function CarbonWater({ r }: { r: Region }) {
               </tbody>
             </table>
             <p className="small muted">
-              {t(`RothC-26.3, ${Math.round(r.assumptions.buffer * 100)}% buffer, $${r.assumptions.co2_price[0]}–${r.assumptions.co2_price[1]}/t. Paid only after soil sampling and a registry audit: an upper bound, not income.`,
-                `RothC-26.3, буфер ${Math.round(r.assumptions.buffer * 100)}%, $${r.assumptions.co2_price[0]}–${r.assumptions.co2_price[1]}/т. Платят только после отбора проб и аудита реестра: верхняя оценка, не доход.`)}
+              {t(`RothC-26.3, ${Math.round(r.assumptions.buffer * 100)}% buffer, $${r.assumptions.co2_price[0]}–${r.assumptions.co2_price[1]}/t.`,
+                `RothC-26.3, буфер ${Math.round(r.assumptions.buffer * 100)}%, $${r.assumptions.co2_price[0]}–${r.assumptions.co2_price[1]}/т.`)}
             </p>
           </div>
           <div className="panel">
@@ -571,7 +571,7 @@ function CarbonWater({ r }: { r: Region }) {
                     ))}
                   </tbody>
                 </table>
-                <p className="small muted">{t('GRACE-FO on the map shows the basin losing stored water; it cannot see one farm.', 'GRACE-FO на карте показывает потерю запасов воды бассейном; одно хозяйство он не видит.')}</p>
+                <p className="small muted">{t('GRACE-FO on the map shows the basin losing stored water.', 'GRACE-FO на карте показывает потерю запасов воды бассейном.')}</p>
               </>
             ) : (
               <>
@@ -604,8 +604,8 @@ function Method({ r }: { r: Region }) {
   return (
     <section className="sec" id="method">
       <div className="wrap">
-        <SecHead n="9" title={t('Method and limits', 'Метод и ограничения')} />
-        <div className="three">
+        <SecHead n="9" title={t('Method', 'Метод')} />
+        <div className="two" style={{ marginBottom: 16 }}>
           <div className="panel">
             <h3 className="h-sm">{t('Data', 'Данные')}</h3>
             <ul className="list-plain small">
@@ -622,14 +622,6 @@ function Method({ r }: { r: Region }) {
               <li>{t('RWEQ wind and RUSLE water erosion', 'Ветровая RWEQ и водная RUSLE эрозия')}</li>
               <li>{t('RothC-26.3 soil carbon', 'Почвенный углерод RothC-26.3')}</li>
               <li>{t('NSGA-II search (pymoo)', 'Поиск NSGA-II (pymoo)')}</li>
-            </ul>
-          </div>
-          <div className="panel">
-            <h3 className="h-sm">{t('What it will not tell you', 'Чего инструмент не скажет')}</h3>
-            <ul className="list-plain small">
-              <li>{t('A yield promise: every number is a range.', 'Обещание урожая: каждое число — диапазон.')}</li>
-              <li>{t('What to plant: you and your agronomist decide.', 'Что сеять: решаете вы и агроном.')}</li>
-              <li>{t('Absolute soil loss: values compare rotations.', 'Абсолютную эрозию: числа сравнивают севообороты.')}</li>
             </ul>
           </div>
         </div>
