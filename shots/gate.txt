@@ -1,1 +1,143 @@
 gate: checking dist/index.html (software); this takes a few minutes on a CPU Chrome
+gate: rounds used up; 46 FAIL open
+  FAIL no-visual        section#strategies "Four rotations to test with your agronom"  [1440, 390]
+       no picture, effect or mock in this section; a feature section needs a visual
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  FAIL cta              section#top > div.wrap.hero-grid > div.panel.hero-card "REFERENCE FIELD 23 soil cells Curr  [1440]
+       1 priced card with no action in or under it
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  FAIL cta              section#method "Method, data and limits"  [1440, 390]
+       the last section before the footer ends with no button
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  FAIL copy-headings    div.wrap > div.two > div.panel.chart:nth-of-type(1) > h3.h-sm "Profit per hectare by harve  [1440]
+       "Profit per hectare by harvest year" names no product, part, place or section (6 headings like it; at most one brand line per page) (and 5 more like it: "Carbon credits and the w", "Method, data and limits", "Data in thi
+       fix: name the thing in every heading: the product, a part, the place or a section noun
+  FAIL section-gaps     section#twin / section#tradeoffs  [1440]
+       282px between these sections, +76% against the median 161px
+       fix: use one gap between sections (all within 25% of each other)
+  FAIL section-gaps     section#carbon / section#method  [1440]
+       384px between these sections, +139% against the median 161px
+       fix: use one gap between sections (all within 25% of each other)
+  FAIL focus-visible    div.map-grid > div.map.maplibregl-map:nth-of-type(1) > div.maplibregl-canvas-container.map  [1440]
+       Tab stop 15, canvas "Map": the focus lands on something you cannot see
+       fix: keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus
+  FAIL moment-none      (the page)  [1440]
+       a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)
+       fix: deal one (moments.mjs pick --page software) and mount it in its own section
+  FAIL hero-screen      section#top "East Kazakhstan (Shemonaikha, Glubokoe)C"  [1440]
+       the hero ends at 961px on a 900px screen, 61px below the fold: it ends at the fold, 1px either way (SR-1)
+       fix: make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter
+  FAIL section-height   div#root > footer.foot "Weather: NASA POWER. Soil: ISRIC SoilGri"  [1440]
+       the section is 145px tall (0.2 screens), 756px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)
+       fix: set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit
+  FAIL section-height (screen-height) section#tradeoffs "Trade-off cockpit: 44 rotations nothing "  [1440, 390]
+       the section is 994px tall (1.1 screens), 94px over one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)
+       fix: set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit
+  FAIL section-height (screen-height) section#carbon "Carbon credits and the water budgetFarm "  [1440]
+       the section starts at 5555px, 155px below the screen grid (6 x 900px): sections start on whole screens (SR-2)
+       fix: make every section above it exactly one or two screens tall, so this one starts on a whole screen
+  FAIL section-height (screen-height) section#method "Method, data and limitsData in this demo"  [1440]
+       the section starts at 6455px, 155px below the screen grid (7 x 900px): sections start on whole screens (SR-2)
+       fix: make every section above it exactly one or two screens tall, so this one starts on a whole screen
+  FAIL one-section      div#root > footer.foot "Weather: NASA POWER. Soil: ISRIC SoilGri"  [1440]
+       the screen at scroll 6599px (the top of section 9) shows 144px of section 9 beside section 8: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL one-section      section#tradeoffs "Trade-off cockpit: 44 rotations nothing "  [1440]
+       the screen at scroll 5400px (stride 6) shows 94px of section 6 beside section 7: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL one-section (neighbour) section#carbon "Carbon credits and the water budgetFarm "  [1440, 390]
+       the screen at scroll 6300px (stride 7) shows 94px of section 7 beside section 8: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL container-edges  div#root > header.nav "furrow.MapStrategiesTime machineClimateT"  [1440]
+       the nav's first box starts at 108px and its last ends at 1329px, not on its .wrap at 108-1332px (SR-6)
+       fix: use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone
+  FAIL container-edges  div#root "Skip to contentfurrow.MapStrategiesTime "  [1440]
+       a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)
+       fix: build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing
+  FAIL container-edges  span#recharts_measurement_span "40"  [1440]
+       a <span> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)
+       fix: build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing
+  FAIL container-edges  section#top > div.wrap.hero-grid "East Kazakhstan (Shemonaikha, Glubokoe)C"  [1440]
+       the hero's .wrap holds 2 children, 0 of them .hero-text: one .hero-text and at most one strip (SR-6)
+       fix: build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing
+  FAIL container-edges  section#method > div.wrap > div.panel.chart > h3.h-sm "Climate of the reference field, NAS  [1440]
+       2 text blocks start on a left line at x 131, 23px from the container's left: text starts on the container's left, or on one split line (x 628, 732, 836) (also "Rain") (SR-6)
+       fix: start the text on the container's left, or on the one split line every split shares
+  FAIL row-lines        section#map > div.wrap > div.map-grid "Use ⌘ + scroll to zoom the mapUse two fi"  [1440]
+       a row of 2 items: its items are 558/705px tall, not one height (2px either way) (SR-7)
+       fix: start the row's first item on the container's left line and end its last on the right line, every item one height
+  FAIL split-pair       section#top > div.wrap.hero-grid "East Kazakhstan (Shemonaikha, Glubokoe)C"  [1440]
+       the two columns of the split start 81px apart at the top (centred on each other): a split's columns are top-aligned, 8px either way (SR-8)
+       fix: top-align both columns of the split (align-items: start)
+  FAIL no-visual        section#method "Method, data and limits"  [390]
+       pictures, effects and mocks cover 11% of this section; a feature section needs a visual (about 25% or more)
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  FAIL edge-left        #top div.panel.hero-card "Reference field23 soil cellsCurr"  [1440]
+       starts at x 775.8; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #map div.panel.side "Strategy on the mapCurrent: whea"  [1440]
+       starts at x 952; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #strategies article.panel.card "A. Diversify: wheat, lentil, fla"  [1440]
+       starts at x 418; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #strategies article.panel.card "B. Soil and forage: sainfoin 2 y"  [1440]
+       starts at x 728; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #strategies article.panel.card "C. Drought-tolerant: wheat, chic"  [1440]
+       starts at x 1038; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #time div.panel.chart "Soil water in 2008, mm in the ro"  [1440]
+       starts at x 806.8; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-right       #twin div.panel "Warming: +2 °CRainfall: -10%Stra"  [1440]
+       ends at x 790.8; the right line is 1332
+       fix: end it on the .wrap right line
+  FAIL edge-left        #twin div.panel.chart "Median profit per hectare, with "  [1440]
+       starts at x 806.8; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #tradeoffs div.panel.list "44 best trade-offs inside your l"  [1440]
+       starts at x 806.8; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-right       #carbon div.panel "Soil-carbon credits against curr"  [1440]
+       ends at x 790.8; the right line is 1332
+       fix: end it on the .wrap right line
+  FAIL edge-left        #carbon div.panel "Where the rain goes on a rain-fe"  [1440]
+       starts at x 806.8; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        #method div.panel "What this tool will not tell you"  [1440]
+       starts at x 934.7; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL edge-left        footer.foot span "NASA Space Apps 2026 · Adapting "  [1440]
+       starts at x 984; the lines are 108 and the column starts
+       fix: start it on the .wrap left line
+  FAIL one-sided        #twin section.sec "Climate twin: the same field, wa"  [1440]
+       its visuals end at x 790.8, short of the right line 1332
+       fix: let the row reach both .wrap edges
+  FAIL screen-height    #map section.sec "Field map with NASA layersUse ⌘ "  [1440]
+       900px, 1.07 screens; a section is exactly one or two (--h)
+       fix: make the section exactly one or two screens (--h: 1 or 2)
+  FAIL screen-height    #strategies section.sec "Four rotations to test with your"  [1440, 390]
+       900px, 1.07 screens; a section is exactly one or two (--h)
+       fix: make the section exactly one or two screens (--h: 1 or 2)
+  FAIL screen-height    #time section.sec "Time machine: replay every seaso"  [1440]
+       900px, 1.07 screens; a section is exactly one or two (--h)
+       fix: make the section exactly one or two screens (--h: 1 or 2)
+  FAIL screen-height    #twin section.sec "Climate twin: the same field, wa"  [1440]
+       900px, 1.07 screens; a section is exactly one or two (--h)
+       fix: make the section exactly one or two screens (--h: 1 or 2)
+  FAIL hero-fold        #top section.sec.hero "East Kazakhstan (Shemonaikha, Gl"  [1440, 390]
+       ends at y 961, past the fold (900): 1.07 screens tall
+       fix: the hero fills the first screen alone, its button inside it
+  FAIL neighbour        #map section.sec "Field map with NASA layersUse ⌘ "  [390]
+       framed, 68px of #strategies section.sec "Four rotations to test with your" shows
+       fix: keep the next section's heading and picture out of this screen
+  FAIL neighbour        #time section.sec "Time machine: replay every seaso"  [390]
+       framed, 104px of #twin section.sec "Climate twin: the same field, wa" shows
+       fix: keep the next section's heading and picture out of this screen
+  FAIL neighbour        #twin section.sec "Climate twin: the same field, wa"  [390]
+       framed, 128px of #tradeoffs section.sec "Trade-off cockpit: 44 rotations " shows
+       fix: keep the next section's heading and picture out of this screen
+  38 WARN (not blocking), first: no-visual section#twin "Climate twin: the same fie; no-visual section#tradeoffs "Trade-off cockpit: 44; no-visual section#method "Method, data and limits"; text-only section#carbon "Carbon credits and the w; copy-headline section#top > div.wrap.hero-grid > div:n
+Stop fixing: put these open FAILs and the waivers in your report, then finish.
+GATE: OPEN 46 (rounds used up)
