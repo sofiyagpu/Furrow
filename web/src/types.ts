@@ -104,6 +104,7 @@ export interface MlYear {
   bare_obs_dates?: number // satellite dates the cell was seen bare that year
   bare_months?: number[] // months (1-12) the cell was bare
   low_obs_months?: number[] // months with too few clear images to tell
+  lag_months?: number[] // months the crop lagged behind the same crop nearby (NDVI): a signal, not a diagnosis
 }
 
 export interface MlCell {

@@ -975,6 +975,11 @@ function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; deta
                   </span>
                 )}
                 {!v.bare_months && v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
+                {v.lag_months && v.lag_months.length > 0 && (
+                  <span className="small ml-lag" title={t('NDVI in the bottom 10% of the same crop nearby on the same dates: a signal to check with an agronomist, not a diagnosis', 'NDVI в нижних 10% той же культуры по соседству в те же даты: повод проверить с агрономом, а не диагноз')}>
+                    {t(`lagged behind the same crop nearby: ${months(v.lag_months, l)}`, `отставала от той же культуры по соседству: ${months(v.lag_months, l)}`)}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

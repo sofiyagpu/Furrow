@@ -115,6 +115,7 @@ a { color: inherit; }
 .ml-scale { font-size: 12px; font-weight: 500; }
 .ml-validation summary { cursor: pointer; }
 .ml-sm-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.ml-lag { color: #b4580e; }
 .ml-validation p { margin: 4px 0 0; }
 .ml-box.ml-cell { align-items: flex-start; }
 .ml-body { display: grid; gap: 6px; min-width: 0; }
