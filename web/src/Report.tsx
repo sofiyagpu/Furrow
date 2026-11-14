@@ -28,12 +28,14 @@ export default function Report({ r }: { r: Region }) {
   const strategiesCsv = () => download(`furrow-${r.id}-strategies.csv`, [
     ['strategy', 'rotation', 'practice', 'profit_p10_usd_ha', 'profit_p50_usd_ha', 'profit_p90_usd_ha', 'loss_years_share',
       'soil_loss_t_ha_yr', 'bare_days_yr', 'soc_change_t_c_ha_yr', 'pumped_mm_yr', 'co2e_t_ha_yr', 'credit_usd_ha_yr_low', 'credit_usd_ha_yr_high',
-      'worst_year', 'worst_year_profit_usd_ha', 'profit_p50_plus2c_minus10pct_rain'],
+      'worst_year', 'worst_year_profit_usd_ha', 'profit_p50_plus2c_minus10pct_rain',
+      'revenue_usd_ha_yr', 'mineral_n_kg_ha_yr', 'deep_market_revenue_share', 'water_stress_share'],
     ...S.map((s) => {
       const m = s.metrics, w = worstYear(s)
       return [s.id, rot(s.rotation), till(s.notill, s.irrigation), ...m.profit, m.loss_years,
         m.erosion, m.bare_days, m.dsoc, Math.round(m.irr[1]), s.carbon.t_co2_ha_yr, ...s.carbon.usd_ha_yr,
-        w.year, w.profit[1], i >= 0 && j >= 0 ? r.twin.grid[s.id][i][j].profit[1] : '']
+        w.year, w.profit[1], i >= 0 && j >= 0 ? r.twin.grid[s.id][i][j].profit[1] : '',
+        s.farm?.revenue ?? '', s.farm?.n_kg ?? '', s.farm?.deep_market ?? '', s.farm?.water_stress ?? '']
     }),
   ])
   const yearsCsv = () => download(`furrow-${r.id}-years.csv`, [

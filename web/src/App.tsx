@@ -679,7 +679,8 @@ function Method({ r }: { r: Region }) {
             <ul className="list-plain small">
               <li><strong>NASA POWER</strong> {t('daily weather', 'суточная погода')}, {r.years[0] - 1}–{r.years[1] + 1}</li>
               <li><strong>SoilGrids 2.0</strong> {t('soil, 0–30 cm', 'почва, 0–30 см')}</li>
-              <li><strong>NASA GIBS</strong> MODIS, SMAP, IMERG, GRACE-FO</li>
+              {r.smap && <li><strong>SMAP L4</strong> {t('root-zone moisture, check of the water balance', 'влага корневой зоны, проверка водного баланса')}</li>}
+              <li><strong>NASA GIBS</strong> {t('map layers', 'слои карты')}: MODIS, SMAP, IMERG, GRACE-FO</li>
               {mlCells(r).length > 0 && <li><strong>ML</strong> {mlTitle(r) || t('crop map', 'карта культур')}</li>}
             </ul>
           </div>
@@ -693,6 +694,7 @@ function Method({ r }: { r: Region }) {
             </ul>
           </div>
         </div>
+        <SmapPanel r={r} />
         <div className="panel chart">
           <h3 className="h-sm">{t('Climate of the reference field, NASA POWER monthly means', 'Климат опорного поля, средние NASA POWER по месяцам')}</h3>
           <ResponsiveContainer width="100%" height={180}>
@@ -709,6 +711,45 @@ function Method({ r }: { r: Region }) {
         </div>
       </div>
     </section>
+  )
+}
+
+// model root-zone water (mm) and SMAP (m3/m3) have different units: both as z-scores on one axis
+function SmapPanel({ r }: { r: Region }) {
+  const t = useT()
+  const sm = r.smap
+  if (!sm) return null
+  const z = (k: 1 | 2) => {
+    const v = sm.series.map((x) => x[k]), m = v.reduce((a, b) => a + b, 0) / v.length
+    const sd = Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length) || 1
+    return v.map((x) => +((x - m) / sd).toFixed(2))
+  }
+  const zs = z(1), zm = z(2)
+  const rows = sm.series.map((x, i) => ({ date: x[0], smap: zs[i], model: zm[i], sm: x[1], mm: x[2] }))
+  const f = (v: number) => v.toFixed(2).replace('.', t('.', ','))
+  return (
+    <div className="panel chart" style={{ marginBottom: 16 }}>
+      <h3 className="h-sm">{t('Check: model soil water against SMAP at the reference field', 'Проверка: влага почвы в модели против SMAP на опорном поле')}</h3>
+      <ResponsiveContainer width="100%" height={200}>
+        <ComposedChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <CartesianGrid stroke="var(--grid)" vertical={false} />
+          <XAxis dataKey="date" tickFormatter={(d) => String(d).slice(0, 4)} interval={35} tick={{ fontSize: 12 }} stroke="var(--muted)" />
+          <YAxis tick={{ fontSize: 12 }} stroke="var(--muted)" width={32} />
+          <ReferenceLine y={0} stroke="var(--ink)" strokeOpacity={0.3} />
+          <Tooltip content={({ payload }) => {
+            const d = payload?.[0]?.payload
+            return d ? <div className="tip"><strong>{d.date}</strong><br />SMAP {f(d.sm)} {t('m³/m³', 'м³/м³')}<br />{t('model', 'модель')} {Math.round(d.mm)} {t('mm', 'мм')}</div> : null
+          }} />
+          <Line dataKey="smap" stroke={SC.current} strokeWidth={2} dot={false} isAnimationActive={false} name="SMAP" />
+          <Line dataKey="model" stroke={SC.A} strokeWidth={2} dot={false} isAnimationActive={false} name={t('Model', 'Модель')} />
+        </ComposedChart>
+      </ResponsiveContainer>
+      <div className="legend"><span><i style={{ background: SC.current }} />SMAP L4, {t('root zone', 'корневая зона')}</span><span><i style={{ background: SC.A }} />{t('Model, current practice', 'Модель, текущая практика')}</span></div>
+      <p className="small muted">
+        {t(`r = ${f(sm.r)} on ${sm.n} dates, ${f(sm.r_anom)} with the seasonal cycle removed. Both lines in standard units. SMAP is a 9 km grid read from NASA GIBS colour tables, so a cell is a district average, not one field.`,
+          `r = ${f(sm.r)} на ${sm.n} датах, ${f(sm.r_anom)} без сезонного хода. Обе линии в стандартных единицах. SMAP — сетка 9 км, прочитанная по цветовым таблицам NASA GIBS: это среднее по округе, а не одно поле.`)}
+      </p>
+    </div>
   )
 }
 

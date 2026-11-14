@@ -195,7 +195,7 @@ def smap_check(rid, h3_cell, dekads):
     obs = dict(zip(sm["dates"], sm["cells"].get(h3_cell, [])))
     pairs = []
     for d, sw, *_ in dekads:
-        nxt = (np.datetime64(d) + 1).astype(str)
+        nxt = (np.datetime64(d) + np.timedelta64(1, "D")).astype(str)
         if obs.get(nxt) is not None:
             pairs.append((nxt, obs[nxt], sw))
     if len(pairs) < 24:

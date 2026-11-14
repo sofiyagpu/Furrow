@@ -249,3 +249,14 @@ input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* farmer priorities */
+.prio { display: grid; gap: 16px; margin-bottom: 16px; }
+.prio-in { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.prio .lead-cell { font-weight: 600; }
+.fit { display: inline-block; vertical-align: middle; width: 64px; height: 6px; margin-right: 8px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.fit i { display: block; height: 100%; border-radius: 3px; }
+.why p + p { margin-top: 6px; }
+.badge.best { margin-left: 8px; vertical-align: 3px; background: var(--accent); color: #00222a; }
+@media (max-width: 900px) { .prio-in { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .prio-in { grid-template-columns: 1fr; } .prio .tbl { display: block; overflow-x: auto; } }
