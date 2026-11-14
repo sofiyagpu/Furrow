@@ -11,4 +11,4 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) new Lenis({ anchors: true })
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) new Lenis({ autoRaf: true, anchors: true })
