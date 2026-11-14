@@ -1,8 +1,8 @@
 {
   "model": "fs_ml bare-season rule (HLS L30 NDVI, ESA WorldCover cropland)",
   "version": "2026-11-14",
-  "validation": "культуры не классифицировались: для этого региона нет меток (CDL есть только в США); пашня — ESA WorldCover 2021, класс Cropland, 10 м → сетка 30 м по преобладающему классу; HLS L30 2019–2021, месяцы 05–09, даты по годам: 2019 — 24, 2020 — 18, 2021 — 24; месяц голый, если NDVI < 0.3 на половине чистых дат месяца или больше (Fmask биты 1–3 — облака); fallow — чёрный пар: пиксель пашни голый во все месяцы пика сезона (06, 07) с наблюдениями, их не меньше 2; в пик сезона любая культура зелёная; cropped — пашня, зелёная в пик сезона; какая культура — неизвестно; доли пашни по числу лет чёрного пара за 2019–2021: 0 лет — 93%, 1 лет — 7%, 2 лет — 0%, 3 лет — 0%; detail — только очаги голой земли: ячейки H3 res 8, где чёрный пар хотя бы в один год занимал не меньше 20% пашни; цвет — fallow, если хотя бы в один год чёрный пар занимал не меньше половины пашни ячейки (доля — максимум по годам); порог 0.3 вместо 0.2 (Аризона): голая почва здесь темнее; по HLS в начале мая 2021, до всходов, NDVI пашни — медиана 0.21–0.24, 75-й процентиль 0.25–0.29; проверки по наземным данным нет: это правило по снимкам, не обученная модель",
-  "validation_en": "crops were not classified: no labels exist for this region (CDL covers the US only); cropland from ESA WorldCover 2021 (class Cropland, 10 m, mode to 30 m); HLS L30 2019–2021, months 05–09; a month counts as bare when NDVI < 0.3 on at least half of its clear images; fallow = black fallow: a cropland pixel bare in every observed peak-season month (06, 07, at least 2); every crop is green then; cropped = cropland green in the peak season; which crop is unknown; share of cropland by years of black fallow in 2019–2021: 0: 93%, 1: 7%, 2: 0%, 3: 0%; detail shows bare-land hotspots only: H3 res 8 cells where black fallow covered at least 20% of cropland in some year; coloured fallow when black fallow covered at least half of the cell's cropland in some year (share = that maximum); threshold 0.3 instead of 0.2 (Arizona): bare soil is darker here; in early May 2021, before emergence, cropland NDVI had a median of 0.21–0.24 and a 75th percentile of 0.25–0.29; no ground check: a rule on satellite images, not a trained model",
+  "validation": "культуры не классифицировались: для этого региона нет меток (CDL есть только в США); пашня — ESA WorldCover 2021, класс Cropland, 10 м → сетка 30 м по преобладающему классу; HLS L30 2019–2021, месяцы 05–09, даты по годам: 2019 — 24, 2020 — 18, 2021 — 24; месяц голый, если NDVI < 0.3 на половине чистых дат месяца или больше (Fmask биты 1–3 — облака); fallow — чёрный пар: пиксель пашни голый во все месяцы пика сезона (06, 07) с наблюдениями, их не меньше 2; в пик сезона любая культура зелёная; cropped — пашня, зелёная в пик сезона; какая культура — неизвестно; доли пашни по числу лет чёрного пара за 2019–2021: 0 лет — 93%, 1 лет — 7%, 2 лет — 0%, 3 лет — 0%; detail — только очаги голой земли: ячейки H3 res 8, где чёрный пар хотя бы в один год занимал не меньше 20% пашни; цвет: fallow — пар ≥ 50% пашни ячейки хотя бы в один год, fallow_part — 20–50% (доля — максимум по годам); порог 0.3 вместо 0.2 (Аризона): голая почва здесь темнее; по HLS в начале мая 2021, до всходов, NDVI пашни — медиана 0.21–0.24, 75-й процентиль 0.25–0.29; проверки по наземным данным нет: это правило по снимкам, не обученная модель",
+  "validation_en": "crops were not classified: no labels exist for this region (CDL covers the US only); cropland from ESA WorldCover 2021 (class Cropland, 10 m, mode to 30 m); HLS L30 2019–2021, months 05–09; a month counts as bare when NDVI < 0.3 on at least half of its clear images; fallow = black fallow: a cropland pixel bare in every observed peak-season month (06, 07, at least 2); every crop is green then; cropped = cropland green in the peak season; which crop is unknown; share of cropland by years of black fallow in 2019–2021: 0: 93%, 1: 7%, 2: 0%, 3: 0%; detail shows bare-land hotspots only: H3 res 8 cells where black fallow covered at least 20% of cropland in some year; colour: fallow = black fallow ≥ 50% of the cell's cropland in at least one year, fallow_part = 20–50% (share = the maximum over years); threshold 0.3 instead of 0.2 (Arizona): bare soil is darker here; in early May 2021, before emergence, cropland NDVI had a median of 0.21–0.24 and a 75th percentile of 0.25–0.29; no ground check: a rule on satellite images, not a trained model",
   "cells": {
     "852044a3fffffff": {
       "crop": "cropped 100%",
@@ -661,8 +661,8 @@
       },
       "882044a315fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.793,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.207,
         "years": {
           "2019": {
             "crop": "cropped 79%, fallow 21%",
@@ -685,8 +685,8 @@
       },
       "882044a31dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.645,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.355,
         "years": {
           "2019": {
             "crop": "cropped 64%, fallow 36%",
@@ -717,8 +717,8 @@
       },
       "882044a43dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5783,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4217,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -779,8 +779,8 @@
       },
       "882044a49dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6734,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3266,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -809,8 +809,8 @@
       },
       "882044a4d3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7879,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2121,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -839,8 +839,8 @@
       },
       "882044a4d7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7657,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2343,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -869,8 +869,8 @@
       },
       "882044a58bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6976,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3024,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -899,8 +899,8 @@
       },
       "882044a5d5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5612,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4388,
         "years": {
           "2019": {
             "crop": "cropped 56%, fallow 44%",
@@ -930,8 +930,8 @@
       },
       "882044a5d7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7483,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2517,
         "years": {
           "2019": {
             "crop": "cropped 75%, fallow 25%",
@@ -989,8 +989,8 @@
       },
       "882044a63bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6082,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3918,
         "years": {
           "2019": {
             "crop": "cropped 61%, fallow 39%",
@@ -1016,8 +1016,8 @@
       },
       "882044a6e9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6706,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3294,
         "years": {
           "2019": {
             "crop": "cropped 67%, fallow 33%",
@@ -1114,8 +1114,8 @@
       },
       "882044ad13fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7131,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2869,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -1176,8 +1176,8 @@
       },
       "882044ad17fffff": {
         "crop": "cropped 84%, fallow 16%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7643,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2357,
         "years": {
           "2019": {
             "crop": "cropped 97%, fallow 3%",
@@ -1207,8 +1207,8 @@
       },
       "882044ad19fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.762,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.238,
         "years": {
           "2019": {
             "crop": "cropped 76%, fallow 24%",
@@ -1236,8 +1236,8 @@
       },
       "882044ad1bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6169,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3831,
         "years": {
           "2019": {
             "crop": "cropped 80%, fallow 20%",
@@ -1266,8 +1266,8 @@
       },
       "882044ad1dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7717,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2283,
         "years": {
           "2019": {
             "crop": "cropped 79%, fallow 21%",
@@ -1364,8 +1364,8 @@
       },
       "882044ad81fffff": {
         "crop": "cropped 70%, fallow 30%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5499,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4501,
         "years": {
           "2019": {
             "crop": "cropped 87%, fallow 13%",
@@ -1594,8 +1594,8 @@
       },
       "882044adc9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6832,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3168,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -1624,8 +1624,8 @@
       },
       "882044adcdfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7186,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2814,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -1687,8 +1687,8 @@
       },
       "882044ade5fffff": {
         "crop": "cropped 99%, fallow 1%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7475,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2525,
         "years": {
           "2019": {
             "crop": "cropped 93%, fallow 7%",
@@ -1749,8 +1749,8 @@
       },
       "882044adebfffff": {
         "crop": "cropped 77%, fallow 23%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.77,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.23,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -1778,8 +1778,8 @@
       },
       "882044adedfffff": {
         "crop": "cropped 99%, fallow 1%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.784,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.216,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -1809,8 +1809,8 @@
       },
       "882044b003fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7919,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2081,
         "years": {
           "2019": {
             "crop": "cropped 79%, fallow 21%",
@@ -1839,8 +1839,8 @@
       },
       "882044b00bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7107,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2893,
         "years": {
           "2019": {
             "crop": "cropped 71%, fallow 29%",
@@ -1871,8 +1871,8 @@
       },
       "882044b015fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7838,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2162,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -1902,8 +1902,8 @@
       },
       "882044b04dfffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.727,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.273,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2221,8 +2221,8 @@
       },
       "882044b131fffff": {
         "crop": "cropped 56%, fallow 44%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.556,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.444,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2409,8 +2409,8 @@
       },
       "882044b18dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7985,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2015,
         "years": {
           "2019": {
             "crop": "cropped 80%, fallow 20%",
@@ -2442,8 +2442,8 @@
       },
       "882044b1c5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7687,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2313,
         "years": {
           "2019": {
             "crop": "cropped 77%, fallow 23%",
@@ -2470,8 +2470,8 @@
       },
       "882044b1c7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7255,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2745,
         "years": {
           "2019": {
             "crop": "cropped 73%, fallow 27%",
@@ -2503,8 +2503,8 @@
       },
       "882044b1e3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5452,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4548,
         "years": {
           "2019": {
             "crop": "cropped 55%, fallow 45%",
@@ -2564,8 +2564,8 @@
       },
       "882044b201fffff": {
         "crop": "cropped 69%, fallow 31%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6936,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3064,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2656,8 +2656,8 @@
       },
       "882044b209fffff": {
         "crop": "cropped 66%, fallow 34%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6603,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3397,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2684,8 +2684,8 @@
       },
       "882044b20dfffff": {
         "crop": "cropped 77%, fallow 23%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7655,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2345,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2708,8 +2708,8 @@
       },
       "882044b217fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7503,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2497,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2737,8 +2737,8 @@
       },
       "882044b219fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5383,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4617,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2767,8 +2767,8 @@
       },
       "882044b21bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5469,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4531,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2830,8 +2830,8 @@
       },
       "882044b225fffff": {
         "crop": "cropped 55%, fallow 45%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5514,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4486,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2862,8 +2862,8 @@
       },
       "882044b227fffff": {
         "crop": "cropped 55%, fallow 45%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5543,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4457,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -2957,8 +2957,8 @@
       },
       "882044b22dfffff": {
         "crop": "cropped 82%, fallow 18%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5327,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4673,
         "years": {
           "2019": {
             "crop": "cropped 53%, fallow 47%",
@@ -2984,8 +2984,8 @@
       },
       "882044b231fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7637,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2363,
         "years": {
           "2019": {
             "crop": "cropped 87%, fallow 13%",
@@ -3016,8 +3016,8 @@
       },
       "882044b233fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7856,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2144,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -3238,8 +3238,8 @@
       },
       "882044b247fffff": {
         "crop": "cropped 53%, fallow 47%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5303,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4697,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3397,8 +3397,8 @@
       },
       "882044b269fffff": {
         "crop": "cropped 56%, fallow 44%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5564,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4436,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3457,8 +3457,8 @@
       },
       "882044b28bfffff": {
         "crop": "cropped 56%, fallow 44%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5595,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4405,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3521,8 +3521,8 @@
       },
       "882044b299fffff": {
         "crop": "cropped 75%, fallow 25%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7457,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2543,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3650,8 +3650,8 @@
       },
       "882044b2e3fffff": {
         "crop": "cropped 65%, fallow 35%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6544,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3456,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3712,8 +3712,8 @@
       },
       "882044b2ebfffff": {
         "crop": "cropped 70%, fallow 30%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7025,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2975,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -3777,8 +3777,8 @@
       },
       "882044b305fffff": {
         "crop": "cropped 58%, fallow 42%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5826,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4174,
         "years": {
           "2019": {
             "crop": "cropped 98%, fallow 2%",
@@ -3906,8 +3906,8 @@
       },
       "882044b347fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7299,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2701,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4037,8 +4037,8 @@
       },
       "882044b357fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6605,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3395,
         "years": {
           "2019": {
             "crop": "cropped 66%, fallow 34%",
@@ -4295,8 +4295,8 @@
       },
       "882044b41dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.787,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.213,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4422,8 +4422,8 @@
       },
       "882044b66bfffff": {
         "crop": "cropped 55%, fallow 45%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5526,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4474,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4455,8 +4455,8 @@
       },
       "882044b743fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5842,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4158,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4487,8 +4487,8 @@
       },
       "882044b74bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5288,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4712,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4582,8 +4582,8 @@
       },
       "882044b869fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7096,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2904,
         "years": {
           "2019": {
             "crop": "cropped 71%, fallow 29%",
@@ -4614,8 +4614,8 @@
       },
       "882044b931fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7344,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2656,
         "years": {
           "2019": {
             "crop": "cropped 97%, fallow 3%",
@@ -4677,8 +4677,8 @@
       },
       "882044b935fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5951,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4049,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4707,8 +4707,8 @@
       },
       "882044b937fffff": {
         "crop": "cropped 62%, fallow 38%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5931,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4069,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4734,8 +4734,8 @@
       },
       "882044b93bfffff": {
         "crop": "cropped 81%, fallow 19%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5371,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4629,
         "years": {
           "2019": {
             "crop": "cropped 54%, fallow 46%",
@@ -4764,8 +4764,8 @@
       },
       "882044b9e5fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.78,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.22,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -4788,8 +4788,8 @@
       },
       "882044b9edfffff": {
         "crop": "cropped 82%, fallow 18%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4,
         "years": {
           "2019": {
             "crop": "cropped 60%, fallow 40%",
@@ -4852,8 +4852,8 @@
       },
       "882044ba03fffff": {
         "crop": "cropped 68%, fallow 32%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6786,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3214,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -4913,8 +4913,8 @@
       },
       "882044ba13fffff": {
         "crop": "cropped 75%, fallow 25%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7495,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2505,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5006,8 +5006,8 @@
       },
       "882044ba1dfffff": {
         "crop": "cropped 80%, fallow 20%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7976,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2024,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5257,8 +5257,8 @@
       },
       "882044bad5fffff": {
         "crop": "cropped 64%, fallow 36%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.64,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.36,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5288,8 +5288,8 @@
       },
       "882044bae9fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7343,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2657,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5314,8 +5314,8 @@
       },
       "882044bb19fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6695,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3305,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5379,8 +5379,8 @@
       },
       "882044bb41fffff": {
         "crop": "cropped 58%, fallow 42%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5768,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4232,
         "years": {
           "2019": {
             "crop": "cropped 89%, fallow 11%",
@@ -5500,8 +5500,8 @@
       },
       "8820459303fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5615,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4385,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5530,8 +5530,8 @@
       },
       "8820459309fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.561,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.439,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5591,8 +5591,8 @@
       },
       "8820459319fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7358,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2642,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5622,8 +5622,8 @@
       },
       "882045931dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7943,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2057,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5652,8 +5652,8 @@
       },
       "8820459349fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6961,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3039,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -5683,8 +5683,8 @@
       },
       "882045934bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6927,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3073,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5709,8 +5709,8 @@
       },
       "882045934dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7004,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2996,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -5740,8 +5740,8 @@
       },
       "8820459351fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.65,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.35,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5832,8 +5832,8 @@
       },
       "8820459361fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6688,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3312,
         "years": {
           "2019": {
             "crop": "cropped 67%, fallow 33%",
@@ -5897,8 +5897,8 @@
       },
       "882045c143fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5633,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4367,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5960,8 +5960,8 @@
       },
       "882045c249fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7968,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2032,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -5990,8 +5990,8 @@
       },
       "882045c2b1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6723,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3277,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6020,8 +6020,8 @@
       },
       "882045c2b3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.716,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.284,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6048,8 +6048,8 @@
       },
       "882045c2b9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7675,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2325,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6141,8 +6141,8 @@
       },
       "882045d007fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7424,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2576,
         "years": {
           "2019": {
             "crop": "cropped 74%, fallow 26%",
@@ -6300,8 +6300,8 @@
       },
       "882045d047fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7874,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2126,
         "years": {
           "2019": {
             "crop": "cropped 79%, fallow 21%",
@@ -6331,8 +6331,8 @@
       },
       "882045d133fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6567,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3433,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6361,8 +6361,8 @@
       },
       "882045d135fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6197,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3803,
         "years": {
           "2019": {
             "crop": "cropped 62%, fallow 38%",
@@ -6459,8 +6459,8 @@
       },
       "882045d195fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6333,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3667,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6522,8 +6522,8 @@
       },
       "882045d1abfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6891,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3109,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6615,8 +6615,8 @@
       },
       "882045d2c9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6993,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3007,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6646,8 +6646,8 @@
       },
       "882045d339fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6677,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3323,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6705,8 +6705,8 @@
       },
       "882045d8d9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6829,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3171,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -6763,8 +6763,8 @@
       },
       "882045dac1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7071,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2929,
         "years": {
           "2019": {
             "crop": "cropped 71%, fallow 29%",
@@ -6825,8 +6825,8 @@
       },
       "8820634001fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7732,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2268,
         "years": {
           "2019": {
             "crop": "cropped 77%, fallow 23%",
@@ -6860,8 +6860,8 @@
       },
       "882063400dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7556,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2444,
         "years": {
           "2019": {
             "crop": "cropped 76%, fallow 24%",
@@ -6957,8 +6957,8 @@
       },
       "8820634027fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6462,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3538,
         "years": {
           "2019": {
             "crop": "cropped 93%, fallow 7%",
@@ -6987,8 +6987,8 @@
       },
       "882063402bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5892,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4108,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7051,8 +7051,8 @@
       },
       "88206340adfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7584,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2416,
         "years": {
           "2019": {
             "crop": "cropped 76%, fallow 24%",
@@ -7083,8 +7083,8 @@
       },
       "8820634185fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6432,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3568,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7114,8 +7114,8 @@
       },
       "8820634193fffff": {
         "crop": "cropped 68%, fallow 32%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6799,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3201,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7177,8 +7177,8 @@
       },
       "88206341abfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7079,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2921,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7207,8 +7207,8 @@
       },
       "88206341adfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5108,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4892,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7238,8 +7238,8 @@
       },
       "88206341e1fffff": {
         "crop": "cropped 67%, fallow 33%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6667,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3333,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7355,8 +7355,8 @@
       },
       "882063421dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7702,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2298,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7389,8 +7389,8 @@
       },
       "8820634229fffff": {
         "crop": "cropped 98%, fallow 2%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7331,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2669,
         "years": {
           "2019": {
             "crop": "cropped 96%, fallow 4%",
@@ -7422,8 +7422,8 @@
       },
       "8820634243fffff": {
         "crop": "cropped 97%, fallow 3%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7589,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2411,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7451,8 +7451,8 @@
       },
       "8820634245fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7225,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2775,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7531,8 +7531,8 @@
       },
       "8820634253fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6887,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3113,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7558,8 +7558,8 @@
       },
       "8820634255fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7069,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2931,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7670,8 +7670,8 @@
       },
       "882063425dfffff": {
         "crop": "cropped 99%, fallow 1%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5098,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4902,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7695,8 +7695,8 @@
       },
       "882063426bfffff": {
         "crop": "cropped 98%, fallow 2%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7882,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2118,
         "years": {
           "2019": {
             "crop": "cropped 95%, fallow 5%",
@@ -7720,8 +7720,8 @@
       },
       "882063428dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7578,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2422,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7749,8 +7749,8 @@
       },
       "8820634291fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6545,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3455,
         "years": {
           "2019": {
             "crop": "cropped 97%, fallow 3%",
@@ -7779,8 +7779,8 @@
       },
       "8820634295fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7813,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2187,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7809,8 +7809,8 @@
       },
       "8820634299fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6846,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3154,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7839,8 +7839,8 @@
       },
       "882063429dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5887,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4113,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7869,8 +7869,8 @@
       },
       "88206342b1fffff": {
         "crop": "cropped 95%, fallow 5%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7309,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2691,
         "years": {
           "2019": {
             "crop": "cropped 96%, fallow 4%",
@@ -7904,8 +7904,8 @@
       },
       "88206342bdfffff": {
         "crop": "cropped 86%, fallow 14%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6746,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3254,
         "years": {
           "2019": {
             "crop": "cropped 94%, fallow 6%",
@@ -7936,8 +7936,8 @@
       },
       "88206342c1fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7308,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2692,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -7969,8 +7969,8 @@
       },
       "88206342c5fffff": {
         "crop": "cropped 72%, fallow 28%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.718,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.282,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8000,8 +8000,8 @@
       },
       "88206342cdfffff": {
         "crop": "cropped 70%, fallow 30%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6984,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3016,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8062,8 +8062,8 @@
       },
       "8820634359fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7476,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2524,
         "years": {
           "2019": {
             "crop": "cropped 95%, fallow 5%",
@@ -8089,8 +8089,8 @@
       },
       "882063435bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5688,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4312,
         "years": {
           "2019": {
             "crop": "cropped 97%, fallow 3%",
@@ -8117,8 +8117,8 @@
       },
       "882063436bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7244,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2756,
         "years": {
           "2019": {
             "crop": "cropped 98%, fallow 2%",
@@ -8150,8 +8150,8 @@
       },
       "8820634409fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5276,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4724,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8246,8 +8246,8 @@
       },
       "8820634415fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7253,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2747,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8310,8 +8310,8 @@
       },
       "8820634419fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7841,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2159,
         "years": {
           "2019": {
             "crop": "cropped 84%, fallow 16%",
@@ -8340,8 +8340,8 @@
       },
       "882063441bfffff": {
         "crop": "cropped 57%, fallow 43%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5526,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4474,
         "years": {
           "2019": {
             "crop": "cropped 55%, fallow 45%",
@@ -8370,8 +8370,8 @@
       },
       "8820634425fffff": {
         "crop": "cropped 61%, fallow 39%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6096,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3904,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8402,8 +8402,8 @@
       },
       "8820634429fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6698,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3302,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8533,8 +8533,8 @@
       },
       "8820634453fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6392,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3608,
         "years": {
           "2019": {
             "crop": "cropped 64%, fallow 36%",
@@ -8565,8 +8565,8 @@
       },
       "8820634457fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6565,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3435,
         "years": {
           "2019": {
             "crop": "cropped 66%, fallow 34%",
@@ -8630,8 +8630,8 @@
       },
       "8820634465fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.555,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.445,
         "years": {
           "2019": {
             "crop": "cropped 77%, fallow 23%",
@@ -8663,8 +8663,8 @@
       },
       "8820634467fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7757,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2243,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -8763,8 +8763,8 @@
       },
       "8820634481fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6085,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3915,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8795,8 +8795,8 @@
       },
       "8820634485fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7037,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2963,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8826,8 +8826,8 @@
       },
       "882063448dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6503,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3497,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8857,8 +8857,8 @@
       },
       "88206344b5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5991,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4009,
         "years": {
           "2019": {
             "crop": "cropped 60%, fallow 40%",
@@ -8887,8 +8887,8 @@
       },
       "88206344c1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6974,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3026,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -8918,8 +8918,8 @@
       },
       "88206344c5fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7827,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2173,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -8947,8 +8947,8 @@
       },
       "88206344c9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7408,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2592,
         "years": {
           "2019": {
             "crop": "cropped 74%, fallow 26%",
@@ -8978,8 +8978,8 @@
       },
       "88206344cbfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7983,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2017,
         "years": {
           "2019": {
             "crop": "cropped 80%, fallow 20%",
@@ -9009,8 +9009,8 @@
       },
       "88206344cdfffff": {
         "crop": "cropped 69%, fallow 31%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5115,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4885,
         "years": {
           "2019": {
             "crop": "cropped 51%, fallow 49%",
@@ -9069,8 +9069,8 @@
       },
       "88206344e5fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7762,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2238,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9095,8 +9095,8 @@
       },
       "88206344e9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5872,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4128,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9126,8 +9126,8 @@
       },
       "88206344ebfffff": {
         "crop": "cropped 79%, fallow 21%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7872,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2128,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9156,8 +9156,8 @@
       },
       "88206344edfffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7275,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2725,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9221,8 +9221,8 @@
       },
       "8820634553fffff": {
         "crop": "cropped 60%, fallow 40%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5963,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4037,
         "years": {
           "2019": {
             "crop": "cropped 93%, fallow 7%",
@@ -9251,8 +9251,8 @@
       },
       "8820634559fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5844,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4156,
         "years": {
           "2019": {
             "crop": "cropped 80%, fallow 20%",
@@ -9281,8 +9281,8 @@
       },
       "882063455bfffff": {
         "crop": "cropped 87%, fallow 13%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7012,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2988,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -9345,8 +9345,8 @@
       },
       "882063456bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7772,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2228,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9441,8 +9441,8 @@
       },
       "88206345d3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7415,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2585,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9469,8 +9469,8 @@
       },
       "88206345d9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5016,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4984,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9499,8 +9499,8 @@
       },
       "8820634601fffff": {
         "crop": "cropped 98%, fallow 2%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6028,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3972,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -9604,8 +9604,8 @@
       },
       "8820634609fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6936,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3064,
         "years": {
           "2019": {
             "crop": "cropped 69%, fallow 31%",
@@ -9663,8 +9663,8 @@
       },
       "8820634619fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6747,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3253,
         "years": {
           "2019": {
             "crop": "cropped 67%, fallow 33%",
@@ -9694,8 +9694,8 @@
       },
       "882063463dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7918,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2082,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -9721,8 +9721,8 @@
       },
       "8820634643fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.692,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.308,
         "years": {
           "2019": {
             "crop": "cropped 69%, fallow 31%",
@@ -9753,8 +9753,8 @@
       },
       "8820634647fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.69,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.31,
         "years": {
           "2019": {
             "crop": "cropped 69%, fallow 31%",
@@ -9997,8 +9997,8 @@
       },
       "882063466dfffff": {
         "crop": "cropped 75%, fallow 25%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.749,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.251,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10118,8 +10118,8 @@
       },
       "88206346a9fffff": {
         "crop": "cropped 75%, fallow 25%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7538,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2462,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10147,8 +10147,8 @@
       },
       "88206346e1fffff": {
         "crop": "cropped 84%, fallow 16%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7873,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2127,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10278,8 +10278,8 @@
       },
       "8820634713fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5482,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4518,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10311,8 +10311,8 @@
       },
       "8820634715fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5234,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4766,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10343,8 +10343,8 @@
       },
       "8820634717fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5094,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4906,
         "years": {
           "2019": {
             "crop": "cropped 51%, fallow 49%",
@@ -10413,8 +10413,8 @@
       },
       "8820634733fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6678,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3322,
         "years": {
           "2019": {
             "crop": "cropped 80%, fallow 20%",
@@ -10545,8 +10545,8 @@
       },
       "8820634811fffff": {
         "crop": "cropped 52%, fallow 48%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5218,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4782,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10738,8 +10738,8 @@
       },
       "8820634831fffff": {
         "crop": "cropped 98%, fallow 2%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7951,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2049,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10767,8 +10767,8 @@
       },
       "8820634835fffff": {
         "crop": "cropped 79%, fallow 21%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7851,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2149,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10859,8 +10859,8 @@
       },
       "8820634853fffff": {
         "crop": "cropped 59%, fallow 41%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5939,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4061,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -10924,8 +10924,8 @@
       },
       "8820634865fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6395,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3605,
         "years": {
           "2019": {
             "crop": "cropped 64%, fallow 36%",
@@ -11022,8 +11022,8 @@
       },
       "8820634883fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7483,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2517,
         "years": {
           "2019": {
             "crop": "cropped 75%, fallow 25%",
@@ -11085,8 +11085,8 @@
       },
       "8820634887fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7805,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2195,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11114,8 +11114,8 @@
       },
       "8820634889fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7089,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2911,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11206,8 +11206,8 @@
       },
       "8820634893fffff": {
         "crop": "cropped 53%, fallow 47%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5265,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4735,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11235,8 +11235,8 @@
       },
       "8820634895fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5067,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4933,
         "years": {
           "2019": {
             "crop": "cropped 51%, fallow 49%",
@@ -11330,8 +11330,8 @@
       },
       "882063489dfffff": {
         "crop": "cropped 61%, fallow 39%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6097,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3903,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11492,8 +11492,8 @@
       },
       "88206348adfffff": {
         "crop": "cropped 70%, fallow 30%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.702,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.298,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11522,8 +11522,8 @@
       },
       "88206348b5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7817,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2183,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11617,8 +11617,8 @@
       },
       "88206348d9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7588,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2412,
         "years": {
           "2019": {
             "crop": "cropped 76%, fallow 24%",
@@ -11684,8 +11684,8 @@
       },
       "88206348edfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7229,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2771,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11716,8 +11716,8 @@
       },
       "8820634901fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5349,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4651,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11842,8 +11842,8 @@
       },
       "882063490bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.626,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.374,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11872,8 +11872,8 @@
       },
       "882063490dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6508,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3492,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11933,8 +11933,8 @@
       },
       "882063492bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.609,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.391,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -11964,8 +11964,8 @@
       },
       "8820634943fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.542,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.458,
         "years": {
           "2019": {
             "crop": "cropped 54%, fallow 46%",
@@ -12027,8 +12027,8 @@
       },
       "882063494bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6786,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3214,
         "years": {
           "2019": {
             "crop": "cropped 68%, fallow 32%",
@@ -12058,8 +12058,8 @@
       },
       "8820634951fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5958,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4042,
         "years": {
           "2019": {
             "crop": "cropped 60%, fallow 40%",
@@ -12122,8 +12122,8 @@
       },
       "8820634957fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5958,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4042,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12149,8 +12149,8 @@
       },
       "8820634959fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6512,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3488,
         "years": {
           "2019": {
             "crop": "cropped 79%, fallow 21%",
@@ -12182,8 +12182,8 @@
       },
       "882063495bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6415,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3585,
         "years": {
           "2019": {
             "crop": "cropped 70%, fallow 30%",
@@ -12213,8 +12213,8 @@
       },
       "882063495dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5434,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4566,
         "years": {
           "2019": {
             "crop": "cropped 54%, fallow 46%",
@@ -12312,8 +12312,8 @@
       },
       "8820634985fffff": {
         "crop": "cropped 89%, fallow 11%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.533,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.467,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12408,8 +12408,8 @@
       },
       "8820634997fffff": {
         "crop": "cropped 62%, fallow 38%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6209,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3791,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12435,8 +12435,8 @@
       },
       "882063499dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6253,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3747,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12466,8 +12466,8 @@
       },
       "88206349a1fffff": {
         "crop": "cropped 62%, fallow 38%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6215,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3785,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12629,8 +12629,8 @@
       },
       "88206349d3fffff": {
         "crop": "cropped 68%, fallow 32%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6772,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3228,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12660,8 +12660,8 @@
       },
       "88206349d7fffff": {
         "crop": "cropped 86%, fallow 14%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5761,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4239,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12725,8 +12725,8 @@
       },
       "88206349e1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7278,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2722,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12756,8 +12756,8 @@
       },
       "88206349e7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7968,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2032,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12856,8 +12856,8 @@
       },
       "8820634a09fffff": {
         "crop": "cropped 99%, fallow 1%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6925,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3075,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12921,8 +12921,8 @@
       },
       "8820634a1dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7024,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2976,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12948,8 +12948,8 @@
       },
       "8820634a21fffff": {
         "crop": "cropped 98%, fallow 2%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6548,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3452,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -12978,8 +12978,8 @@
       },
       "8820634a23fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5628,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4372,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13070,8 +13070,8 @@
       },
       "8820634a8bfffff": {
         "crop": "cropped 62%, fallow 38%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6209,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3791,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13192,8 +13192,8 @@
       },
       "8820634aa7fffff": {
         "crop": "cropped 74%, fallow 26%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7422,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2578,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13223,8 +13223,8 @@
       },
       "8820634ad1fffff": {
         "crop": "cropped 57%, fallow 43%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5732,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4268,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13252,8 +13252,8 @@
       },
       "8820634ad3fffff": {
         "crop": "cropped 78%, fallow 22%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7803,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2197,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13412,8 +13412,8 @@
       },
       "8820634ae5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.652,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.348,
         "years": {
           "2019": {
             "crop": "cropped 65%, fallow 35%",
@@ -13478,8 +13478,8 @@
       },
       "8820634aebfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6438,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3562,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13509,8 +13509,8 @@
       },
       "8820634aedfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5344,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4656,
         "years": {
           "2019": {
             "crop": "cropped 95%, fallow 5%",
@@ -13569,8 +13569,8 @@
       },
       "8820634b05fffff": {
         "crop": "cropped 93%, fallow 7%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6894,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3106,
         "years": {
           "2019": {
             "crop": "cropped 69%, fallow 31%",
@@ -13602,8 +13602,8 @@
       },
       "8820634b07fffff": {
         "crop": "cropped 86%, fallow 14%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7782,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2218,
         "years": {
           "2019": {
             "crop": "cropped 78%, fallow 22%",
@@ -13700,8 +13700,8 @@
       },
       "8820634b23fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7388,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2612,
         "years": {
           "2019": {
             "crop": "cropped 74%, fallow 26%",
@@ -13731,8 +13731,8 @@
       },
       "8820634b29fffff": {
         "crop": "cropped 99%, fallow 1%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6575,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3425,
         "years": {
           "2019": {
             "crop": "cropped 66%, fallow 34%",
@@ -13932,8 +13932,8 @@
       },
       "8820634b49fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7642,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2358,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -13963,8 +13963,8 @@
       },
       "8820634b4bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7969,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2031,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -13994,8 +13994,8 @@
       },
       "8820634b51fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.526,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.474,
         "years": {
           "2019": {
             "crop": "cropped 53%, fallow 47%",
@@ -14025,8 +14025,8 @@
       },
       "8820634b5dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6785,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3215,
         "years": {
           "2019": {
             "crop": "cropped 68%, fallow 32%",
@@ -14058,8 +14058,8 @@
       },
       "8820634b61fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.558,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.442,
         "years": {
           "2019": {
             "crop": "cropped 56%, fallow 44%",
@@ -14087,8 +14087,8 @@
       },
       "8820634c23fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.618,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.382,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14183,8 +14183,8 @@
       },
       "8820634c2bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.666,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.334,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14214,8 +14214,8 @@
       },
       "8820634c2dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7764,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2236,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14242,8 +14242,8 @@
       },
       "8820634c31fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6045,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3955,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14274,8 +14274,8 @@
       },
       "8820634c8dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6747,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3253,
         "years": {
           "2019": {
             "crop": "cropped 67%, fallow 33%",
@@ -14301,8 +14301,8 @@
       },
       "8820634cc1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7739,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2261,
         "years": {
           "2019": {
             "crop": "cropped 77%, fallow 23%",
@@ -14332,8 +14332,8 @@
       },
       "8820634cc5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7449,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2551,
         "years": {
           "2019": {
             "crop": "cropped 74%, fallow 26%",
@@ -14462,8 +14462,8 @@
       },
       "8820634d19fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6617,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3383,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14521,8 +14521,8 @@
       },
       "8820634d27fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7621,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2379,
         "years": {
           "2019": {
             "crop": "cropped 99%, fallow 1%",
@@ -14549,8 +14549,8 @@
       },
       "8820634d4dfffff": {
         "crop": "cropped 77%, fallow 23%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7658,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2342,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14578,8 +14578,8 @@
       },
       "8820634d93fffff": {
         "crop": "cropped 76%, fallow 24%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7625,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2375,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14607,8 +14607,8 @@
       },
       "8820634d95fffff": {
         "crop": "cropped 61%, fallow 39%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6137,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3863,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14673,8 +14673,8 @@
       },
       "8820634d99fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6472,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3528,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14702,8 +14702,8 @@
       },
       "8820634d9dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7751,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2249,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14732,8 +14732,8 @@
       },
       "8820634da1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6359,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3641,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14762,8 +14762,8 @@
       },
       "8820634da5fffff": {
         "crop": "cropped 86%, fallow 14%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5138,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4862,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14792,8 +14792,8 @@
       },
       "8820634dadfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7025,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2975,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14823,8 +14823,8 @@
       },
       "8820634db1fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.62,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.38,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14852,8 +14852,8 @@
       },
       "8820634db5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5037,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4963,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14948,8 +14948,8 @@
       },
       "8820634dbdfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.612,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.388,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -14979,8 +14979,8 @@
       },
       "8820634dc9fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7968,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2032,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15010,8 +15010,8 @@
       },
       "8820634dd3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5493,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4507,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15039,8 +15039,8 @@
       },
       "8820634ddbfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5285,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4715,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15169,8 +15169,8 @@
       },
       "8820634e25fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7321,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2679,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15263,8 +15263,8 @@
       },
       "8820634e3dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6458,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3542,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15290,8 +15290,8 @@
       },
       "8820634e81fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6639,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3361,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15318,8 +15318,8 @@
       },
       "8820634e83fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7644,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2356,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15346,8 +15346,8 @@
       },
       "8820634e9bfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5495,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4505,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15473,8 +15473,8 @@
       },
       "8820634f3dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.59,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.41,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15500,8 +15500,8 @@
       },
       "8820636011fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5456,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4544,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15525,8 +15525,8 @@
       },
       "88206360b3fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7875,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2125,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15553,8 +15553,8 @@
       },
       "88206360c7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7262,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2738,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15580,8 +15580,8 @@
       },
       "8820636253fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7914,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2086,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15671,8 +15671,8 @@
       },
       "8820636411fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6828,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3172,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -15766,8 +15766,8 @@
       },
       "8820636445fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6081,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3919,
         "years": {
           "2019": {
             "crop": "cropped 61%, fallow 39%",
@@ -15922,8 +15922,8 @@
       },
       "88206364edfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5812,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4188,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16019,8 +16019,8 @@
       },
       "8820636685fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6364,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3636,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16112,8 +16112,8 @@
       },
       "88206366a7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5953,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4047,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16144,8 +16144,8 @@
       },
       "88206366abfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5571,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4429,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16172,8 +16172,8 @@
       },
       "88206366b5fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6417,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3583,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16260,8 +16260,8 @@
       },
       "8820636703fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5175,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4825,
         "years": {
           "2019": {
             "crop": "cropped 52%, fallow 48%",
@@ -16291,8 +16291,8 @@
       },
       "8820636717fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5059,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4941,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16353,8 +16353,8 @@
       },
       "8820636733fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.735,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.265,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16381,8 +16381,8 @@
       },
       "8820636739fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.525,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.475,
         "years": {
           "2019": {
             "crop": "cropped 52%, fallow 48%",
@@ -16443,8 +16443,8 @@
       },
       "8820636a45fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7766,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2234,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16472,8 +16472,8 @@
       },
       "8820636b49fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6517,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3483,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16498,8 +16498,8 @@
       },
       "8820636b59fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7964,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2036,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16560,8 +16560,8 @@
       },
       "8820636ee7fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7311,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2689,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16588,8 +16588,8 @@
       },
       "8820637089fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7485,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2515,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16614,8 +16614,8 @@
       },
       "8820637289fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.5697,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.4303,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16643,8 +16643,8 @@
       },
       "882063728dfffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7943,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2057,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16672,8 +16672,8 @@
       },
       "8820637309fffff": {
         "crop": "cropped 65%, fallow 35%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6496,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3504,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16737,8 +16737,8 @@
       },
       "882063736bfffff": {
         "crop": "cropped 62%, fallow 38%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.6191,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.3809,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16770,8 +16770,8 @@
       },
       "8820637949fffff": {
         "crop": "cropped 71%, fallow 29%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7067,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2933,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16799,8 +16799,8 @@
       },
       "8820637951fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7079,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2921,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16894,8 +16894,8 @@
       },
       "8820637a49fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7622,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2378,
         "years": {
           "2019": {
             "crop": "cropped 76%, fallow 24%",
@@ -16922,8 +16922,8 @@
       },
       "8820637a61fffff": {
         "crop": "cropped 100%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7441,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2559,
         "years": {
           "2019": {
             "crop": "cropped 100%",
@@ -16953,8 +16953,8 @@
       },
       "8820637b01fffff": {
         "crop": "cropped 73%, fallow 27%",
-        "crop_top": "cropped",
-        "crop_top_share": 0.7278,
+        "crop_top": "fallow_part",
+        "crop_top_share": 0.2722,
         "years": {
           "2019": {
             "crop": "cropped 100%",
