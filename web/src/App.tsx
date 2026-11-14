@@ -238,7 +238,8 @@ const LEVEL: [string, string][] = [['ignore', 'не важно'], ['some', 'не
 // price slider: crop prices change revenue only, costs stay (pct = -0.3..0.3)
 const atPrice = (s: Strategy, pct: number, v: number) => v + pct * (s.farm?.revenue ?? 0)
 
-// score 0-1 relative to these four strategies; best per dimension = 1, worst = 0
+// score 0-1 relative to these four strategies, on a ratio scale so a 15% gap stays a 15% gap
+// (min-max would turn 210 vs 241 kg N into 1 vs 0). Best per dimension = 1.
 function fitScores(r: Region, pct: number, w: Weights) {
   const S = r.strategies
   if (!S.every((s) => s.farm)) return null // data built before the priorities existed
@@ -251,7 +252,8 @@ function fitScores(r: Region, pct: number, w: Weights) {
   const up: Record<Dim, boolean> = { profit: true, water: false, market: true, n: false }
   const part = Object.fromEntries(DIMS.map((d) => {
     const v = raw[d], lo = Math.min(...v), hi = Math.max(...v)
-    return [d, v.map((x) => (hi === lo ? 1 : up[d] ? (x - lo) / (hi - lo) : (hi - x) / (hi - lo)))]
+    const f = (x: number) => (hi <= 0 ? (x === hi ? 1 : 0) : up[d] ? x / hi : 1 - (x - lo) / hi)
+    return [d, v.map((x) => Math.max(0, Math.min(1, f(x))))]
   })) as Record<Dim, number[]>
   const tot = DIMS.reduce((a, d) => a + w[d], 0)
   const score = S.map((_, i) => (tot ? DIMS.reduce((a, d) => a + w[d] * part[d][i], 0) / tot : 0))
@@ -282,7 +284,11 @@ function Priorities({ r, price, setPrice, w, setW, fit }: {
   }
   const on = DIMS.filter((d) => w[d] > 0)
   const strong = on.filter((d) => fit.part[d][fit.bi] > 0.99).map((d) => name[d].toLowerCase())
-  const weak = on.filter((d) => fit.part[d][fit.bi] < 0.34).map((d) => name[d].toLowerCase())
+  const weak = on.filter((d) => fit.part[d][fit.bi] < 0.75).map((d) => name[d].toLowerCase())
+  const col: Record<Dim, string> = {
+    profit: t('Profit', 'Прибыль'), water: r.irrigated ? t('Pumped', 'Откачка') : t('Water shortfall', 'Недобор воды'),
+    market: t('Deep market', 'Ходовой рынок'), n: t('N bought', 'Покупной азот'),
+  }
   const best = r.strategies[fit.bi]
   return (
     <div className="panel prio">
@@ -299,7 +305,7 @@ function Priorities({ r, price, setPrice, w, setW, fit }: {
         </label>
       </div>
       <table className="tbl">
-        <thead><tr><th>{t('Strategy', 'Стратегия')}</th>{DIMS.map((d) => <th key={d} title={hint[d]}>{name[d]}</th>)}<th>{t('Fit', 'Подходит')}</th></tr></thead>
+        <thead><tr><th>{t('Strategy', 'Стратегия')}</th>{DIMS.map((d) => <th key={d} title={hint[d]}>{col[d]}</th>)}<th>{t('Fit', 'Подходит')}</th></tr></thead>
         <tbody>
           {r.strategies.map((s, i) => (
             <tr key={s.id}>
@@ -313,13 +319,13 @@ function Priorities({ r, price, setPrice, w, setW, fit }: {
       <p className="small">
         {on.length ? <>
           <strong>{t('Best fit', 'Лучше всего подходит')}: {short(best, l)}.</strong>{' '}
-          {strong.length > 0 && t(`Leads on ${strong.join(', ')}.`, `Лучшая по пунктам: ${strong.join(', ')}.`)}{' '}
-          {weak.length > 0 && t(`Gives up ${weak.join(', ')}.`, `Уступает по пунктам: ${weak.join(', ')}.`)}
+          {strong.length > 0 && t(`Leads on: ${strong.join(', ')}.`, `Лидирует: ${strong.join(', ')}.`)}{' '}
+          {weak.length > 0 && t(`Falls behind on: ${weak.join(', ')}.`, `Отстаёт: ${weak.join(', ')}.`)}
         </> : t('Turn on at least one priority.', 'Включите хотя бы один приоритет.')}
       </p>
       <p className="small muted">
-        {t(`Columns: ${DIMS.map((d) => `${name[d].toLowerCase()} = ${hint[d]}`).join('; ')}. Fit is relative to these four. Nitrogen and market depth are assumptions to check with an agronomist.`,
-          `Столбцы: ${DIMS.map((d) => `${name[d].toLowerCase()} — ${hint[d]}`).join('; ')}. «Подходит» — относительно этих четырёх. Азот и глубина рынка — допущения, проверьте с агрономом.`)}
+        {t(`${DIMS.map((d) => `${col[d]}: ${hint[d]}`).join('. ')}. Fit is relative to these four. Nitrogen rates and market depth are assumptions to check with an agronomist.`,
+          `${DIMS.map((d) => `${col[d]}: ${hint[d]}`).join('. ')}. «Подходит» — относительно этих четырёх. Нормы азота и глубина рынка — допущения, проверьте с агрономом.`)}
       </p>
     </div>
   )
