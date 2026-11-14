@@ -282,7 +282,8 @@ def soundtrack(length):
 
 
 def add_audio(video, length):
-    """Mux a soundtrack into the crawl. AUDIO=/path/to/licensed.mp3 uses your own file instead."""
+    """Mux a soundtrack into the crawl. AUDIO=/path/to/track.mp3 uses your own file instead, levelled down
+    to a quiet bed (about -30 LUFS) so the speaker's voice stays on top."""
     import os
     import wave
     src = os.environ.get("AUDIO")
@@ -294,9 +295,15 @@ def add_audio(video, length):
             w.setsampwidth(2)
             w.setframerate(SR)
             w.writeframes(a.tobytes())
+    if os.environ.get("AUDIO"):
+        # your track: its opening hit (at the start of the file) lands on the logo at 3.8 s, levelled to a quiet bed
+        af = f"adelay=3600:all=1,loudnorm=I=-30:TP=-9:LRA=11,afade=t=out:st={length - 3}:d=3"
+    else:
+        af = f"afade=t=in:d=1,afade=t=out:st={length - 3}:d=3"
     tmp = OUT / "crawl_av.mp4"
     subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video), "-i", src, "-map", "0:v", "-map", "1:a",
-                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-af", f"afade=t=out:st={length - 3}:d=3", "-t", str(length),
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-t", str(length),
+                    "-af", af,
                     "-movflags", "+faststart", str(tmp)], check=True)
     tmp.replace(video)
 
