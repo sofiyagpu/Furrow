@@ -3,7 +3,7 @@ import type { Region } from './types'
 
 // Light agent: answers from the precomputed results only, never invents a number.
 // ponytail: keyword intents, swap for an LLM with these JSON results as tools if the demo needs free chat.
-const usd = (v: number) => `$${Math.round(v)}`
+const usd = (v: number) => `${v < 0 ? 'minus ' : ''}$${Math.abs(Math.round(v))}`
 
 export function answer(q: string, r: Region): string {
   const s = r.strategies

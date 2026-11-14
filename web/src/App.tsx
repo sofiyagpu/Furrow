@@ -41,7 +41,7 @@ export default function App() {
           </nav>
           {r && <Agent key={rid} region={r} />}
           <div className="seg" role="group" aria-label="Region">
-            <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>East Kazakhstan</button>
+            <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>Kazakhstan</button>
             <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>Arizona</button>
           </div>
         </div>
