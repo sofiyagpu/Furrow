@@ -26,11 +26,30 @@ const ML_CROPS: Record<string, [string, string]> = {
   fallow: ['Fallow', 'Пар'],
   barley: ['Barley', 'Ячмень'],
   wheat: ['Wheat', 'Пшеница'],
+  small_grains: ['Small grains', 'Зерновые'],
 }
 export const mlCrop = (key: string, l: Lang) => ML_CROPS[key]?.[l === 'ru' ? 1 : 0] ?? key
+// a composition "fallow 29%, corn 19% (низкая достоверность)": translate the class keys and the low-confidence mark
+export const mlText = (text: string, l: Lang) =>
+  text.replace(/\b[a-z_]+\b/g, (k) => (k in ML_CROPS ? mlCrop(k, l) : k)).replace(/\(низкая достоверность\)/g, l === 'ru' ? '(низкая достоверность)' : '(low confidence)')
+// validation in the page language: validation_en in English when present, else the file's validation as written
+export const mlValidation = (r: Region, l: Lang) => (l === 'en' ? r.ml?.validation_en ?? r.ml?.validation : r.ml?.validation)
+
+// detail map colours by crop_top; other keys fall back to grey
+export const ML_COLOURS: Record<string, string> = { alfalfa: '#8e6cf0', corn: '#f5b301', cotton: '#f2f2f2', fallow: '#9c5a2e', small_grains: '#ef7fa8', barley: '#ef7fa8', wheat: '#e3d26f' }
+export const ML_OTHER_COLOUR = '#8a8a8a'
+
+const MONTHS: [string, string][] = [['Jan', 'янв'], ['Feb', 'фев'], ['Mar', 'мар'], ['Apr', 'апр'], ['May', 'май'], ['Jun', 'июн'], ['Jul', 'июл'], ['Aug', 'авг'], ['Sep', 'сен'], ['Oct', 'окт'], ['Nov', 'ноя'], ['Dec', 'дек']]
+export const months = (ms: number[], l: Lang) => ms.filter((m) => m >= 1 && m <= 12).map((m) => MONTHS[m - 1][l === 'ru' ? 1 : 0]).join(', ')
+
+// detail cells that can be drawn (outline from build.py, grid cell in this region)
+export const mlDetail = (r: Region) => {
+  const grid = new Set(r.cells.map((c) => c.h3))
+  return Object.entries(r.ml?.detail?.cells ?? {}).filter(([, c]) => c.b && c.b.length >= 3 && c.p && grid.has(c.p))
+}
 
 // a cell counts as having ML data only if it carries something to show
-export const mlHas = (c?: MlCell) => !!c && (!!c.crop || !!c.low_confidence || Object.keys(c.years ?? {}).length > 0)
+export const mlHas = (c?: MlCell) => !!c && (!!c.crop || !!c.crop_top || !!c.low_confidence || Object.keys(c.years ?? {}).length > 0)
 
 // region cells with ML data; [] when the file or `cells` is missing or empty
 export const mlCells = (r: Region) => r.cells.filter((c) => mlHas(r.ml?.cells?.[c.h3])).map((c) => c.h3)

@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Region } from './types'
-import { useT, useLang, usd, mlCells, mlHas } from './fmt'
+import { useT, useLang, usd, mlCells, mlHas, mlDetail, mlCrop, ML_COLOURS, ML_OTHER_COLOUR } from './fmt'
 
 maplibregl.setWorkerUrl(workerUrl) // bundlers lose maplibre's own relative worker path
 
@@ -32,15 +32,26 @@ export function cellValue(r: Region, h3: string, sid: string, m: MetricKey) {
 const RAMP = ['#c7402c', '#e0803a', '#e8c24c', '#a6c957', '#57a552']
 const RGB = RAMP.map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)))
 
-type P = { region: Region; strategy: string; metric: MetricKey; layer: NasaLayer; selected: string; onSelect: (h3: string) => void }
+// detail: an ML detail cell (finer H3) inside `selected`, or null; clicking one selects its grid cell and the detail cell
+type P = {
+  region: Region; strategy: string; metric: MetricKey; layer: NasaLayer; selected: string; onSelect: (h3: string) => void
+  detail?: string | null; onSelectDetail?: (h3: string | null) => void
+}
 
 export default function MapView(props: P) {
-  const t = useT(), ru = useLang() === 'ru'
+  const t = useT(), l = useLang(), ru = l === 'ru'
   const box = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const pins = useRef<maplibregl.Marker[]>([])
   const latest = useRef(props)
   latest.current = props
+  const detailCells = mlDetail(props.region)
+  const [showDetail, setShowDetail] = useState(true)
+  const showRef = useRef(showDetail) // read by the map's load handler
+  useEffect(() => { showRef.current = showDetail }, [showDetail])
+  const detailOn = showDetail && detailCells.length > 0
+  const detailCrops = [...new Set(detailCells.map(([, c]) => c.crop_top).filter((k): k is string => !!k))]
+    .sort((a, b) => detailCells.filter(([, c]) => c.crop_top === b).length - detailCells.filter(([, c]) => c.crop_top === a).length)
 
   useEffect(() => {
     const m = new maplibregl.Map({
@@ -71,7 +82,25 @@ export default function MapView(props: P) {
       m.addLayer({ id: 'edge', type: 'line', source: 'cells', paint: { 'line-color': '#ffffff', 'line-opacity': 0.85, 'line-width': 1.5 } })
       m.addLayer({ id: 'sel', type: 'line', source: 'cells', filter: ['==', ['get', 'h3'], p.selected], paint: { 'line-color': '#ffffff', 'line-width': 4 } })
       m.addLayer({ id: 'ml', type: 'line', source: 'cells', filter: ['==', ['get', 'ml'], true], paint: { 'line-color': '#00e5ff', 'line-width': 2.5, 'line-dasharray': [2, 1.5] } })
-      m.on('click', 'cells', (e: maplibregl.MapLayerMouseEvent) => e.features?.[0] && latest.current.onSelect(e.features[0].properties!.h3))
+      if (mlDetail(p.region).length) {
+        m.addSource('mld', { type: 'geojson', data: detailGeo(p.region) })
+        const vis = showRef.current ? 'visible' : 'none'
+        m.addLayer({ id: 'mld', type: 'fill', source: 'mld', layout: { visibility: vis }, paint: { 'fill-color': ['coalesce', ['get', 'colour'], ML_OTHER_COLOUR], 'fill-opacity': 0.78 } })
+        m.addLayer({ id: 'mld-edge', type: 'line', source: 'mld', layout: { visibility: vis }, paint: { 'line-color': '#1b1b1b', 'line-opacity': 0.35, 'line-width': 0.5 } })
+        m.addLayer({ id: 'mld-sel', type: 'line', source: 'mld', layout: { visibility: vis }, filter: ['==', ['get', 'h3'], p.detail ?? ''], paint: { 'line-color': '#00e5ff', 'line-width': 3 } })
+      }
+      // one click handler: a visible detail cell under the pointer wins, else the grid cell
+      m.on('click', 'cells', (e: maplibregl.MapLayerMouseEvent) => {
+        const cur = latest.current
+        const fine = m.getLayer('mld') && m.getLayoutProperty('mld', 'visibility') !== 'none' ? m.queryRenderedFeatures(e.point, { layers: ['mld'] })[0] : undefined
+        if (fine && cur.region.cells.some((c) => c.h3 === fine.properties!.p)) {
+          cur.onSelect(fine.properties!.p)
+          cur.onSelectDetail?.(fine.properties!.h3)
+        } else if (e.features?.[0]) {
+          cur.onSelect(e.features[0].properties!.h3)
+          cur.onSelectDetail?.(null)
+        }
+      })
       m.on('mouseenter', 'cells', () => (m.getCanvas().style.cursor = 'pointer'))
       m.on('mouseleave', 'cells', () => (m.getCanvas().style.cursor = ''))
       setNasa(m, p.layer)
@@ -98,6 +127,20 @@ export default function MapView(props: P) {
     m.setPaintProperty('field', 'raster-opacity', fieldOpacity(props.layer))
   }, [props.layer])
 
+  useEffect(() => {
+    const m = map.current
+    if (!m?.getLayer('mld')) return // layers exist once loaded; isStyleLoaded() is false while the field image updates
+    for (const id of ['mld', 'mld-edge', 'mld-sel']) m.setLayoutProperty(id, 'visibility', showDetail ? 'visible' : 'none')
+    m.setFilter('mld-sel', ['==', ['get', 'h3'], props.detail ?? ''])
+  }, [showDetail, props.detail])
+
+  const zoomToDetail = () => {
+    const pts = detailCells.flatMap(([, c]) => c.b!)
+    if (!map.current || !pts.length) return
+    const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1])
+    map.current.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, duration: 800 })
+  }
+
   return (
     <div className="map-wrap">
       <div ref={box} className="map" data-lenis-prevent role="region" aria-label={`Map of ${props.region.name}`} />
@@ -105,7 +148,20 @@ export default function MapView(props: P) {
         <div className="map-legend-bar">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</div>
         <div className="row-between small"><span>{t('worse', 'хуже')}</span><span>{t('better', 'лучше')}</span></div>
         <p className="map-legend-note">{t('Within this region, smoothed between cell centres', 'Внутри региона, сглажено между центрами ячеек')}</p>
-        {mlCells(props.region).length > 0 && <p className="map-legend-ml small"><i />{t('cell has ML data', 'есть ML-данные')}</p>}
+        {(mlCells(props.region).length > 0 || detailCells.length > 0) && <p className="map-legend-ml small"><i />{t('cell has ML data', 'есть ML-данные')}</p>}
+        {detailCells.length > 0 && (
+          <div className="map-legend-detail">
+            <label className="small"><input type="checkbox" checked={showDetail} onChange={(e) => setShowDetail(e.target.checked)} /> {t('ML crop map, field scale', 'ML-карта культур, масштаб поля')}</label>
+            {detailOn && (
+              <>
+                <ul className="map-legend-crops">
+                  {detailCrops.map((k) => <li key={k}><i style={{ background: ML_COLOURS[k] ?? ML_OTHER_COLOUR }} />{mlCrop(k, l)}</li>)}
+                </ul>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={zoomToDetail}>{t('Zoom to the fields', 'Приблизить к полям')}</button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -129,12 +185,25 @@ function flip(b: Region['bbox']): [[number, number], [number, number]] {
 const centre = (b: [number, number][]) => [b.reduce((s, p) => s + p[0], 0) / b.length, b.reduce((s, p) => s + p[1], 0) / b.length]
 
 function geo(r: Region) {
+  const withDetail = new Set(mlDetail(r).map(([, c]) => c.p))
   return {
     type: 'FeatureCollection' as const,
     features: r.cells.map((c) => ({
       type: 'Feature' as const,
-      properties: { h3: c.h3, ml: mlHas(r.ml?.cells?.[c.h3]) },
+      properties: { h3: c.h3, ml: mlHas(r.ml?.cells?.[c.h3]) || withDetail.has(c.h3) },
       geometry: { type: 'Polygon' as const, coordinates: [[...c.b, c.b[0]]] },
+    })),
+  }
+}
+
+// ML detail cells (finer H3), coloured by their largest class
+function detailGeo(r: Region) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: mlDetail(r).map(([h, c]) => ({
+      type: 'Feature' as const,
+      properties: { h3: h, p: c.p!, colour: (c.crop_top && ML_COLOURS[c.crop_top]) || ML_OTHER_COLOUR },
+      geometry: { type: 'Polygon' as const, coordinates: [[...c.b!, c.b![0]]] },
     })),
   }
 }

@@ -8,7 +8,7 @@ import Agent from './Agent'
 import Report from './Report'
 import { SecHead } from './SecHead'
 import type { Region, Strategy } from './types'
-import { SC, usd, short, sname, cropShort, rname, mlCrop, mlCells, mlHas, LangCtx, useLang, useT, type Lang } from './fmt'
+import { SC, usd, short, sname, cropShort, rname, mlCrop, mlText, mlCells, mlHas, mlDetail, mlValidation, months, LangCtx, useLang, useT, type Lang } from './fmt'
 
 const METRICS: Record<MetricKey, [string, string]> = {
   profit: ['Median profit, $/ha', 'Медианная прибыль, $/га'],
@@ -41,7 +41,8 @@ const viewFromHash = (): View => {
 }
 
 export default function App() {
-  const [rid, setRid] = useState<'vko' | 'az'>(() => (new URLSearchParams(location.search).get('r') === 'az' ? 'az' : 'vko'))
+  // Arizona first: it carries the ML crop map; ?r=vko opens Kazakhstan
+  const [rid, setRid] = useState<'vko' | 'az'>(() => (new URLSearchParams(location.search).get('r') === 'vko' ? 'vko' : 'az'))
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
   const [view, setView] = useState<View>(viewFromHash)
   const [data, setData] = useState<Record<string, Region>>({})
@@ -162,6 +163,7 @@ function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, la
   const ref = r.strategies
   const [tab, setTab] = useState<'summary' | 'cell'>('summary')
   const [panel, setPanel] = useState(true)
+  const [detail, setDetail] = useState<string | null>(null) // ML detail cell (finer H3) inside `selected`
   const cell = r.cells.find((c) => c.h3 === selected)!
   const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
   const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
@@ -260,14 +262,14 @@ function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, la
                       })}
                     </tbody>
                   </table>
-                  <MlCellBox r={r} h3={selected} />
-                  {selected !== r.rep_cell && <button className="btn btn-ghost btn-sm" onClick={() => setSelected(r.rep_cell)}>{t('Back to the reference field', 'Вернуться к опорному полю')}</button>}
+                  <MlCellBox r={r} h3={selected} detail={detail} onWholeCell={() => setDetail(null)} />
+                  {selected !== r.rep_cell && <button className="btn btn-ghost btn-sm" onClick={() => { setSelected(r.rep_cell); setDetail(null) }}>{t('Back to the reference field', 'Вернуться к опорному полю')}</button>}
                 </section>
               )}
             </div>
           </aside>
         )}
-        <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={pick} />
+        <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={pick} detail={detail} onSelectDetail={setDetail} />
       </div>
     </div>
   )
@@ -890,8 +892,8 @@ function SmapPanel({ r }: { r: Region }) {
 }
 
 function MlSection({ r }: { r: Region }) {
-  const t = useT()
-  const n = mlCells(r).length
+  const t = useT(), l = useLang()
+  const n = mlCells(r).length, nd = mlDetail(r).length
   return (
     <section className="sec" id="ml">
       <div className="wrap">
@@ -909,7 +911,7 @@ function MlSection({ r }: { r: Region }) {
         </div>
         <p className="small muted note">
           {n
-            ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), r.ml?.validation].filter(Boolean).join(' · ')
+            ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), nd ? t(`${nd} field-scale cells on the map`, `мелких ячеек на карте: ${nd}`) : '', mlValidation(r, l)].filter(Boolean).join(' · ')
             : t(`The models live in a separate repository. Put its output in data/ml/${r.id}.json and rebuild: the cell panel picks it up.`, `Модели живут в отдельном репозитории. Положите их вывод в data/ml/${r.id}.json и пересоберите: его покажет панель ячейки.`)}
         </p>
       </div>
@@ -920,36 +922,55 @@ function MlSection({ r }: { r: Region }) {
 const mlTitle = (r: Region) => [r.ml?.model, r.ml?.version].filter(Boolean).join(' ')
 
 // ML block in the cell panel. Every field of the ML file is optional, so each line shows only when its field is there.
-function MlCellBox({ r, h3 }: { r: Region; h3: string }) {
+// With `detail` set (a finer H3 cell clicked on the map), that cell is shown instead of the whole grid cell.
+function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; detail?: string | null; onWholeCell?: () => void }) {
   const l = useLang(), t = useT()
-  const c = r.ml?.cells?.[h3]
-  const share = c?.crop_pixel_share ?? c?.crop_p
+  const fine = detail ? r.ml?.detail?.cells?.[detail] : undefined
+  const c = fine && fine.p === h3 ? fine : r.ml?.cells?.[h3]
+  const isFine = !!fine && c === fine
+  const top = c?.crop_top
+  const share = top ? c?.crop_top_share : c?.crop_pixel_share ?? c?.crop_p
   const years = Object.entries(c?.years ?? {}).sort(([a], [b]) => a.localeCompare(b))
   if (!c || !mlHas(c)) {
     return <div className="ml-box"><span className="badge">ML</span><span className="muted">{t('No ML data for this cell', 'ML-данных для ячейки нет')}</span></div>
   }
+  const src = (s?: string) => (s === 'model' ? t('model', 'модель') : s)
   return (
     <div className="ml-box ml-cell">
       <span className="badge">ML</span>
       <div className="ml-body">
-        {c.crop && (
+        {isFine && <span className="ml-scale">{t('Field-scale cell (~0.7 km²)', 'Участок ~0,7 км²')}</span>}
+        {(top || c.crop) && (
           <p>
-            <strong>{mlCrop(c.crop, l)}</strong>
+            <strong>{top ? mlCrop(top, l) : mlText(c.crop!, l)}</strong>
             {share != null && <span className="muted"> · {t('pixel share', 'доля пикселей')} {Math.round(share * 100)}%</span>}
           </p>
         )}
+        {top && c.crop && <p className="small muted">{mlText(c.crop, l)}</p>}
         {c.low_confidence && <span className="ml-flag">{t('low confidence', 'низкая достоверность')}</span>}
         {years.length > 0 && (
           <ul className="ml-years">
             {years.map(([y, v]) => (
               <li key={y}>
-                <span className="mono">{y}</span> {v.crop ? mlCrop(v.crop, l) : '–'}
-                {v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
+                <span><span className="mono">{y}</span> {v.crop ? mlText(v.crop, l) : '–'}{v.source && <span className="ml-src">{src(v.source)}</span>}</span>
+                {v.bare_months && (
+                  <span className="small muted">
+                    {v.bare_months.length ? t(`bare: ${months(v.bare_months, l)}`, `голая почва: ${months(v.bare_months, l)}`) : t('green all season', 'зелёная весь сезон')}
+                    {v.low_obs_months?.length ? t(` · too few images: ${months(v.low_obs_months, l)}`, ` · мало снимков: ${months(v.low_obs_months, l)}`) : ''}
+                  </span>
+                )}
+                {!v.bare_months && v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
               </li>
             ))}
           </ul>
         )}
-        {r.ml?.validation && <p className="small muted">{r.ml.validation}</p>}
+        {isFine && onWholeCell && <button className="btn btn-ghost btn-sm" onClick={onWholeCell}>{t('Show the whole cell', 'Показать всю ячейку')}</button>}
+        {mlValidation(r, l) && (
+          <details className="ml-validation small muted">
+            <summary>{t('How the model was checked', 'Как проверяли модель')}</summary>
+            <p>{mlValidation(r, l)}</p>
+          </details>
+        )}
       </div>
     </div>
   )
