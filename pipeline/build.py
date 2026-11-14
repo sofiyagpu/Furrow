@@ -188,10 +188,10 @@ def build(rid):
 
     ml = ML / f"{rid}.json"
     data = dict(
-        id=rid, name=region["name"], bbox=region["bbox"], irrigated=region["irrigated"],
+        id=rid, name=region["name"], name_ru=region["name_ru"], bbox=region["bbox"], irrigated=region["irrigated"],
         years=[int(wx.year.min()) + 1, int(wx.year.max()) - 1],
         rep_cell=rep, climate=climatology(wx),
-        crops={k: dict(label=v["label"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"]) for k, v in CROPS[rid].items()},
+        crops={k: dict(label=v["label"], label_ru=v["label_ru"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"]) for k, v in CROPS[rid].items()},
         assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION),
         cells=out_cells, strategies=out_strat, twin=twin, pareto=front, cloud=cloud,
         ml=json.loads(ml.read_text()) if ml.exists() else None,

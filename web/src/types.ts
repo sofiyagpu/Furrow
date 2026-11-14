@@ -25,11 +25,14 @@ export interface YearRow {
 export interface Strategy {
   id: string
   name: string
+  name_ru?: string
   rotation: string[]
   notill: boolean
   irrigation?: string
   idea: string
+  idea_ru?: string
   risk: string
+  risk_ru?: string
   metrics: Metrics
   timeline: YearRow[]
   dekads: [string, number, number, string][] // date, soil water mm, cover 0-1, crop
@@ -54,12 +57,13 @@ export interface ParetoPoint { rotation: string[]; notill: boolean; irrigation?:
 export interface Region {
   id: 'az' | 'vko'
   name: string
+  name_ru?: string
   bbox: [[number, number], [number, number]]
   irrigated: boolean
   years: [number, number]
   rep_cell: string
   climate: { month: number; rain: number; tmean: number; et0: number; wind: number }[]
-  crops: Record<string, { label: string; price: number; cost: number; ymax: number; family: string }>
+  crops: Record<string, { label: string; label_ru?: string; price: number; cost: number; ymax: number; family: string }>
   assumptions: { co2_price: [number, number]; buffer: number; pump_cost_m3: number; irrigation_eff: Record<string, number> }
   cells: Cell[]
   strategies: Strategy[]

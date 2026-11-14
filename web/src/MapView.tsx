@@ -8,11 +8,11 @@ maplibregl.setWorkerUrl(workerUrl) // bundlers lose maplibre's own relative work
 
 const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best'
 export const NASA_LAYERS = {
-  none: { label: 'Imagery only' },
-  ndvi: { label: 'MODIS NDVI, 16-day', id: 'MODIS_Terra_L3_NDVI_16Day', tms: 'GoogleMapsCompatible_Level9', max: 9 },
-  smap: { label: 'SMAP root-zone moisture', id: 'SMAP_L4_Analyzed_Root_Zone_Soil_Moisture', tms: 'GoogleMapsCompatible_Level6', max: 6 },
-  imerg: { label: 'GPM IMERG rain rate', id: 'IMERG_Precipitation_Rate', tms: 'GoogleMapsCompatible_Level6', max: 6 },
-  grace: { label: 'GRACE-FO water storage', id: 'GRACE_Tellus_Liquid_Water_Equivalent_Thickness_Mascon_CRI', tms: 'GoogleMapsCompatible_Level6', max: 6 },
+  none: { label: 'Imagery only', ru: 'Только снимок' },
+  ndvi: { label: 'MODIS NDVI, 16-day', ru: 'MODIS NDVI, 16 дней', id: 'MODIS_Terra_L3_NDVI_16Day', tms: 'GoogleMapsCompatible_Level9', max: 9 },
+  smap: { label: 'SMAP root-zone moisture', ru: 'SMAP, влага корневой зоны', id: 'SMAP_L4_Analyzed_Root_Zone_Soil_Moisture', tms: 'GoogleMapsCompatible_Level6', max: 6 },
+  imerg: { label: 'GPM IMERG rain rate', ru: 'GPM IMERG, осадки', id: 'IMERG_Precipitation_Rate', tms: 'GoogleMapsCompatible_Level6', max: 6 },
+  grace: { label: 'GRACE-FO water storage', ru: 'GRACE-FO, запасы воды', id: 'GRACE_Tellus_Liquid_Water_Equivalent_Thickness_Mascon_CRI', tms: 'GoogleMapsCompatible_Level6', max: 6 },
 } as const
 export type NasaLayer = keyof typeof NASA_LAYERS
 
@@ -74,7 +74,6 @@ export default function MapView(props: {
       setNasa(m, latest.current.layer)
     })
     map.current = m
-    ;(window as unknown as { __map: maplibregl.Map }).__map = m // debug handle
     return () => m.remove()
   }, [props.region.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
