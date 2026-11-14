@@ -1,0 +1,218 @@
+{
+ "url": "http://localhost:5173/?r=az",
+ "views": {
+  "mobile": {
+   "width": 390,
+   "height": 844,
+   "navH": 61,
+   "scrollHeight": 12492,
+   "screens": 14.8,
+   "sections": [
+    {
+     "n": 1,
+     "tag": "section",
+     "id": "top",
+     "cls": "sec hero",
+     "top": 61,
+     "h": 992,
+     "hScreens": 1.18,
+     "offGrid": 148,
+     "tiles": [
+      {
+       "file": "mobile-sec-01-a.jpg",
+       "scrollY": 61
+      },
+      {
+       "file": "mobile-sec-01-b.jpg",
+       "scrollY": 209
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "tag": "button",
+     "id": "",
+     "cls": "btn btn-solid agent-fab",
+     "top": 776,
+     "h": 48,
+     "hScreens": 0.06,
+     "offGrid": 48,
+     "tiles": [
+      {
+       "file": "mobile-sec-02-a.jpg",
+       "scrollY": 776
+      }
+     ]
+    },
+    {
+     "n": 3,
+     "tag": "section",
+     "id": "map",
+     "cls": "sec",
+     "top": 1053,
+     "h": 1485,
+     "hScreens": 1.76,
+     "offGrid": 641,
+     "tiles": [
+      {
+       "file": "mobile-sec-03-a.jpg",
+       "scrollY": 1053
+      },
+      {
+       "file": "mobile-sec-03-b.jpg",
+       "scrollY": 1694
+      }
+     ]
+    },
+    {
+     "n": 4,
+     "tag": "section",
+     "id": "strategies",
+     "cls": "sec",
+     "top": 2537,
+     "h": 2261,
+     "hScreens": 2.68,
+     "offGrid": 573,
+     "tiles": [
+      {
+       "file": "mobile-sec-04-a.jpg",
+       "scrollY": 2537
+      },
+      {
+       "file": "mobile-sec-04-b.jpg",
+       "scrollY": 3381
+      },
+      {
+       "file": "mobile-sec-04-c.jpg",
+       "scrollY": 3954
+      }
+     ]
+    },
+    {
+     "n": 5,
+     "tag": "section",
+     "id": "time",
+     "cls": "sec",
+     "top": 4798,
+     "h": 1419,
+     "hScreens": 1.68,
+     "offGrid": 575,
+     "tiles": [
+      {
+       "file": "mobile-sec-05-a.jpg",
+       "scrollY": 4798
+      },
+      {
+       "file": "mobile-sec-05-b.jpg",
+       "scrollY": 5373
+      }
+     ]
+    },
+    {
+     "n": 6,
+     "tag": "section",
+     "id": "twin",
+     "cls": "sec",
+     "top": 6217,
+     "h": 1258,
+     "hScreens": 1.49,
+     "offGrid": 414,
+     "tiles": [
+      {
+       "file": "mobile-sec-06-a.jpg",
+       "scrollY": 6217
+      },
+      {
+       "file": "mobile-sec-06-b.jpg",
+       "scrollY": 6631
+      }
+     ]
+    },
+    {
+     "n": 7,
+     "tag": "section",
+     "id": "tradeoffs",
+     "cls": "sec",
+     "top": 7476,
+     "h": 2162,
+     "hScreens": 2.56,
+     "offGrid": 474,
+     "tiles": [
+      {
+       "file": "mobile-sec-07-a.jpg",
+       "scrollY": 7476
+      },
+      {
+       "file": "mobile-sec-07-b.jpg",
+       "scrollY": 8320
+      },
+      {
+       "file": "mobile-sec-07-c.jpg",
+       "scrollY": 8794
+      }
+     ]
+    },
+    {
+     "n": 8,
+     "tag": "section",
+     "id": "carbon",
+     "cls": "sec",
+     "top": 9637,
+     "h": 1186,
+     "hScreens": 1.41,
+     "offGrid": 342,
+     "tiles": [
+      {
+       "file": "mobile-sec-08-a.jpg",
+       "scrollY": 9637
+      },
+      {
+       "file": "mobile-sec-08-b.jpg",
+       "scrollY": 9979
+      }
+     ]
+    },
+    {
+     "n": 9,
+     "tag": "section",
+     "id": "method",
+     "cls": "sec",
+     "top": 10824,
+     "h": 1449,
+     "hScreens": 1.72,
+     "offGrid": 605,
+     "tiles": [
+      {
+       "file": "mobile-sec-09-a.jpg",
+       "scrollY": 10824
+      },
+      {
+       "file": "mobile-sec-09-b.jpg",
+       "scrollY": 11429
+      }
+     ]
+    },
+    {
+     "n": 10,
+     "tag": "footer",
+     "id": "",
+     "cls": "foot",
+     "top": 12273,
+     "h": 219,
+     "hScreens": 0.26,
+     "offGrid": 219,
+     "tiles": [
+      {
+       "file": "mobile-sec-10-a.jpg",
+       "scrollY": 11648,
+       "cutTop": 625,
+       "height": 219
+      }
+     ]
+    }
+   ],
+   "consoleErrors": []
+  }
+ },
+ "at": "2026-11-14T09:12:33.507Z"
+}
