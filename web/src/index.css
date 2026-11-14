@@ -99,13 +99,19 @@ a { color: inherit; }
 
 /* map */
 .map-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; margin-top: 12px; }
-.map-wrap { position: relative; min-width: 0; }
+.map-wrap { position: relative; min-width: 0; align-self: start; }
 .map { height: min(70svh, 700px); min-height: 420px; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); }
 .map-legend { position: absolute; left: 12px; bottom: 12px; width: 230px; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.94); color: #232323; box-shadow: 0 6px 20px rgba(0,0,0,.18); display: grid; gap: 6px; pointer-events: none; }
 .map-legend-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
 .map-legend-bar i { height: 8px; }
 .map-legend-bar i:first-child { border-radius: 4px 0 0 4px; } .map-legend-bar i:last-child { border-radius: 0 4px 4px 0; }
 .map-legend-note { font-size: 11px; color: #5c5c5c; }
+.map-legend-ml { display: flex; align-items: center; gap: 8px; }
+.map-legend-ml i { width: 22px; border-top: 2.5px dashed #00b8d4; }
+.ml-box.ml-cell { align-items: flex-start; }
+.ml-body { display: grid; gap: 6px; min-width: 0; }
+.ml-flag { justify-self: start; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 6px; background: #fff1d6; color: #8a5300; }
+.ml-years { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 13px; }
 /* pin: white ring with the cell's band colour inside; the value callout shows only on the clicked cell */
 .pin { position: relative; width: 26px; height: 26px; padding: 0; border: 0; background: none; cursor: pointer; }
 .pin .ring { display: none; }

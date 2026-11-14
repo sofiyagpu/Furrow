@@ -3,7 +3,7 @@ import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Region } from './types'
-import { useT, useLang, usd } from './fmt'
+import { useT, useLang, usd, mlCells, mlHas } from './fmt'
 
 maplibregl.setWorkerUrl(workerUrl) // bundlers lose maplibre's own relative worker path
 
@@ -70,6 +70,7 @@ export default function MapView(props: P) {
       m.addLayer({ id: 'cells', type: 'fill', source: 'cells', paint: { 'fill-color': '#000', 'fill-opacity': 0 } }) // hit area
       m.addLayer({ id: 'edge', type: 'line', source: 'cells', paint: { 'line-color': '#ffffff', 'line-opacity': 0.85, 'line-width': 1.5 } })
       m.addLayer({ id: 'sel', type: 'line', source: 'cells', filter: ['==', ['get', 'h3'], p.selected], paint: { 'line-color': '#ffffff', 'line-width': 4 } })
+      m.addLayer({ id: 'ml', type: 'line', source: 'cells', filter: ['==', ['get', 'ml'], true], paint: { 'line-color': '#00e5ff', 'line-width': 2.5, 'line-dasharray': [2, 1.5] } })
       m.on('click', 'cells', (e: maplibregl.MapLayerMouseEvent) => e.features?.[0] && latest.current.onSelect(e.features[0].properties!.h3))
       m.on('mouseenter', 'cells', () => (m.getCanvas().style.cursor = 'pointer'))
       m.on('mouseleave', 'cells', () => (m.getCanvas().style.cursor = ''))
@@ -102,6 +103,7 @@ export default function MapView(props: P) {
         <div className="map-legend-bar">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</div>
         <div className="row-between small"><span>{t('worse', 'хуже')}</span><span>{t('better', 'лучше')}</span></div>
         <p className="map-legend-note">{t('Within this region, smoothed between cell centres', 'Внутри региона, сглажено между центрами ячеек')}</p>
+        {mlCells(props.region).length > 0 && <p className="map-legend-ml small"><i />{t('cell has ML data', 'есть ML-данные')}</p>}
       </div>
     </div>
   )
@@ -129,7 +131,7 @@ function geo(r: Region) {
     type: 'FeatureCollection' as const,
     features: r.cells.map((c) => ({
       type: 'Feature' as const,
-      properties: { h3: c.h3 },
+      properties: { h3: c.h3, ml: mlHas(r.ml?.cells?.[c.h3]) },
       geometry: { type: 'Polygon' as const, coordinates: [[...c.b, c.b[0]]] },
     })),
   }
