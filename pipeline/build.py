@@ -14,7 +14,7 @@ from pymoo.operators.repair.rounding import RoundingRepair
 from pymoo.operators.sampling.rnd import IntegerRandomSampling
 from pymoo.optimize import minimize
 
-from crops import CROPS, STRATEGIES, CO2_PRICE, IRRIGATION, PUMP_COST
+from crops import CROPS, STRATEGIES, CO2_PRICE, IRRIGATION, PUMP_COST, N_RATE, N_CREDIT, MARKET
 from model import Weather, run_strategy, summarise
 from regions import REGIONS
 
@@ -168,6 +168,47 @@ def carbon(dsoc_vs_base):
     return dict(t_co2_ha_yr=round(t_co2, 2), usd_ha_yr=[r1(t_co2 * CO2_PRICE[0]), r1(t_co2 * CO2_PRICE[1])])
 
 
+def farm(seasons, rid):
+    """Priority numbers from the phase-0 seasons: revenue (for the price slider), mineral N, market depth, water stress."""
+    crops, n_rate = CROPS[rid], N_RATE[rid]
+    years = max(1, seasons[-1]["year"] - seasons[0]["year"] + 1) if seasons else 1
+    n, rev, deep, stress, prev = 0.0, 0.0, 0.0, [], None
+    for x in seasons:
+        c = x["crop"]
+        n += max(0, n_rate[c] - (N_CREDIT if prev and crops[prev].get("fix") else 0))
+        rev += x["revenue"]
+        deep += x["revenue"] if MARKET[rid].get(c) == "deep" else 0
+        if crops[c]["ymax"] > 0 and x["etc"] > 0:
+            stress.append(1 - x["eta"] / x["etc"])
+        prev = c
+    return dict(revenue=r1(rev / years), n_kg=r1(n / years), deep_market=round(float(deep / rev), 2) if rev else None,
+                water_stress=round(float(np.mean(stress)), 2) if stress else None)
+
+
+def smap_check(rid, h3_cell, dekads):
+    """Model root-zone water (mm, dekad mean) against SMAP L4 root-zone moisture (m3/m3) on the next day.
+    r on the raw series rewards the shared seasonal cycle; r on monthly anomalies is the stricter test."""
+    path = ROOT / "data" / "raw" / f"{rid}.smap.json"
+    if not path.exists():
+        return None
+    sm = json.loads(path.read_text())
+    obs = dict(zip(sm["dates"], sm["cells"].get(h3_cell, [])))
+    pairs = []
+    for d, sw, *_ in dekads:
+        nxt = (np.datetime64(d) + np.timedelta64(1, "D")).astype(str)
+        if obs.get(nxt) is not None:
+            pairs.append((nxt, obs[nxt], sw))
+    if len(pairs) < 24:
+        return None
+    a = np.array([[p[1], p[2]] for p in pairs], float)
+    month = np.array([int(p[0][5:7]) for p in pairs])
+    anom = a.copy()
+    for m in range(1, 13):
+        anom[month == m] -= a[month == m].mean(axis=0)
+    r = lambda x: round(float(np.corrcoef(x[:, 0], x[:, 1])[0, 1]), 2)  # noqa: E731
+    return dict(layer=sm["layer"], n=len(pairs), r=r(a), r_anom=r(anom), series=[[d, o, m] for d, o, m in pairs])
+
+
 def build(rid):
     t0 = time.time()
     region = REGIONS[rid]
@@ -198,7 +239,7 @@ def build(rid):
         base = base if base is not None else m
         out_strat.append(dict(**s, metrics=m, timeline=time_machine(rows, seasons), dekads=dek,
                               carbon=carbon(m["dsoc"] - base["dsoc"]),
-                              water_saved_mm=r1(base["irr"][1] - m["irr"][1])))
+                              water_saved_mm=r1(base["irr"][1] - m["irr"][1]), farm=farm(seasons, rid)))
     print(rid, "strategies", round(time.time() - t0), "s")
 
     twin = dict(dT=[0, 1, 2, 3], dP=[-0.2, -0.1, 0, 0.1], grid={})
@@ -222,9 +263,11 @@ def build(rid):
         id=rid, name=region["name"], name_ru=region["name_ru"], bbox=region["bbox"], irrigated=region["irrigated"],
         years=[int(wx.year.min()) + 1, int(wx.year.max()) - 1],
         rep_cell=rep, climate=climatology(wx),
-        crops={k: dict(label=v["label"], label_ru=v["label_ru"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"]) for k, v in CROPS[rid].items()},
-        assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION),
+        crops={k: dict(label=v["label"], label_ru=v["label_ru"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"],
+                       n=N_RATE[rid][k], market=MARKET[rid].get(k)) for k, v in CROPS[rid].items()},
+        assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION, n_credit=N_CREDIT),
         cells=out_cells, strategies=out_strat, twin=twin, pareto=front, cloud=cloud,
+        smap=smap_check(rid, rep, out_strat[0]["dekads"]),
         ml=load_ml(ML / f"{rid}.json"),
     )
     OUT.mkdir(parents=True, exist_ok=True)
