@@ -38,6 +38,8 @@ pres.defineSlideMaster({
   background: { path: B("stars.png") },
   slideNumber: num,
   objects: [
+    // NASA Space Apps 2026 default logo, official file from spaceappschallenge.org/brand
+    { image: { x: 13.333 - M - 1.4, y: 0.22, w: 1.4, h: 1.4 * 600 / 1527, path: path.join(__dirname, "img/spaceapps_logo.png"), altText: "NASA Space Apps Challenge" } },
     { placeholder: { options: { name: "kicker", type: "body", x: M, y: 0.42, w: CW, h: 0.36, fontSize: 13, bold: true,
       color: C.accent2, charSpacing: 4, margin: 0, valign: "middle" }, text: "" } },
     { placeholder: { options: { name: "title", type: "title", x: M, y: 0.8, w: CW, h: 0.95, fontSize: 34,
@@ -158,9 +160,10 @@ function screens(s, back, front, side, facts) {
   s.addText("FURROW", T({ objectName: "logo", x: M, y: 2.0, w: 6.2, h: 1.1, fontSize: 72, color: C.accent1, charSpacing: 6, fontFace: THEME.headFontFace }));
   s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 3.3, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
   s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 4.45, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
-  s.addText("Built on NASA data  ·  NASA Space Apps 2026", T({ objectName: "l3", x: M, y: 5.35, w: 5.6, h: 0.4, fontSize: 14, color: C.background2 }));
+  s.addText("Built on NASA data", T({ objectName: "l3", x: M, y: 5.25, w: 5.6, h: 0.4, fontSize: 14, color: C.background2 }));
+  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 5.85, w: 2.55, h: 2.55 * 600 / 1527, altText: "NASA Space Apps Challenge" });
   s.addNotes("2:25–2:40. Furrow does not tell a farmer what to plant. It shows what each choice would have cost and kept. The farmer decides.");
-  anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 600 }, { fx: "fade", names: ["l2"], dur: 600 }, { fx: "fade", names: ["l3"], dur: 500 }]);
+  anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 600 }, { fx: "fade", names: ["l2"], dur: 600 }, { fx: "fade", names: ["l3", "sa"], dur: 500, stagger: 200 }]);
   TRANS[s._n] = "fade";
 }
 

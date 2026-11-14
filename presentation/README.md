@@ -26,3 +26,5 @@ node build.js && python3 animate.py       # -> Furrow.pptx
 
 Fonts (Google Fonts, SIL OFL): the slides use Libre Franklin, which Microsoft 365 also serves as a cloud font, so it
 shows on any machine with Office. The videos are set in News Cycle and Libre Franklin Black from `fonts/`.
+
+NASA Space Apps logo: official 2026 file from https://www.spaceappschallenge.org/brand/ (img/spaceapps_logo.png), used per the Space Apps brand guide.
