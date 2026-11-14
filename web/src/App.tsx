@@ -101,7 +101,7 @@ function Page({ r }: { r: Region }) {
   const [selected, setSelected] = useState(r.rep_cell)
   const [sid, setSid] = useState('current')
   const [metric, setMetric] = useState<MetricKey>('profit')
-  const [layer, setLayer] = useState<NasaLayer>('ndvi')
+  const [layer, setLayer] = useState<NasaLayer>('none')
   const cell = r.cells.find((c) => c.h3 === selected)!
   const low = [...ref].sort((a, b) => a.metrics.erosion - b.metrics.erosion)[0]
   const lowCut = Math.round((1 - low.metrics.erosion / Math.max(cur.metrics.erosion, 0.01)) * 100)
@@ -165,9 +165,8 @@ function Page({ r }: { r: Region }) {
                   {Object.entries(NASA_LAYERS).map(([k, v]) => <option key={k} value={k}>{l === 'ru' ? v.ru : v.label}</option>)}
                 </select>
               </Field>
-              <div className="legend-ramp"><span>{t('worse', 'хуже')}</span><i /><span>{t('better', 'лучше')}</span></div>
               <h3 className="h-sm">{selected === r.rep_cell ? t('Reference field', 'Опорное поле') : t(`Field cell ${cellNo} of ${r.cells.length}`, `Ячейка ${cellNo} из ${r.cells.length}`)}</h3>
-              <p className="small muted mono">
+              <p className="small mono">
                 {t('clay', 'глина')} {cell.soil.clay.toFixed(0)}% · {t('sand', 'песок')} {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} {t('g/kg', 'г/кг')}
               </p>
               {r.ml?.cells[selected] && <a className="ml-box" href="#ml">
