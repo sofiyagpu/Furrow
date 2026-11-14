@@ -30,15 +30,15 @@ def stars(seed=7):
     a += band[..., None] * np.array([10, 9, 16])
     im = Image.fromarray(a.clip(0, 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
-    for _ in range(1400):
+    for _ in range(900):
         x, y = rng.uniform(0, W), rng.uniform(0, H)
-        b = rng.power(6) * 255
+        b = rng.power(9) * 210
         tint = rng.choice([(1, 1, 1), (0.85, 0.9, 1), (1, 0.95, 0.85)])
         c = tuple(int(b * t) for t in tint)
         r = 0.6 if b < 200 else 1.1
         d.ellipse([x - r, y - r, x + r, y + r], fill=c)
     glow = im.filter(ImageFilter.GaussianBlur(2.2))
-    return Image.fromarray(np.maximum(np.asarray(im), (np.asarray(glow) * 1.6).clip(0, 255).astype(np.uint8)))
+    return Image.fromarray(np.maximum(np.asarray(im), (np.asarray(glow) * 1.1).clip(0, 255).astype(np.uint8)))
 
 
 def planet():
@@ -57,20 +57,20 @@ def planet():
     light = np.clip(0.25 + 0.95 * (z * 0.6 + (-xx * 0.55 - yy * 0.45)), 0.04, 1.2)
     col = col * light[..., None]
     rim = np.exp(-((1 - rr) / 0.035) ** 2) * inside * np.clip(-xx - yy + 0.6, 0, 1.4)
-    col += rim[..., None] * np.array([120, 200, 255])
+    col += rim[..., None] * np.array([40, 70, 95])
     out = np.zeros((S, S, 4), np.float32)
     out[..., :3] = col
     out[..., 3] = inside * 255
     # atmosphere halo outside the disc
     halo = np.exp(-((rr - 1) / 0.03) ** 2) * (rr >= 1) * np.clip(-xx - yy + 0.8, 0, 1.5)
-    out[..., :3] += (halo[..., None] * np.array([90, 170, 255])) * (rr >= 1)[..., None]
-    out[..., 3] = np.maximum(out[..., 3], halo * 200)
+    out[..., :3] += (halo[..., None] * np.array([60, 110, 150])) * (rr >= 1)[..., None]
+    out[..., 3] = np.maximum(out[..., 3], halo * 90)
     Image.fromarray(out.clip(0, 255).astype(np.uint8), "RGBA").save(OUT / "planet.png")
 
 
 def crops():
     boxes = {  # app screenshots at 1440x900, nav and section headings cut off
-        "shot_map.jpg": ("desktop-sec-03-a.jpg", (100, 130, 1340, 845)),
+        "shot_map.jpg": ("desktop-sec-03-a.jpg", (100, 130, 1340, 822)),
         "shot_cards.jpg": ("desktop-sec-04-a.jpg", (100, 262, 1340, 830)),
         "shot_time.jpg": ("desktop-sec-05-a.jpg", (100, 256, 1340, 784)),
         "shot_trade.jpg": ("desktop-sec-07-a.jpg", (100, 290, 1340, 900)),
@@ -83,10 +83,9 @@ def crops():
 INTRO = ["Not long ago, on a field", "not so far away...."]
 HEAD = ["SPACE APPS 2026", "THE BARE FIELD"]
 BODY = [
-    "It is a time of shifting seasons. Rain comes late or not at all, and the heat arrives just as the wheat flowers.",
-    "On the steppe of East Kazakhstan, every third summer a field lies bare as black fallow, and the wind carries its soil away. "
-    "In the Arizona desert, wells pump an aquifer that the GRACE-FO satellites watch drain from orbit.",
-    "Farmers know that other rotations exist. What they lack is proof from their own field, in their own weather. "
+    "Rain comes late or not at all. On the Kazakh steppe, every third summer a field lies bare as black fallow, "
+    "and the wind carries its soil away. In Arizona, wells drain an aquifer that GRACE-FO watches from orbit.",
+    "Farmers know other rotations exist. What they lack is proof from their own field, in their own weather. "
     "Armed with twenty-two seasons of NASA data, a small crew sets out to build FURROW....",
 ]
 
@@ -170,22 +169,22 @@ def crawl():
     # outline only: stroke minus glyph interior
     logo = Image.fromarray(np.where(np.asarray(hollow) > 128, 0, np.asarray(lg)).astype(np.uint8))
 
-    T_INTRO, T_LOGO, T_CRAWL, T_END = 5.0, 6.0, 12.5, 56.0
+    T_INTRO, T_LOGO, T_CRAWL, T_END = 3.6, 4.0, 7.5, 27.0
     n = int(T_END * FPS)
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     proc = subprocess.Popen([ff, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
                              "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "medium",
                              "-movflags", "+faststart", str(OUT / "crawl.mp4")], stdin=subprocess.PIPE)
     yel = np.array(YELLOW, np.float32)
-    poster_t = 27.0
+    poster_t = 14.0
     for k in range(n):
         t = k / FPS
         fr = bg_a.copy()
         if t < T_INTRO:
-            a = min(1, t / 1.2) * min(1, max(0, (T_INTRO - t) / 0.9))
+            a = min(1, t / 0.8) * min(1, max(0, (T_INTRO - t) / 0.7))
             fr = fr * (1 - intro_a * a) + intro_a * a * np.array(BLUE)
-        if T_LOGO <= t < T_LOGO + 9:
-            p = (t - T_LOGO) / 9
+        if T_LOGO <= t < T_LOGO + 7:
+            p = (t - T_LOGO) / 7
             sc = 2.4 * (0.012 / 2.4) ** p  # exponential recession into the stars
             if sc * 1500 > 8:
                 li = logo.resize((max(1, int(1500 * sc)), max(1, int(420 * sc))), Image.BICUBIC)
