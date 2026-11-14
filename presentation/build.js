@@ -10,8 +10,8 @@ const S = (r, id) => r.strategies.find((s) => s.id === id);
 
 const THEME = {
   name: "Furrow Starfield",
-  headFontFace: "Franklin Gothic Medium",
-  bodyFontFace: "Arial",
+  headFontFace: "Libre Franklin ExtraBold",
+  bodyFontFace: "Libre Franklin",
   colors: {
     dk1: "05060B", lt1: "FFFFFF", dk2: "0E1322", lt2: "AEB6C8",
     accent1: "FFE81F", accent2: "4BD5EE", accent3: "2A78D6", accent4: "EB6834", accent5: "1BAF7A", accent6: "EDA100",
@@ -67,7 +67,7 @@ function card(s, name, x, y, w, h, opts = {}) {
 }
 function stat(s, name, x, y, w, big, label, o = {}) {
   s.addText([
-    { text: big, options: { fontSize: o.size || 34, color: o.color || C.accent1, bold: true, fontFace: THEME.headFontFace, breakLine: true } },
+    { text: big, options: { fontSize: o.size || 34, color: o.color || C.accent1, fontFace: THEME.headFontFace, breakLine: true } },
     { text: label, options: { fontSize: o.labelSize || 14, color: C.background2 } },
   ], T({ objectName: name, x, y, w, h: o.h || 1.2, valign: "top", paraSpaceAfter: 2 }));
 }
@@ -208,7 +208,7 @@ const chartBase = {
 {
   const s = slide("Close", null, null, "Starfield blank");
   s.addImage({ path: B("planet.png"), objectName: "planet", x: 1.17, y: 4.35, w: 11, h: 11, altText: "East Kazakhstan fields seen by MODIS, wrapped on a globe" });
-  s.addText("FURROW", T({ objectName: "logo", x: M, y: 0.7, w: CW, h: 1.1, fontSize: 72, bold: true, color: C.accent1, align: "center", charSpacing: 6, fontFace: THEME.headFontFace }));
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 0.7, w: CW, h: 1.1, fontSize: 72, color: C.accent1, align: "center", charSpacing: 6, fontFace: THEME.headFontFace }));
   s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 2.0, w: CW, h: 0.6, fontSize: 28, color: C.background1, align: "center" }));
   s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 2.65, w: CW, h: 0.6, fontSize: 28, color: C.accent1, align: "center" }));
   s.addText("Ranges, never promises  ·  hypotheses for the agronomist  ·  an assistant that only quotes the model", T({ objectName: "g", x: M, y: 3.45, w: CW, h: 0.4, fontSize: 15, color: C.background2, align: "center" }));

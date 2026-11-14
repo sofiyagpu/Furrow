@@ -97,11 +97,18 @@ def timing(xml, steps):
     return out
 
 
+MC = 'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"'
+P14 = 'xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main"'
+
+
 def transition(n):
-    kind = cfg["trans"].get(str(n))
-    if kind == "fade":
-        return '<p:transition spd="slow"><p:fade/></p:transition>'
-    return f'<p:transition spd="med"><p:wipe dir="{"r" if n % 2 else "l"}"/></p:transition>'
+    """PowerPoint 2010+ 'Fly Through' between slides, like a jump to hyperspace; fade through black on the ends.
+    Older readers take the plain fade in mc:Fallback."""
+    if cfg["trans"].get(str(n)) == "fade":
+        return '<p:transition spd="slow"><p:fade thruBlk="1"/></p:transition>'
+    return (f'<mc:AlternateContent {MC}><mc:Choice {P14} Requires="p14">'
+            '<p:transition spd="slow" p14:dur="1400"><p14:flythrough/></p:transition></mc:Choice>'
+            '<mc:Fallback><p:transition spd="slow"><p:fade/></p:transition></mc:Fallback></mc:AlternateContent>')
 
 
 def theme(xml):

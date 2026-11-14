@@ -1,5 +1,5 @@
 """Deck art: starfield, the planet (a real MODIS frame of the VKO fields), app screenshot crops, the opening crawl video.
-Needs pillow, numpy, imageio-ffmpeg. Fonts: News Gothic MT / Franklin Gothic, shipped with Microsoft Office.
+Needs pillow, numpy, imageio-ffmpeg. Fonts in ./fonts (Google Fonts).
     python make_assets.py
 """
 import subprocess
@@ -13,9 +13,9 @@ HERE = Path(__file__).resolve().parent
 IMG, SHOTS = HERE / "img", HERE.parent / "shots" / "tiles"
 OUT = HERE / "build"
 OUT.mkdir(exist_ok=True)
-DF = Path("/Applications/Microsoft PowerPoint.app/Contents/Resources/DFonts")
-NEWS_B, NEWS = DF / "News Gothic MT Bold.ttf", DF / "News Gothic MT.ttf"
-HEAVY = DF / "Franklin Gothic Heavy.ttf"
+FONTS = HERE / "fonts"  # Google Fonts, OFL: News Cycle (News Gothic revival), Libre Franklin (Franklin Gothic revival)
+NEWS_B, NEWS = FONTS / "NewsCycle-Bold.ttf", FONTS / "NewsCycle-Regular.ttf"
+HEAVY = FONTS / "LibreFranklin-Black.ttf"
 W, H, FPS = 1920, 1080, 30
 YELLOW, BLUE = (255, 232, 31), (75, 213, 238)
 
