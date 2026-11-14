@@ -20,197 +20,273 @@ const METRICS: Record<MetricKey, [string, string]> = {
 const stored = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
 const store = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* private mode: lasts this visit */ } }
 
+const METRIC_SHORT: Record<MetricKey, [string, string]> = { profit: ['Profit', 'Прибыль'], erosion: ['Soil loss', 'Эрозия'], dsoc: ['Carbon', 'Углерод'], irr: ['Water', 'Вода'] }
+
+// app shell after soilink: menu on the left, one view at a time, the map view fills the screen
+type View = 'map' | 'strategies' | 'time' | 'climate' | 'tradeoffs' | 'carbon' | 'ml' | 'report' | 'method'
+const VIEWS: [View, string, string][] = [
+  ['map', 'Field map', 'Карта полей'],
+  ['strategies', 'Strategies', 'Стратегии'],
+  ['time', 'Time machine', 'По годам'],
+  ['climate', 'Climate', 'Климат'],
+  ['tradeoffs', 'Trade-offs', 'Компромиссы'],
+  ['carbon', 'Carbon and water', 'Углерод и вода'],
+  ['ml', 'ML layers', 'ML-слои'],
+  ['report', 'Report', 'Отчёт'],
+  ['method', 'Method and data', 'Метод и данные'],
+]
+const viewFromHash = (): View => {
+  const h = location.hash.replace('#', '') as View
+  return VIEWS.some(([v]) => v === h) ? h : 'map'
+}
+
 export default function App() {
   const [rid, setRid] = useState<'vko' | 'az'>(() => (new URLSearchParams(location.search).get('r') === 'az' ? 'az' : 'vko'))
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
+  const [view, setView] = useState<View>(viewFromHash)
   const [data, setData] = useState<Record<string, Region>>({})
   const r = data[rid]
   const t = (en: string, ru: string) => (lang === 'ru' ? ru : en)
+  const title = VIEWS.find(([v]) => v === view)!
 
   useEffect(() => {
     if (data[rid]) return
     fetch(`${import.meta.env.BASE_URL}data/${rid}.json`).then((x) => x.json()).then((d) => setData((o) => ({ ...o, [rid]: d })))
   }, [rid, data])
   useEffect(() => { document.documentElement.lang = lang; store('lang', lang) }, [lang])
+  useEffect(() => {
+    const on = () => setView(viewFromHash())
+    addEventListener('hashchange', on)
+    return () => removeEventListener('hashchange', on)
+  }, [])
+  useEffect(() => { document.querySelector('.content')?.scrollTo(0, 0) }, [view])
+
+  const nav = VIEWS.map(([v, en, ru], i) => (
+    <a key={v} href={`#${v}`} aria-current={view === v ? 'page' : undefined}><span className="nav-n">{String(i + 1).padStart(2, '0')}</span>{t(en, ru)}</a>
+  ))
+  const regionSeg = (
+    <div className="seg" role="group" aria-label={t('Region', 'Регион')}>
+      <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>{t('Kazakhstan', 'ВКО')}</button>
+      <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>{t('Arizona', 'Аризона')}</button>
+    </div>
+  )
+  const langSeg = (
+    <div className="seg" role="group" aria-label={t('Language', 'Язык')}>
+      <button aria-pressed={lang === 'en'} onClick={() => setLang('en')} lang="en">EN</button>
+      <button aria-pressed={lang === 'ru'} onClick={() => setLang('ru')} lang="ru">RU</button>
+    </div>
+  )
 
   return (
     <LangCtx.Provider value={lang}>
       <a className="skip" href="#main">{t('Skip to content', 'К содержанию')}</a>
-      <header className="nav">
-        <div className="wrap nav-in">
-          <a href="#top" className="mark" aria-label="Furrow">furrow<span>.</span></a>
-          <nav aria-label={t('Sections', 'Разделы')} className="nav-links">
-            <a href="#map">{t('Map', 'Карта')}</a>
-            <a href="#strategies">{t('Strategies', 'Стратегии')}</a>
-            <a href="#time">{t('Time machine', 'По годам')}</a>
-            <a href="#twin">{t('Climate', 'Климат')}</a>
-            <a href="#tradeoffs">{t('Trade-offs', 'Выбор')}</a>
-            <a href="#carbon">{t('Carbon and water', 'Углерод')}</a>
-            <a href="#ml">ML</a>
-            <a href="#report">{t('Report', 'Отчёт')}</a>
-          </nav>
-          {r && <Agent key={rid + lang} region={r} />}
-          <div className="seg" role="group" aria-label={t('Region', 'Регион')}>
-            <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>{t('Kazakhstan', 'ВКО')}</button>
-            <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>{t('Arizona', 'Аризона')}</button>
+      <div className="app">
+        <aside className="rail">
+          <a href="#map" className="mark" aria-label="Furrow"><span className="mark-i" aria-hidden />Furrow</a>
+          <p className="rail-sub">{t('Crop rotation planner on NASA data', 'Планировщик севооборотов на данных NASA')}</p>
+          <nav aria-label={t('Sections', 'Разделы')} className="rail-nav">{nav}</nav>
+          <div className="rail-foot">
+            <span className="label">{t('Region', 'Регион')}</span>
+            {regionSeg}
+            <span className="label">{t('Language', 'Язык')}</span>
+            {langSeg}
+            <p className="rail-src">NASA POWER · SMAP · GPM IMERG · GIBS · SoilGrids</p>
           </div>
-          <div className="seg" role="group" aria-label={t('Language', 'Язык')}>
-            <button aria-pressed={lang === 'en'} onClick={() => setLang('en')} lang="en">EN</button>
-            <button aria-pressed={lang === 'ru'} onClick={() => setLang('ru')} lang="ru">RU</button>
-          </div>
-          <Theme />
+        </aside>
+        <div className="main">
+          <header className="top">
+            <div className="top-title">
+              <h1>{t(title[1], title[2])}</h1>
+              {r && <span className="top-region">{rname(r, lang)}</span>}
+            </div>
+            <div className="top-tools">
+              <span className="top-mobile">{regionSeg}{langSeg}</span>
+              <Theme />
+              {r && <Agent key={rid + lang} region={r} />}
+            </div>
+          </header>
+          <nav className="mtabs" aria-label={t('Sections', 'Разделы')}>{nav}</nav>
+          <main id="main" className={`content view-${view}`}>
+            {r ? <Page key={rid} r={r} view={view} /> : <p className="muted pad">{t('Loading the region', 'Загружаем регион')}</p>}
+          </main>
         </div>
-      </header>
-      <main id="main">
-        {r ? <Page key={rid} r={r} /> : <section className="sec hero"><div className="wrap"><p className="muted">{t('Loading the region', 'Загружаем регион')}</p></div></section>}
-      </main>
-      <footer className="foot">
-        <div className="wrap foot-in">
-          <span>{t('Weather', 'Погода')}: NASA POWER. {t('Soil', 'Почва')}: ISRIC SoilGrids 2.0. {t('Layers', 'Слои')}: NASA GIBS (MODIS, SMAP, GPM IMERG, GRACE-FO). {t('Imagery', 'Снимки')}: Esri, Maxar.</span>
-          <span>NASA Space Apps 2026 · Adapting farms with NASA data</span>
-        </div>
-      </footer>
+      </div>
     </LangCtx.Provider>
   )
 }
 
-// one button cycles auto -> light -> dark; the head script applies the stored choice before paint
-type Mode = 'auto' | 'light' | 'dark'
+// dark by default, as the design; one button switches to light, the head script applies the stored choice before paint
+type Mode = 'light' | 'dark'
 function Theme() {
   const t = useT()
-  const [m, setM] = useState<Mode>(() => (stored('theme') as Mode) || 'auto')
-  useEffect(() => {
-    const el = document.documentElement
-    if (m === 'auto') delete el.dataset.theme
-    else el.dataset.theme = m
-    store('theme', m)
-  }, [m])
-  const label = { auto: t('Auto', 'Авто'), light: t('Light', 'Светлая'), dark: t('Dark', 'Тёмная') }[m]
+  const [m, setM] = useState<Mode>(() => (stored('theme') === 'light' ? 'light' : 'dark'))
+  useEffect(() => { document.documentElement.dataset.theme = m; store('theme', m) }, [m])
+  const label = m === 'dark' ? t('Dark', 'Тёмная') : t('Light', 'Светлая')
   return (
-    <button className="theme" onClick={() => setM(({ auto: 'light', light: 'dark', dark: 'auto' } as const)[m])}
+    <button className="theme" onClick={() => setM(m === 'dark' ? 'light' : 'dark')}
       aria-label={`${t('Theme', 'Тема')}: ${label}`} title={`${t('Theme', 'Тема')}: ${label}`}>
       <span className={`theme-i theme-${m}`} aria-hidden />{label}
     </button>
   )
 }
 
-function Page({ r }: { r: Region }) {
-  const l = useLang(), t = useT()
-  const ref = r.strategies
-  const cur = ref[0]
+function Page({ r, view }: { r: Region; view: View }) {
   const [selected, setSelected] = useState(r.rep_cell)
   const [sid, setSid] = useState('current')
   const [metric, setMetric] = useState<MetricKey>('profit')
   const [layer, setLayer] = useState<NasaLayer>('none')
-  const cell = r.cells.find((c) => c.h3 === selected)!
-  const low = [...ref].sort((a, b) => a.metrics.erosion - b.metrics.erosion)[0]
-  const lowCut = Math.round((1 - low.metrics.erosion / Math.max(cur.metrics.erosion, 0.01)) * 100)
-  const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
-  const n = r.years[1] - r.years[0] + 1
-  const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
   const [price, setPrice] = useState(0)
   const [w, setW] = useState<Weights>({ profit: 2, water: 1, market: 1, n: 1 })
   const fit = useMemo(() => fitScores(r, price, w), [r, price, w])
 
+  switch (view) {
+    case 'map': return <Overview r={r} {...{ selected, setSelected, sid, setSid, metric, setMetric, layer, setLayer, fit }} />
+    case 'strategies': return <Strategies r={r} {...{ price, setPrice, w, setW, fit }} />
+    case 'time': return <TimeMachine r={r} />
+    case 'climate': return <Twin r={r} />
+    case 'tradeoffs': return <Tradeoffs r={r} />
+    case 'carbon': return <CarbonWater r={r} />
+    case 'ml': return <MlSection r={r} />
+    case 'report': return <Report r={r} />
+    case 'method': return <Method r={r} />
+  }
+}
+
+// map view: toolbar on top, panel with tabs on the left, the map takes the rest
+function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, layer, setLayer, fit }: {
+  r: Region; selected: string; setSelected: (h: string) => void; sid: string; setSid: (s: string) => void
+  metric: MetricKey; setMetric: (m: MetricKey) => void; layer: NasaLayer; setLayer: (l: NasaLayer) => void
+  fit: ReturnType<typeof fitScores>
+}) {
+  const l = useLang(), t = useT()
+  const ref = r.strategies
+  const [tab, setTab] = useState<'summary' | 'cell'>('summary')
+  const [panel, setPanel] = useState(true)
+  const cell = r.cells.find((c) => c.h3 === selected)!
+  const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
+  const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
+  const cur = ref[0]
+  const low = [...ref].sort((a, b) => a.metrics.erosion - b.metrics.erosion)[0]
+  const lowCut = Math.round((1 - low.metrics.erosion / Math.max(cur.metrics.erosion, 0.01)) * 100)
+  const top = [...ref].sort((a, b) => b.metrics.profit[1] - a.metrics.profit[1])[0]
+  const n = r.years[1] - r.years[0] + 1
+  const best = fit && ref.find((s) => s.id === fit.best)
+  const tag = (s: Strategy) => (s.id === 'current' ? t('Now', 'Сейчас') : s.id)
+  const pick = (h: string) => { setSelected(h); setTab('cell'); setPanel(true) }
+
   return (
-    <>
-      <section className="sec hero" id="top" data-enter>
-        <div className="wrap hero-grid">
-          <div>
-            <p className="eyebrow">{rname(r, l)}</p>
-            <h1 className="h-xl">{t('Crop rotation planner for dry farms, built on NASA data', 'Планировщик севооборотов для засушливых хозяйств на данных NASA')}</h1>
-            <p className="lead">
-              {t(`Profit, soil loss, soil carbon${r.irrigated ? ' and water' : ''} for each rotation, replayed over ${n} real seasons (${r.years[0]}–${r.years[1]}).`,
-                `Прибыль, потеря почвы, углерод${r.irrigated ? ' и вода' : ''} для каждого севооборота на ${n} реальных сезонах (${r.years[0]}–${r.years[1]}).`)}
-            </p>
-            <div className="actions">
-              <a className="btn btn-solid" href="#map">{t('Open the field map', 'Открыть карту полей')}</a>
-              <a className="btn btn-ghost" href="#report">{t('Download the report', 'Скачать отчёт')}</a>
+    <div className="ov">
+      <div className="toolbar">
+        <label className="tool"><span>{t('Strategy', 'Стратегия')}</span>
+          <select value={sid} onChange={(e) => setSid(e.target.value)}>
+            {ref.map((s) => <option key={s.id} value={s.id}>{short(s, l)}</option>)}
+          </select>
+        </label>
+        <div className="seg seg-sm" role="group" aria-label={t('Colour cells by', 'Цвет ячеек')} title={METRICS[metric][l === 'ru' ? 1 : 0]}>
+          {metricKeys.map((k) => <button key={k} aria-pressed={metric === k} onClick={() => setMetric(k)}>{METRIC_SHORT[k][l === 'ru' ? 1 : 0]}</button>)}
+        </div>
+        <label className="tool"><span>{t('NASA layer', 'Слой NASA')}</span>
+          <select value={layer} onChange={(e) => setLayer(e.target.value as NasaLayer)}>
+            {Object.entries(NASA_LAYERS).map(([k, v]) => <option key={k} value={k}>{l === 'ru' ? v.ru : v.label}</option>)}
+          </select>
+        </label>
+        <span className="toolbar-end">
+          <a className="btn btn-ghost btn-sm" href="#report">{t('Export', 'Выгрузка')}</a>
+          <button className="btn btn-ghost btn-sm panel-toggle" onClick={() => setPanel((v) => !v)} aria-expanded={panel}>{panel ? t('Hide panel', 'Скрыть панель') : t('Show panel', 'Показать панель')}</button>
+        </span>
+      </div>
+      <div className={`ov-body${panel ? '' : ' no-panel'}`}>
+        {panel && (
+          <aside className="ov-panel">
+            <div className="tabs" role="tablist">
+              <button role="tab" aria-selected={tab === 'summary'} onClick={() => setTab('summary')}>{t('Summary', 'Сводка')}</button>
+              <button role="tab" aria-selected={tab === 'cell'} onClick={() => setTab('cell')}>
+                {selected === r.rep_cell ? t('Reference field', 'Опорное поле') : t(`Cell ${cellNo}`, `Ячейка ${cellNo}`)}
+              </button>
             </div>
-          </div>
-          <div className="panel hero-card" aria-label={t('Reference field summary', 'Опорное поле, сводка')}>
-            <div className="row-between"><span className="label">{t('Reference field', 'Опорное поле')}</span><span className="mono small">{r.cells.length} {t('soil cells', 'почвенных ячеек')}</span></div>
-            {ref.map((s) => (
-              <div className="hero-row" key={s.id}>
-                <span className="dot" style={{ background: SC[s.id] }} />
-                <span className="hero-name">{short(s, l)}</span>
-                <Rotation r={r} s={s} />
-                <span className="mono">{usd(s.metrics.profit[1])}</span>
-                <span className="mono muted">{s.metrics.erosion} {t('t', 'т')}</span>
-              </div>
-            ))}
-            <p className="small muted">
-              {t(`Median profit per hectare a year and soil loss. Lowest soil loss: ${short(low, l)}, ${lowCut}% below current practice.`,
-                `Медианная прибыль на гектар в год и эрозия. Меньше всего эрозии: ${short(low, l)}, на ${lowCut}% ниже текущей практики.`)}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="sec" id="map">
-        <div className="wrap">
-          <SecHead n="1" title={t('Field map with NASA layers', 'Карта полей со слоями NASA')} sub={t('Click a cell to see its soil and how each rotation does there.', 'Нажмите на ячейку: её почва и результат каждого севооборота.')} />
-          <div className="map-grid">
-            <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={setSelected} />
-            <div className="panel side">
-              <Field label={t('Strategy on the map', 'Стратегия на карте')}>
-                <select value={sid} onChange={(e) => setSid(e.target.value)}>
-                  {ref.map((s) => <option key={s.id} value={s.id}>{sname(s, l)}</option>)}
-                </select>
-              </Field>
-              <Field label={t('Colour cells by', 'Цвет ячеек')}>
-                <select value={metric} onChange={(e) => setMetric(e.target.value as MetricKey)}>
-                  {metricKeys.map((k) => <option key={k} value={k}>{METRICS[k][l === 'ru' ? 1 : 0]}</option>)}
-                </select>
-              </Field>
-              <Field label={t('NASA layer', 'Слой NASA')}>
-                <select value={layer} onChange={(e) => setLayer(e.target.value as NasaLayer)}>
-                  {Object.entries(NASA_LAYERS).map(([k, v]) => <option key={k} value={k}>{l === 'ru' ? v.ru : v.label}</option>)}
-                </select>
-              </Field>
-              <h3 className="h-sm">{selected === r.rep_cell ? t('Reference field', 'Опорное поле') : t(`Field cell ${cellNo} of ${r.cells.length}`, `Ячейка ${cellNo} из ${r.cells.length}`)}</h3>
-              <p className="small mono">
-                {t('clay', 'глина')} {cell.soil.clay.toFixed(0)}% · {t('sand', 'песок')} {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} {t('g/kg', 'г/кг')}
-              </p>
-              <MlCellBox r={r} h3={selected} />
-              <table className="tbl">
-                <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Profit P10–P90', 'Прибыль P10–P90')}</th><th>{t('Soil loss', 'Эрозия')}</th></tr></thead>
-                <tbody>
-                  {ref.map((s) => {
-                    const m = cell.s[s.id]
-                    return (
-                      <tr key={s.id} aria-selected={s.id === sid} onClick={() => setSid(s.id)}>
-                        <td><span className="dot" style={{ background: SC[s.id] }} />{short(s, l)}</td>
-                        <td className="mono">{usd(m.profit[0])}…{usd(m.profit[2])}</td>
-                        <td className="mono">{m.erosion}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+            <div className="ov-scroll">
+              {tab === 'summary' ? (
+                <>
+                  <div className="tiles">
+                    <a className="tile tile-blue" href="#strategies"><strong>{usd(top.metrics.profit[1])}</strong><span>{t(`Most profit, ${tag(top)}`, `Больше всего прибыли: ${tag(top)}`)}</span></a>
+                    <a className="tile tile-ink" href="#carbon"><strong>−{lowCut}%</strong><span>{t(`Soil loss, ${tag(low)} vs now`, `Эрозия: ${tag(low)} к текущей`)}</span></a>
+                    {best && <a className="tile tile-grey" href="#strategies"><strong>{tag(best)}</strong><span>{t('Fits your priorities', 'Под ваши приоритеты')}</span></a>}
+                    <a className="tile tile-white" href="#time"><strong>{n}</strong><span>{t(`Real seasons, ${r.years[0]}–${r.years[1]}`, `Реальных сезонов, ${r.years[0]}–${r.years[1]}`)}</span></a>
+                  </div>
+                  <section className="card-s">
+                    <h2 className="h-sm">{t('Four rotations, one field', 'Четыре севооборота, одно поле')}</h2>
+                    <table className="tbl">
+                      <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Profit /ha', 'Прибыль /га')}</th><th>{t('Soil loss', 'Эрозия')}</th></tr></thead>
+                      <tbody>
+                        {ref.map((s) => (
+                          <tr key={s.id} aria-selected={s.id === sid} onClick={() => setSid(s.id)}>
+                            <td className="nw"><span className="dot" style={{ background: SC[s.id] }} />{short(s, l)}</td>
+                            <td className="mono">{usd(s.metrics.profit[1])}</td>
+                            <td className="mono">{s.metrics.erosion} {t('t', 'т')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="small muted">{t('Median a year. Click a row to colour the map by that strategy; click a cell on the map for its soil.', 'Медиана за год. Нажмите на строку — карта окрасится по этой стратегии; на ячейку карты — её почва.')}</p>
+                  </section>
+                  <section className="card-s">
+                    <h2 className="h-sm">{t('Next steps', 'Что дальше')}</h2>
+                    <ul className="steps small">
+                      <li><a href="#strategies">{t('Compare the rotations and set your priorities', 'Сравнить севообороты и задать приоритеты')}</a></li>
+                      <li><a href="#time">{t('Replay a bad year', 'Прокрутить плохой год')}</a></li>
+                      <li><a href="#climate">{t('Try a warmer, drier climate', 'Проверить более тёплый и сухой климат')}</a></li>
+                      <li><a href="#report">{t('Download the report for an agronomist, lender or insurer', 'Скачать отчёт для агронома, банка или страховщика')}</a></li>
+                    </ul>
+                  </section>
+                </>
+              ) : (
+                <section className="card-s">
+                  <h2 className="h-sm">{selected === r.rep_cell ? t('Reference field', 'Опорное поле') : t(`Field cell ${cellNo} of ${r.cells.length}`, `Ячейка ${cellNo} из ${r.cells.length}`)}</h2>
+                  <p className="small mono">
+                    {t('clay', 'глина')} {cell.soil.clay.toFixed(0)}% · {t('sand', 'песок')} {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} {t('g/kg', 'г/кг')}
+                  </p>
+                  <table className="tbl">
+                    <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Profit P10–P90', 'Прибыль P10–P90')}</th><th>{t('Soil loss', 'Эрозия')}</th></tr></thead>
+                    <tbody>
+                      {ref.map((s) => {
+                        const m = cell.s[s.id]
+                        return (
+                          <tr key={s.id} aria-selected={s.id === sid} onClick={() => setSid(s.id)}>
+                            <td className="nw"><span className="dot" style={{ background: SC[s.id] }} />{short(s, l)}</td>
+                            <td className="mono">{usd(m.profit[0])}…{usd(m.profit[2])}</td>
+                            <td className="mono">{m.erosion}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                  <MlCellBox r={r} h3={selected} />
+                  {selected !== r.rep_cell && <button className="btn btn-ghost btn-sm" onClick={() => setSelected(r.rep_cell)}>{t('Back to the reference field', 'Вернуться к опорному полю')}</button>}
+                </section>
+              )}
             </div>
-          </div>
-        </div>
-      </section>
+          </aside>
+        )}
+        <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={pick} />
+      </div>
+    </div>
+  )
+}
 
-      <section className="sec" id="strategies">
-        <div className="wrap">
-          <SecHead n="2" title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives. Set what matters on your farm.', 'Текущая практика против трёх альтернатив. Задайте, что важно в вашем хозяйстве.')} />
-          <Priorities r={r} price={price} setPrice={setPrice} w={w} setW={setW} fit={fit} />
-          <div className="cards">
-            {ref.map((s) => <StrategyCard key={s.id} r={r} s={s} price={price} best={fit?.best === s.id} />)}
-          </div>
+function Strategies({ r, price, setPrice, w, setW, fit }: {
+  r: Region; price: number; setPrice: (v: number) => void; w: Weights; setW: (v: Weights) => void; fit: ReturnType<typeof fitScores>
+}) {
+  const t = useT()
+  return (
+    <section className="sec" id="strategies">
+      <div className="wrap">
+        <SecHead title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives. Set what matters on your farm.', 'Текущая практика против трёх альтернатив. Задайте, что важно в вашем хозяйстве.')} />
+        <Priorities r={r} price={price} setPrice={setPrice} w={w} setW={setW} fit={fit} />
+        <div className="cards">
+          {r.strategies.map((s) => <StrategyCard key={s.id} r={r} s={s} price={price} best={fit?.best === s.id} />)}
         </div>
-      </section>
-
-      <TimeMachine r={r} />
-      <Twin r={r} />
-      <Tradeoffs r={r} />
-      <CarbonWater r={r} />
-      <MlSection r={r} />
-      <Report r={r} />
-      <Method r={r} />
-    </>
+      </div>
+    </section>
   )
 }
 
