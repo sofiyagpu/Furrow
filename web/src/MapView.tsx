@@ -78,7 +78,9 @@ export default function MapView(props: P) {
       drawPins(m, p, pins.current, ru)
     })
     map.current = m
-    return () => { pins.current.forEach((x) => x.remove()); pins.current = []; m.remove() }
+    const ro = new ResizeObserver(() => m.resize()) // the side panel can open and close
+    ro.observe(box.current!)
+    return () => { ro.disconnect(); pins.current.forEach((x) => x.remove()); pins.current = []; m.remove() }
   }, [props.region.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

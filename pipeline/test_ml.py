@@ -1,7 +1,7 @@
 """ML contract checks: .venv/bin/python -m pytest pipeline/test_ml.py"""
 import json
 import pytest
-from build import load_ml, ML
+from build import load_ml, ML, OUT
 
 
 def write(tmp_path, obj):
@@ -26,6 +26,9 @@ def test_broken_json_fails_loudly(tmp_path):
 
 
 def test_repo_files_load():
-    assert load_ml(ML / "az.json")["cells"] == {}            # real file: no fake cells
+    for p in ML.glob("*.json"):                               # real ML files: every cell must be on the region grid
+        grid = {c["h3"] for c in json.loads((OUT / f"{p.stem}.json").read_text())["cells"]}
+        stray = set(load_ml(p)["cells"]) - grid
+        assert not stray, f"{p.name}: cells outside the {p.stem} grid: {sorted(stray)[:3]}"
     fx = load_ml(ML / "fixtures" / "az.one-cell.json")
     assert set(fx["cells"]["8548eb87fffffff"]) >= {"crop", "crop_p", "crop_pixel_share", "low_confidence", "years"}

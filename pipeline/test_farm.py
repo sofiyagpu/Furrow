@@ -23,3 +23,11 @@ def test_farm_thin_market_share():
 
 def test_smap_missing_file():
     assert smap_check("nowhere", "x", []) is None
+
+
+def test_imerg_power_scales_months():
+    from build import imerg_power
+    power = {"dates": ["20200101", "20200102", "20200201", "20200301"], "PRECTOTCORR": [2.0, 2.0, 0.5, -999.0]}
+    out = imerg_power(power, {"months": ["2020-01", "2020-02", "2020-03"], "mm": [8.0, 9.0, 5.0]})
+    assert out["PRECTOTCORR"] == [4.0, 4.0, 0.5, -999.0]  # Jan x2; Feb under 1 mm stays; missing stays missing
+    assert power["PRECTOTCORR"][0] == 2.0  # input untouched
