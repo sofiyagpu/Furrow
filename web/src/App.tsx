@@ -108,6 +108,9 @@ function Page({ r }: { r: Region }) {
   const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
   const n = r.years[1] - r.years[0] + 1
   const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
+  const [price, setPrice] = useState(0)
+  const [w, setW] = useState<Weights>({ profit: 2, water: 1, market: 1, n: 1 })
+  const fit = useMemo(() => fitScores(r, price, w), [r, price, w])
 
   return (
     <>
@@ -192,9 +195,10 @@ function Page({ r }: { r: Region }) {
 
       <section className="sec" id="strategies">
         <div className="wrap">
-          <SecHead n="2" title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives.', 'Текущая практика против трёх альтернатив.')} />
+          <SecHead n="2" title={t('Four rotations to test with your agronomist', 'Четыре севооборота для проверки с агрономом')} sub={t('Current practice against three alternatives. Set what matters on your farm.', 'Текущая практика против трёх альтернатив. Задайте, что важно в вашем хозяйстве.')} />
+          <Priorities r={r} price={price} setPrice={setPrice} w={w} setW={setW} fit={fit} />
           <div className="cards">
-            {ref.map((s) => <StrategyCard key={s.id} r={r} s={s} />)}
+            {ref.map((s) => <StrategyCard key={s.id} r={r} s={s} price={price} best={fit?.best === s.id} />)}
           </div>
         </div>
       </section>
@@ -225,22 +229,122 @@ function Rotation({ r, s }: { r: Region; s: { rotation: string[] } }) {
 
 const irrName = (i: string | undefined, t: (a: string, b: string) => string) => (i ? `, ${i === 'drip' ? t('drip', 'капельный') : t('flood', 'напуск')}` : '')
 
-// card: name, rotation, one idea, the median profit large, three numbers, the risk in one line
-function StrategyCard({ r, s }: { r: Region; s: Strategy }) {
+// ---------- farmer priorities: weights over four numbers the pipeline already computed ----------
+type Weights = { profit: number; water: number; market: number; n: number }
+type Dim = keyof Weights
+const DIMS: Dim[] = ['profit', 'water', 'market', 'n']
+const LEVEL: [string, string][] = [['ignore', 'не важно'], ['some', 'немного'], ['important', 'важно'], ['top', 'главное']]
+
+// price slider: crop prices change revenue only, costs stay (pct = -0.3..0.3)
+const atPrice = (s: Strategy, pct: number, v: number) => v + pct * (s.farm?.revenue ?? 0)
+
+// score 0-1 relative to these four strategies; best per dimension = 1, worst = 0
+function fitScores(r: Region, pct: number, w: Weights) {
+  const S = r.strategies
+  if (!S.every((s) => s.farm)) return null // data built before the priorities existed
+  const raw: Record<Dim, number[]> = {
+    profit: S.map((s) => atPrice(s, pct, s.metrics.profit[1])),
+    water: S.map((s) => (r.irrigated ? s.metrics.irr[1] : s.farm!.water_stress ?? 0)),
+    market: S.map((s) => s.farm!.deep_market ?? 0),
+    n: S.map((s) => s.farm!.n_kg),
+  }
+  const up: Record<Dim, boolean> = { profit: true, water: false, market: true, n: false }
+  const part = Object.fromEntries(DIMS.map((d) => {
+    const v = raw[d], lo = Math.min(...v), hi = Math.max(...v)
+    return [d, v.map((x) => (hi === lo ? 1 : up[d] ? (x - lo) / (hi - lo) : (hi - x) / (hi - lo)))]
+  })) as Record<Dim, number[]>
+  const tot = DIMS.reduce((a, d) => a + w[d], 0)
+  const score = S.map((_, i) => (tot ? DIMS.reduce((a, d) => a + w[d] * part[d][i], 0) / tot : 0))
+  const bi = score.indexOf(Math.max(...score))
+  return { raw, part, score, best: S[bi].id, bi }
+}
+
+function Priorities({ r, price, setPrice, w, setW, fit }: {
+  r: Region; price: number; setPrice: (v: number) => void; w: Weights; setW: (v: Weights) => void; fit: ReturnType<typeof fitScores>
+}) {
+  const l = useLang(), t = useT()
+  if (!fit) return null
+  const name: Record<Dim, string> = {
+    profit: t('Profit', 'Прибыль'), water: t('Water', 'Вода'), market: t('Market', 'Рынок'), n: t('Nitrogen', 'Азот'),
+  }
+  const hint: Record<Dim, string> = {
+    profit: t('median $/ha a year at these prices', 'медиана $/га в год при этих ценах'),
+    water: r.irrigated ? t('pumped water, mm a year', 'откачка, мм в год') : t('crop water demand not met', 'недобор воды культурой'),
+    market: t('revenue from crops with several buyers', 'выручка с культур, у которых много покупателей'),
+    n: t('mineral N bought, kg/ha a year', 'покупной азот, кг/га в год'),
+  }
+  const val = (d: Dim, i: number) => {
+    const v = fit.raw[d][i]
+    if (d === 'profit') return usd(v)
+    if (d === 'water') return r.irrigated ? `${Math.round(v)} ${t('mm', 'мм')}` : `${Math.round(v * 100)}%`
+    if (d === 'market') return `${Math.round(v * 100)}%`
+    return `${Math.round(v)} ${t('kg', 'кг')}`
+  }
+  const on = DIMS.filter((d) => w[d] > 0)
+  const strong = on.filter((d) => fit.part[d][fit.bi] > 0.99).map((d) => name[d].toLowerCase())
+  const weak = on.filter((d) => fit.part[d][fit.bi] < 0.34).map((d) => name[d].toLowerCase())
+  const best = r.strategies[fit.bi]
+  return (
+    <div className="panel prio">
+      <div className="prio-in">
+        {DIMS.map((d) => (
+          <label className="field" key={d}>
+            <span className="label">{name[d]}: {LEVEL[w[d]][l === 'ru' ? 1 : 0]}</span>
+            <input type="range" min={0} max={3} value={w[d]} onChange={(e) => setW({ ...w, [d]: +e.target.value })} />
+          </label>
+        ))}
+        <label className="field">
+          <span className="label">{t('Crop prices', 'Цены на урожай')}: {price > 0 ? '+' : ''}{Math.round(price * 100)}%</span>
+          <input type="range" min={-0.3} max={0.3} step={0.05} value={price} onChange={(e) => setPrice(+e.target.value)} />
+        </label>
+      </div>
+      <table className="tbl">
+        <thead><tr><th>{t('Strategy', 'Стратегия')}</th>{DIMS.map((d) => <th key={d} title={hint[d]}>{name[d]}</th>)}<th>{t('Fit', 'Подходит')}</th></tr></thead>
+        <tbody>
+          {r.strategies.map((s, i) => (
+            <tr key={s.id}>
+              <td><span className="dot" style={{ background: SC[s.id] }} />{short(s, l)}</td>
+              {DIMS.map((d) => <td key={d} className={`mono${w[d] && fit.part[d][i] > 0.99 ? ' lead-cell' : ''}`}>{val(d, i)}</td>)}
+              <td><span className="fit"><i style={{ width: `${Math.round(fit.score[i] * 100)}%`, background: SC[s.id] }} /></span><span className="mono small">{Math.round(fit.score[i] * 100)}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="small">
+        {on.length ? <>
+          <strong>{t('Best fit', 'Лучше всего подходит')}: {short(best, l)}.</strong>{' '}
+          {strong.length > 0 && t(`Leads on ${strong.join(', ')}.`, `Лучшая по пунктам: ${strong.join(', ')}.`)}{' '}
+          {weak.length > 0 && t(`Gives up ${weak.join(', ')}.`, `Уступает по пунктам: ${weak.join(', ')}.`)}
+        </> : t('Turn on at least one priority.', 'Включите хотя бы один приоритет.')}
+      </p>
+      <p className="small muted">
+        {t(`Columns: ${DIMS.map((d) => `${name[d].toLowerCase()} = ${hint[d]}`).join('; ')}. Fit is relative to these four. Nitrogen and market depth are assumptions to check with an agronomist.`,
+          `Столбцы: ${DIMS.map((d) => `${name[d].toLowerCase()} — ${hint[d]}`).join('; ')}. «Подходит» — относительно этих четырёх. Азот и глубина рынка — допущения, проверьте с агрономом.`)}
+      </p>
+    </div>
+  )
+}
+
+// card: name, rotation, why and benefit, the median profit large, three numbers, the risk in one line
+function StrategyCard({ r, s, price, best }: { r: Region; s: Strategy; price: number; best: boolean }) {
   const l = useLang(), t = useT()
   const m = s.metrics
   const name = sname(s, l).split(':')[0]
+  const why = (l === 'ru' && s.why_ru) || s.why
   return (
     <article className="panel card" style={{ borderTopColor: SC[s.id] }}>
       <div>
-        <h3 className="h-sm">{name}</h3>
+        <h3 className="h-sm">{name}{best && <span className="badge best">{t('best fit', 'лучше всего')}</span>}</h3>
         <p className="small muted">{s.notill ? 'No-till' : t('Tilled', 'Вспашка')}{irrName(s.irrigation, t)}</p>
       </div>
       <Rotation r={r} s={s} />
-      <p className="small">{(l === 'ru' && s.idea_ru) || s.idea}</p>
+      <div className="small why">
+        {why && <p><strong>{t('Why', 'Почему')}.</strong> {why}</p>}
+        <p><strong>{t('Benefit', 'Польза')}.</strong> {(l === 'ru' && s.idea_ru) || s.idea}</p>
+      </div>
       <div className="profit">
-        <strong>{usd(m.profit[1])}</strong><span className="muted">{t(' /ha a year', ' /га в год')}</span>
-        <p className="small muted"><span className="nw">{t('bad year', 'плохой год')} {usd(m.profit[0])}</span> · <span className="nw">{t('good year', 'хороший')} {usd(m.profit[2])}</span></p>
+        <strong>{usd(atPrice(s, price, m.profit[1]))}</strong><span className="muted">{t(' /ha a year', ' /га в год')}</span>
+        <p className="small muted"><span className="nw">{t('bad year', 'плохой год')} {usd(atPrice(s, price, m.profit[0]))}</span> · <span className="nw">{t('good year', 'хороший')} {usd(atPrice(s, price, m.profit[2]))}</span></p>
       </div>
       <dl className="stats">
         <div><dt>{t('Soil loss', 'Эрозия')}</dt><dd className="mono">{m.erosion}<small> {t('t/ha', 'т/га')}</small></dd></div>
