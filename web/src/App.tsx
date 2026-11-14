@@ -100,13 +100,16 @@ export default function App() {
               <h1>{t(title[1], title[2])}</h1>
               {r && <span className="top-region">{rname(r, lang)}</span>}
             </div>
+            {/* narrow screens: one native select instead of a sideways-scrolling tab strip */}
+            <select className="msel" aria-label={t('Section', 'Раздел')} value={view} onChange={(e) => { location.hash = e.target.value }}>
+              {VIEWS.map(([v, en, ru]) => <option key={v} value={v}>{t(en, ru)}</option>)}
+            </select>
             <div className="top-tools">
               <span className="top-mobile">{regionSeg}{langSeg}</span>
               <Theme />
               {r && <Agent key={rid + lang} region={r} />}
             </div>
           </header>
-          <nav className="mtabs" aria-label={t('Sections', 'Разделы')}>{nav}</nav>
           <main id="main" className={`content view-${view}`}>
             {r ? <Page key={rid} r={r} view={view} /> : <p className="muted pad">{t('Loading the region', 'Загружаем регион')}</p>}
           </main>
@@ -126,7 +129,7 @@ function Theme() {
   return (
     <button className="theme" onClick={() => setM(m === 'dark' ? 'light' : 'dark')}
       aria-label={`${t('Theme', 'Тема')}: ${label}`} title={`${t('Theme', 'Тема')}: ${label}`}>
-      <span className={`theme-i theme-${m}`} aria-hidden />{label}
+      <span className={`theme-i theme-${m}`} aria-hidden /><span className="theme-t">{label}</span>
     </button>
   )
 }
@@ -230,15 +233,6 @@ function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, la
                       </tbody>
                     </table>
                     <p className="small muted">{t('Median a year. Click a row to colour the map by that strategy; click a cell on the map for its soil.', 'Медиана за год. Нажмите на строку — карта окрасится по этой стратегии; на ячейку карты — её почва.')}</p>
-                  </section>
-                  <section className="card-s">
-                    <h2 className="h-sm">{t('Next steps', 'Что дальше')}</h2>
-                    <ul className="steps small">
-                      <li><a href="#strategies">{t('Compare the rotations and set your priorities', 'Сравнить севообороты и задать приоритеты')}</a></li>
-                      <li><a href="#time">{t('Replay a bad year', 'Прокрутить плохой год')}</a></li>
-                      <li><a href="#climate">{t('Try a warmer, drier climate', 'Проверить более тёплый и сухой климат')}</a></li>
-                      <li><a href="#report">{t('Download the report for an agronomist, lender or insurer', 'Скачать отчёт для агронома, банка или страховщика')}</a></li>
-                    </ul>
                   </section>
                 </>
               ) : (
@@ -905,8 +899,8 @@ function MlSection({ r }: { r: Region }) {
             <p className="small muted">{t('Classifies the current crop of each cell from HLS / MODIS time series, so "current practice" comes from the field, not a guess.', 'Определяет текущую культуру ячейки по рядам HLS / MODIS, чтобы «текущая практика» бралась с поля, а не из догадки.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Not connected', 'Не подключено')}</span></div>
-            <p className="small muted">{t('SMAP pixels are 9 km wide. The model sharpens root-zone moisture to the cell, with a prediction interval.', 'Пиксель SMAP — 9 км. Модель уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Awaiting model', 'Ждёт модель')}</span></div>
+            <p className="small muted">{t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
