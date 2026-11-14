@@ -1,0 +1,345 @@
+consistency  http://localhost:5173/
+--quick: not checked: scroll-linked (stepping), scroll-reveal (the reveal walk; IntersectionObserver reveals are read), hover-spill, hidden-visual, loop-pause, forms, reduced-motion, the dead-IntersectionObserver walk (hidden content is read with scripts off and under reduced motion), hover-move. Still told: IntersectionObserver reveals (scroll-reveal), held sections (pinned) and CSS scroll timelines (scroll-linked); faults inside held or [data-big-scene] sections are WARNs
+
+1440x900  10 screens  33 FAIL  27 WARN
+  FAIL nav-covers      main#main > button.btn.btn-solid  "Ask about this field"
+       sits on top of the text "PROFIT PER HA, 1-IN-10 BAD YEAR TO 1-IN-" while the page scrolls: part of the line shows beside it  [1440-12-nav-covers.jpg]
+       fix: make the fixed nav one opaque band across the whole screen, or let it scroll away with the page
+  FAIL no-visual       section#strategies  "Four rotations to test with your agronom"
+       no picture, effect or mock in this section; a feature section needs a visual  [1440-13-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  FAIL cta             section#method  "Method, data and limits"
+       the last section before the footer ends with no button  [1440-27-cta.jpg]
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  FAIL copy-headings   div.wrap > div.two > div.panel.chart:nth-of-type(1) > h3.h-sm  "Profit per hectare by harvest year"
+       "Profit per hectare by harvest year" names no product, part, place or section (6 headings like it; at most one brand line per page) (and 5 more like it: "Carbon credits and the w", "Method, data and limits", "Data in this demo", "Models", ...)  [1440-16-copy-headings.jpg]
+       fix: name the thing in every heading: the product, a part, the place or a section noun
+  FAIL text-contrast   div.panel.hero-card > div.hero-row:nth-of-type(3) > span.rot > span.crop.crop-pulse  "Lentil"
+       a caption, label or muted line in #f2f2f2 on #557f67 reads 4.06:1 (needs 4.5:1); 10 like it, like "Field pea", "Sainfoin", "Sainfoin"  [1440-01-text-contrast.jpg]
+       fix: body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels
+  FAIL text-contrast   div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(1)  "clay 32% · sand 37% · SOC 33.3 g/kg · 12"
+       body text in #a4a4a4 on #1e1e1e reads 6.69:1 (needs 7:1); 6 like it, like "SMAP and IMERG are 9–1", "Soil lies bare 20+ mon", "Line: median over ever"  [1440-08-text-contrast.jpg]
+       fix: body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels
+  FAIL section-gaps    section#carbon / section#method
+       320px between these sections, +130% against the median 139px  [1440-30-section-gaps.jpg]
+       fix: use one gap between sections (all within 25% of each other)
+  FAIL phone-number    div.wrap > div.map-grid > div.panel.side > h3.h-sm  "8520636"
+       a phone number after its label: "8520636"; a visitor can dial it and reach a stranger  [1440-09-phone-number.jpg]
+       fix: drop the number and its tel: link (a "Request a call" form may stand in), unless the brief gives the number
+  FAIL focus-visible   div.map-grid > div.map.maplibregl-map:nth-of-type(1) > div.maplibregl-canvas-container.maplibregl-interactive:nth-of-type(1) > canvas.maplibregl-canvas  "Map"
+       Tab stop 14, canvas "Map": the focus lands on something you cannot see
+       fix: keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus
+  WARN no-visual       section#twin  "Climate twin: the same field, warmer and"
+       pictures, effects and mocks cover 17% of this section; a feature section needs a visual (about 25% or more)  [1440-18-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  WARN no-visual       section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       pictures, effects and mocks cover 18% of this section; a feature section needs a visual (about 25% or more)  [1440-20-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  WARN no-visual       section#method  "Method, data and limits"
+       pictures, effects and mocks cover 21% of this section; a feature section needs a visual (about 25% or more)  [1440-28-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  WARN text-only       section#carbon  "Carbon credits and the water budget"
+       the section is only text: no picture, icon, mock or effect in it  [1440-23-text-only.jpg]
+       fix: give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground
+  WARN copy-headline   section#top > div.wrap.hero-grid > div:nth-of-type(1) > h1.h-xl  "Crop rotation planner for dry farms, bui"
+       the h1 has 10 words (2 to 8 read at a glance)  [1440-02-copy-headline.jpg]
+       fix: put the category noun in the h1 (and who it is for, or where), in 2 to 8 words
+  WARN copy-actions    (the page)
+       the main action "Open the field map" does not read word for word the same in the closing section
+       fix: few actions, one wording: at most 2 in the hero, the main action word for word in nav, hero and close
+  WARN off-grid        div.wrap > div.row-between.filters > label.field.inline:nth-of-type(1) > input
+       left edge at 110px, 2px off the page margin at 108px (18 elements)  [1440-21-off-grid.jpg]
+       fix: move it onto the page margin, or the column edge its section uses
+  WARN off-grid        section#carbon > div.wrap > label.field.inline > input
+       left edge at 110px, 2px off the page margin at 108px (18 elements, like span.label)  [1440-24-off-grid.jpg]
+       fix: move it onto the page margin, or the column edge its section uses
+  WARN col-edge        section#top > div.wrap.hero-grid > div.panel.hero-card  "REFERENCE FIELD 23 soil cells Current Sp"
+       the second column starts at 3 places: 776px (section#top), 807px (section#time, section#twin, section#tradeoffs, section#carbon), 952px (section#map)  [1440-03-col-edge.jpg]
+       fix: start the second column of every split on the same one or two grid columns
+  WARN body-size       div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(1)  "clay 32% · sand 37% · SOC 33.3 g/kg · 12"
+       14 of 17 paragraphs of running text are set under 16px (14px)  [1440-10-body-size.jpg]
+       fix: set running text at 16px or more
+  WARN section-gaps    section#top / section#map
+       208px between these sections, +50% against the median 139px of gaps at a change of ground  [1440-29-section-gaps.jpg]
+       fix: use one gap between sections (all within 25% of each other)
+  WARN section-gaps    section#twin / section#tradeoffs
+       222px between these sections, +60% against the median 139px  [1440-19-section-gaps.jpg]
+       fix: use one gap between sections (all within 25% of each other)
+  WARN nav-labels      header.nav > div.wrap.nav-in > nav.nav-links > a:nth-of-type(2)  "Strategies"
+       "Strategies" opens a section headed "Four rotations to test with your agronomist"  [1440-04-nav-labels.jpg]
+       fix: name each nav link after the heading of the section it opens
+  WARN orphan          div.three > div.panel:nth-of-type(1) > ul.list-plain.small > li:nth-of-type(1)  "NASA POWER daily rain, temperature, wind"
+       its last line holds only "2024"  [1440-25-orphan.jpg]
+       fix: rebalance the text (text-wrap: pretty, or a shorter line) so the last line holds more than one short word
+  WARN unit-break      div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(2)  "SMAP and IMERG are 9–11 km pixels: they "
+       "250 km" breaks across two lines: the number ends one line and its unit starts the next (and 1 more like it: "Your field's own moistur")  [1440-14-unit-break.jpg]
+       fix: keep a number with its unit: a no-break space (&nbsp;) between them
+  WARN copy-length     section#top > div.wrap.hero-grid > div:nth-of-type(1) > h1.h-xl  "Crop rotation planner for dry farms, bui"
+       a headline of 10 words on 4 lines at 80px: a paragraph set in display type  [1440-05-copy-length.jpg]
+       fix: cut the heading to one short line (2 to 12 words) and move the rest into the text under it
+  WARN copy-length     section#strategies  "Four rotations to test with your agronom"
+       7 sections over 90 words a screen outside the UI mocks ("Four rotations to test w" 274, "Method, data and limits" 193, "Carbon credits and the w" 176); 145 words a screen across the page (1185 words in 8.2 screens): a tech page says it in about 80 or fewer  [1440-15-copy-length.jpg]
+       fix: cut every section to its heading, one line and the product UI: the UI says the rest; no second paragraph, no list of feature sentences
+  WARN nav-current     div#root > header.nav
+       the nav stays on screen with 7 links to the page's sections, but never marks the one you are in (no link changes as the page scrolls)  [1440-11-nav-current.jpg]
+       fix: mark the link of the section on screen (a colour, a weight or a line under it) as the visitor scrolls
+  WARN split-align     section#top > div.wrap.hero-grid  "East Kazakhstan (Shemonaikha, Glubokoe) "
+       the picture beside "East Kazakhstan (Shemonaikha, " sits centred on a text column 164px taller: its top and bottom line up with nothing  [1440-06-split-align.jpg]
+       fix: set the picture's top on the heading's top (align-items: start), or let it run the column's full height
+  WARN visual-caption  table.tbl > thead > tr > th:nth-of-type(1)  "Strategy"
+       a muted 12px line of 2 rows sits 6px under the drawing (svg): it reads as a caption: "Strategy"; no caption or description under any image, render or visual (house rule)  [1440-17-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+  WARN visual-caption  div.two > div.panel.chart > div.legend > span:nth-of-type(1)  "Searched"
+       a muted 13px line of 1 row sits 6px under the drawing (svg): it reads as a caption: "Searched"; no caption or description under any image, render or visual (house rule)  [1440-22-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+  WARN visual-caption  div.wrap > div.panel.chart > div.legend > span:nth-of-type(1)  "Rain"
+       a muted 13px line of 1 row sits 6px under the drawing (svg): it reads as a caption: "Rain"; no caption or description under any image, render or visual (house rule)  [1440-26-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+  WARN hero-enter      section#top
+       the hero does not enter on load: no head line setting html.m-enter (motion.md, The hero's entrance)  [1440-07-hero-enter.jpg]
+       fix: put data-enter on the hero <section> and keep the head line from starter.html that sets html.m-enter
+  WARN moment-none     (the page)
+       a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)
+       fix: deal one (moments.mjs pick --page software) and mount it in its own section
+  WARN section-tile    section#time  "Time machine: replay every season since "
+       the section is 848px tall (0.94 screens at 1440x900), shorter than the screen: its tile (the screen from its top) shows 787px of it and only 52px of the next section's ground ("Climate twin: the same field, "), none of its content  [1440-32-section-tile.jpg]
+       fix: set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb
+  WARN section-tile    section#carbon  "Carbon credits and the water budget"
+       the section is 840px tall (0.93 screens at 1440x900), shorter than the screen: its tile (the screen from its top) shows 779px of it and only 60px of the next section's ground ("Method, data and limits"), none of its content  [1440-35-section-tile.jpg]
+       fix: set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb
+  WARN share-meta      head
+       the head lacks og:image, twitter:card: a shared link shows no picture or title of its own
+       fix: copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)
+  FAIL section-height  div#root > footer.foot  "Weather: NASA POWER. Soil: ISRIC SoilGri"
+       the section is 145px tall (0.2 screens), 756px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)  [1440-rhythm-01-section-height.jpg]
+       fix: set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit
+  FAIL section-height  section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       the section is 1046px tall (1.2 screens), 146px over one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)
+       fix: set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit
+  FAIL section-height  section#twin  "Climate twin: the same field, warmer and"
+       the section is 840px tall (0.9 screens), 60px short of one screen (900px): every section after the hero is one screen or two, 2px either way (and 5 more like it: "Carbon credits and the w", "Method, data and limitsD", "Time machine: replay eve") (SR-2)
+       fix: set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit
+  FAIL section-height  section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       the section starts at 4397px, 103px above the screen grid (5 x 900px): sections start on whole screens (SR-2)
+       fix: make every section above it exactly one or two screens tall, so this one starts on a whole screen
+  FAIL section-height  div#root > footer.foot  "Weather: NASA POWER. Soil: ISRIC SoilGri"
+       the section starts at 7122px, 78px above the screen grid (8 x 900px): sections start on whole screens (SR-2)
+       fix: make every section above it exactly one or two screens tall, so this one starts on a whole screen
+  FAIL section-height  section#top  "East Kazakhstan (Shemonaikha, Glubokoe)C"
+       the section starts at 61px, 61px below the screen grid (0 x 900px): sections start on whole screens (and 5 more like it: "Climate twin: the same f", "Carbon credits and the w", "Method, data and limitsD") (SR-2)
+       fix: make every section above it exactly one or two screens tall, so this one starts on a whole screen
+  FAIL one-section     section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       the screen at scroll 3600px (stride 4) shows 103px of section 6 and the content of 2 sections, over 24px each beside section 5: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)  [1440-rhythm-02-one-section.jpg]
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL one-section     div#root > footer.foot  "Weather: NASA POWER. Soil: ISRIC SoilGri"
+       the screen at scroll 6300px (stride 7) shows 78px of section 9 beside section 8: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL one-section     section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       the screen at scroll 3557px (the top of section 5) shows 60px of section 6 beside section 5: a screen shows one section (another may peek 8px, 24px WARN) (and 6 more like it: scroll 61px, scroll 5442px, scroll 6282px) (SR-4)
+       fix: make each section exactly one screen or two, so a screen shows one section and no neighbour peeks
+  FAIL one-section     main#main > button.btn.btn-solid  "Ask about this field"
+       a <button> sits directly in <main>: every part of <main> is a <section> (SR-4)
+       fix: put every block of <main> in a <section>, and give a band its own section instead of a ground inside one
+  FAIL container-edges div#root > header.nav  "furrow.MapStrategiesTime machineClimateT"
+       the nav's content runs 60px from the left and 60px from the right: the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)  [1440-rhythm-03-container-edges.jpg]
+       fix: use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone
+  FAIL container-edges section#top  "East Kazakhstan (Shemonaikha, Glubokoe)C"
+       the content of section 1 runs 60px from the left and 60px from the right: the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (and 9 more like it: "Field map with NASA laye", "Four rotations to test w", "Time machine: replay eve") (SR-6)
+       fix: use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone
+  FAIL container-edges div#root  "Skip to contentfurrow.MapStrategiesTime "
+       a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)
+       fix: build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing
+  FAIL container-edges span#recharts_measurement_span  "40"
+       a <span> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (and 1 more like it: "East Kazakhstan (Shemona") (SR-6)
+       fix: build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing
+  FAIL container-edges section#method > div.wrap > div.panel.chart > h3.h-sm  "Climate of the reference field, NASA POW"
+       2 text blocks start on a left line at x 131, 71px from the container's left: text starts on the container's left, or on one split line (x 620, 732, 844) (also "Rain") (SR-6)
+       fix: start the text on the container's left, or on the one split line every split shares
+  FAIL container-edges section#top > div.wrap.hero-grid > div:nth-of-type(1) > p.eyebrow  "East Kazakhstan (Shemonaikha, Glubokoe)"
+       18 text blocks start on a left line at x 108, 48px from the container's left: text starts on the container's left, or on one split line (x 620, 732, 844) (also "Crop rotation planner for dry fa", "Compare rotations on your field ", "Field map with NASA layers") (and 8 more like it: "Crop rotation planner fo", "Field map with NASA laye", "Four rotations to test w") (SR-6)
+       fix: start the text on the container's left, or on the one split line every split shares
+  FAIL container-edges section#carbon > div.wrap > label.field.inline > input
+       a box over half the container wide runs 110-1334px, not on the container's lines at 60-1380px (SR-6)
+       fix: run the picture or box from the container's left line to its right line, or put it in a row or a split
+  FAIL container-edges section#method > div.wrap > div.panel.chart  "Climate of the reference field, NASA POW"
+       a box over half the container wide runs 108-1332px, not on the container's lines at 60-1380px (SR-6)
+       fix: run the picture or box from the container's left line to its right line, or put it in a row or a split
+  FAIL row-lines       section#map > div.wrap > div.map-grid  "Use ⌘ + scroll to zoom the mapUse two fi"
+       a row of 2 items: its first item starts at 108px, the container's left line at 60px; its last item ends at 1332px, the container's right line at 1380px; its items are 630/705px tall, not one height (2px either way) (SR-7)  [1440-rhythm-04-row-lines.jpg]
+       fix: start the row's first item on the container's left line and end its last on the right line, every item one height
+  FAIL row-lines       section#strategies > div.wrap > div.cards  "Current: wheat, wheat, black fallowSprin"
+       a row of 4 items: its first item starts at 108px, the container's left line at 60px; its last item ends at 1332px, the container's right line at 1380px (2px either way) (SR-7)
+       fix: start the row's first item on the container's left line and end its last on the right line, every item one height
+  FAIL row-lines       section#time > div.wrap > div.two  "Profit per hectare by harvest yearLine: "
+       a row of 2 items: its first item starts at 108px, the container's left line at 60px; its last item ends at 1332px, the container's right line at 1380px (2px either way) (and 4 more like it: "Warming: +2 °CRainfall: ", "Median profit against so", "Soil-carbon credits agai") (SR-7)
+       fix: start the row's first item on the container's left line and end its last on the right line, every item one height
+  FAIL split-pair      section#top > div.wrap.hero-grid  "East Kazakhstan (Shemonaikha, Glubokoe)C"
+       the two columns of the split start 81px apart at the top (centred on each other): a split's columns are top-aligned, 8px either way (SR-8)  [1440-rhythm-05-split-pair.jpg]
+       fix: top-align both columns of the split (align-items: start)
+  FAIL split-pair      section#top > div.wrap.hero-grid  "East Kazakhstan (Shemonaikha, Glubokoe)C"
+       the split's columns are off the page's one pair of lines: its right column starts at x 776, on none of the split lines 620 (k=5), 732 (k=6), 844 (k=7) (SR-8)
+       fix: start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it
+  FAIL split-pair      section#top > div.wrap.hero-grid  "East Kazakhstan (Shemonaikha, Glubokoe)C"
+       the split does not run edge to edge on the container: its left column starts at 108px, the container's left at 60px; its right column ends at 1332px, the container's right at 1380px (SR-8)
+       fix: run the split from the container's left line to its right line
+  (probe error) effect-kind: 4 files not read: react-dom_client.js (over 3 MB (3.1 MB)), recharts.js (over 3 MB (5.2 MB)), maplibre-gl.js (over 3 MB (4.4 MB)), ...
+
+390x844  17 screens  11 FAIL  22 WARN
+  FAIL nav-covers      main#main > button.btn.btn-solid  "Ask about this field"
+       sits on top of the text "Soil lies bare 20+ months per cycle: win" while the page scrolls: part of the line shows beside it  [390-10-nav-covers.jpg]
+       fix: make the fixed nav one opaque band across the whole screen, or let it scroll away with the page
+  FAIL tap-size        div.maplibregl-control-container > div.maplibregl-ctrl-top-right > div.maplibregl-ctrl.maplibregl-ctrl-group > button.maplibregl-ctrl-zoom-in
+       a 29x29px tap target: 0px from the next one (""), so a thumb lands on the wrong one  [390-04-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  FAIL tap-size        div.maplibregl-control-container > div.maplibregl-ctrl-top-right > div.maplibregl-ctrl.maplibregl-ctrl-group > button.maplibregl-ctrl-zoom-out
+       a 29x29px tap target: 0px from the next one (""), so a thumb lands on the wrong one  [390-05-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  FAIL no-visual       section#strategies  "Four rotations to test with your agronom"
+       no picture, effect or mock in this section; a feature section needs a visual  [390-12-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  FAIL no-visual       section#method  "Method, data and limits"
+       pictures, effects and mocks cover 12% of this section; a feature section needs a visual (about 25% or more)  [390-30-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  FAIL cta             section#method  "Method, data and limits"
+       the last section before the footer ends with no button  [390-31-cta.jpg]
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  FAIL centre-axis     section#carbon > div.wrap > label.field.inline > input
+       centred on the screen (197px), but the content column around it runs 16-278px, whose middle is 147px: 48px off the column's axis  [390-26-centre-axis.jpg]
+       fix: centre the block on its container (margin-inline: auto), or set it on the left grid
+  FAIL contrast        section#top > div.wrap.hero-grid > div:nth-of-type(1) > p.eyebrow  "East Kazakhstan (Shemonaikha, Glubokoe)"
+       body text over a effect reads at 3.9:1 at its worst tenth (needs 4.5:1) (and 1 more like it: "Compare rotations on you")  [390-01-contrast.jpg]
+       fix: put the text on a calm part of the picture, or on a solid panel
+  FAIL contrast        div.wrap.hero-grid > div.panel.hero-card > div.hero-row:nth-of-type(4) > span.mono:nth-of-type(4)  "$119"
+       body text over a effect reads at 1.1:1 at its worst tenth (needs 4.5:1), on a busy ground  [390-02-contrast.jpg]
+       fix: put the text on a calm part of the picture, or on a solid panel
+  FAIL text-contrast   div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(1)  "clay 32% · sand 37% · SOC 33.3 g/kg · 12"
+       body text in #a4a4a4 on #1e1e1e reads 6.69:1 (needs 7:1); 6 like it, like "SMAP and IMERG are 9–1", "Soil lies bare 20+ mon", "Line: median over ever"  [390-06-text-contrast.jpg]
+       fix: body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels
+  FAIL text-contrast   div.cards > article.panel.card:nth-of-type(2) > span.rot > span.crop.crop-pulse  "Lentil"
+       a caption, label or muted line in #f2f2f2 on #557f67 reads 4.06:1 (needs 4.5:1); 5 like it, like "Field pea", "Sainfoin", "Sainfoin"  [390-13-text-contrast.jpg]
+       fix: body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels
+  WARN tap-size        div#root > header.nav > div.wrap.nav-in > a.mark  "furrow."
+       a 63x33px tap target: under the 44px a phone needs  [390-03-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  WARN tap-size        div.maplibregl-control-container > div.maplibregl-ctrl-bottom-right > details.maplibregl-ctrl.maplibregl-ctrl-attrib > summary.maplibregl-ctrl-attrib-button
+       a 24x24px tap target: under the 44px a phone needs  [390-07-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  WARN tap-size        div.wrap > div.row-between.filters > label.field.inline > input
+       a 260x32px tap target: under the 44px a phone needs  [390-15-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  WARN tap-size        div.two > div.panel:nth-of-type(1) > label.field:nth-of-type(1) > input
+       a 324x32px tap target: under the 44px a phone needs  [390-19-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  WARN tap-size        section#carbon > div.wrap > label.field.inline > input
+       a 358x32px tap target: under the 44px a phone needs  [390-27-tap-size.jpg]
+       fix: make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box
+  WARN no-visual       section#twin  "Climate twin: the same field, warmer and"
+       pictures, effects and mocks cover 24% of this section; a feature section needs a visual (about 25% or more)  [390-21-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  WARN no-visual       section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       pictures, effects and mocks cover 18% of this section; a feature section needs a visual (about 25% or more)  [390-23-no-visual.jpg]
+       fix: give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits
+  WARN text-only       section#carbon  "Carbon credits and the water budget"
+       the section is only text: no picture, icon, mock or effect in it  [390-29-text-only.jpg]
+       fix: give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground
+  WARN button-styles   div.wrap > div.row-between.filters > div.chips > button.chip:nth-of-type(4)  "Strategy C"
+       on the phone 2 buttons run the full width of their column, but  "Strategy C" is 117px of 358px: one action in two sizes  [390-16-button-styles.jpg]
+       fix: give every button the same width rule on the phone: all full width, or all at their own width
+  WARN cta             section#strategies  "Four rotations to test with your agronom"
+       a section over 1.5 screens long with no link or button in it  [390-14-cta.jpg]
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  WARN cta             section#tradeoffs  "Trade-off cockpit: 44 rotations nothing "
+       a section over 1.5 screens long with no link or button in it  [390-24-cta.jpg]
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  WARN cta             section#method  "Method, data and limits"
+       a section over 1.5 screens long with no link or button in it  [390-32-cta.jpg]
+       fix: add the action: a button in the hero, one on every priced item, one in the closing section
+  WARN off-grid        div.wrap > div.row-between.filters > label.field.inline > input
+       left edge at 18px, 2px off the page margin at 16px (24 elements, like span.label)  [390-17-off-grid.jpg]
+       fix: move it onto the page margin, or the column edge its section uses
+  WARN off-grid        div.wrap > div.row-between.filters > label.field.inline:nth-of-type(1) > input
+       left edge at 18px, 2px off the page margin at 16px (24 elements, like span.label); 1 more in this section off the grid too (input at 18px)  [390-22-off-grid.jpg]
+       fix: move it onto the page margin, or the column edge its section uses
+  WARN off-grid        section#carbon > div.wrap > label.field.inline > input
+       left edge at 18px, 2px off the page margin at 16px (24 elements, like span.label)  [390-28-off-grid.jpg]
+       fix: move it onto the page margin, or the column edge its section uses
+  WARN body-size       div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(1)  "clay 32% · sand 37% · SOC 33.3 g/kg · 12"
+       14 of 17 paragraphs of running text are set under 16px (14px)  [390-08-body-size.jpg]
+       fix: set running text at 16px or more
+  WARN unit-break      div.wrap > div.map-grid > div.panel.side > p.small.muted:nth-of-type(2)  "SMAP and IMERG are 9–11 km pixels: they "
+       "250 km" breaks across two lines: the number ends one line and its unit starts the next  [390-11-unit-break.jpg]
+       fix: keep a number with its unit: a no-break space (&nbsp;) between them
+  WARN tab-wrap        div.wrap > div.row-between.filters > div.chips > button.chip:nth-of-type(4)  "Strategy C"
+       the row of 4 tabs wraps onto 2 lines and leaves "Strategy C" alone on the last  [390-18-tab-wrap.jpg]
+       fix: fit the tabs on one line at this width (shorter labels, a scrolling row), or let them stack evenly
+  WARN fade-cut        table.tbl > tbody > tr:nth-of-type(1) > td.mono:nth-of-type(3)  "6.43"
+       2 lines of div.panel.side fade out under its edge ("6.43", "-0.957"): drawn at a fraction of #f2f2f2 on #1e1e1e, half-erased  [390-09-fade-cut.jpg]
+       fix: fit the mock's rows inside its panel (fewer rows, a taller panel), or end the fade below the last whole row: no row half-erased
+  WARN visual-caption  table.tbl > thead > tr > th:nth-of-type(1)  "Strategy"
+       a muted 12px line of 2 rows sits 6px under the drawing (svg): it reads as a caption: "Strategy"; no caption or description under any image, render or visual (house rule)  [390-20-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+  WARN visual-caption  div.two > div.panel.chart > div.legend > span:nth-of-type(1)  "Searched"
+       a muted 13px line of 2 rows sits 6px under the drawing (svg): it reads as a caption: "Searched"; no caption or description under any image, render or visual (house rule)  [390-25-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+  WARN visual-caption  div.wrap > div.panel.chart > div.legend > span:nth-of-type(1)  "Rain"
+       a muted 13px line of 1 row sits 6px under the drawing (svg): it reads as a caption: "Rain"; no caption or description under any image, render or visual (house rule)  [390-33-visual-caption.jpg]
+       fix: take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line
+
+first screen at 1280, 1152, 1024, 896, 768  0 FAIL  0 WARN
+
+the page at 320x640, walked for what runs past the screen's edge  0 FAIL
+  (probe error) narrow: page: TypeError: Cannot read properties of undefined (reading 'phoneLook')
+    at <anonymous>:1:13
+
+checks
+  PASS assets                 PASS shader-lint            PASS gl-fallback            
+  PASS empty-visual           PASS hero-fill              PASS flush                  
+  PASS placeholder            PASS sample-label           PASS caption                
+  PASS credit-wall            PASS nav                    FAIL nav-covers             
+  PASS spill                  PASS off-viewport           PASS fold-card              
+  SKIP hover-spill            PASS overlap-text           PASS collide                
+  FAIL tap-size               PASS row-gap                PASS cut-text               
+  PASS fold-cut               PASS marquee                SKIP scroll-linked          
+  SKIP scroll-reveal          PASS pinned                 SKIP loop-pause             
+  SKIP reduced-motion         PASS hidden-content         PASS webgl                  
+  FAIL no-visual              WARN text-only              PASS card-visual            
+  SKIP hidden-visual          PASS card-family            PASS card-layout            
+  PASS nesting                PASS effect-repeat          PASS ui-fit                 
+  PASS ui-centre              PASS dark-ground            WARN button-styles          
+  PASS button-shape           PASS same-action            PASS button-picture         
+  FAIL cta                    PASS pricing-tiers          WARN copy-headline          
+  PASS copy-fact              FAIL copy-headings          PASS copy-buttons           
+  WARN copy-actions           PASS heading-scale          PASS stagger                
+  PASS top-stagger            WARN off-grid               WARN col-edge               
+  PASS right-edge             FAIL centre-axis            PASS tilt                   
+  FAIL contrast               FAIL text-contrast          WARN body-size              
+  PASS busy-ground            FAIL section-gaps           PASS proximity              
+  PASS hole                   PASS links                  SKIP forms                  
+  PASS photo-upscale          PASS photo-set              PASS photo-credit           
+  PASS nav-family             WARN nav-labels             PASS link-styles            
+  PASS heading-align          PASS label-centre           PASS fake-button            
+  PASS stranded-action        WARN orphan                 WARN unit-break             
+  WARN tab-wrap               PASS effects-fit            WARN fade-cut               
+  PASS photo-weight           WARN copy-length            WARN nav-current            
+  PASS progress-bar           PASS photo-repeat           PASS button-contrast        
+  PASS photo-print            PASS grounds                WARN split-align            
+  PASS fact-agree             PASS fold-action            PASS action-count           
+  PASS one-screen             SKIP hover                  SKIP hover-move             
+  PASS product-shown          PASS same-object            PASS font-load              
+  WARN visual-caption         PASS visual-empty           PASS effect-kind            
+  WARN hero-enter             WARN moment-none            PASS street-number          
+  PASS postcode               PASS coordinates            PASS company-number         
+  FAIL phone-number           PASS hero-screen            FAIL section-height         
+  PASS section-air            FAIL one-section            PASS one-heading            
+  FAIL container-edges        FAIL row-lines              FAIL split-pair             
+  PASS motion-layer           PASS count-text             PASS loop-cycle             
+  WARN section-tile           PASS empty-area             PASS a11y-name              
+  PASS img-alt                PASS field-label            PASS heading-order          
+  PASS tabindex               PASS focus-ring             FAIL focus-visible          
+  PASS focus-hidden           PASS skip-link              PASS menu-toggle            
+  PASS lang                   PASS page-meta              WARN share-meta             
+  PASS action-repeat          PASS map-link               PASS open-now               
+  PASS assumed                PASS run-on                 PASS form-fields            
+  PASS form-send              
+
+total  44 FAIL  49 WARN  (crops and report.json in /var/folders/ct/xkbkjph90kl0k19nj4h2c2l80000gn/T/taste-skill-consistency/localhost-5173)

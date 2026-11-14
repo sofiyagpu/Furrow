@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { Region } from './types'
+
+maplibregl.setWorkerUrl(workerUrl) // bundlers lose maplibre's own relative worker path
 
 const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best'
 export const NASA_LAYERS = {
@@ -87,7 +90,7 @@ export default function MapView(props: {
     if (m?.isStyleLoaded()) setNasa(m, props.layer)
   }, [props.layer])
 
-  return <div ref={box} className="map" role="region" aria-label={`Map of ${props.region.name}`} />
+  return <div ref={box} className="map" data-lenis-prevent role="region" aria-label={`Map of ${props.region.name}`} />
 }
 
 function setNasa(m: maplibregl.Map, layer: NasaLayer) {

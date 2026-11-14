@@ -39,6 +39,7 @@ export default function App() {
             <a href="#map">Map</a><a href="#strategies">Strategies</a><a href="#time">Time machine</a>
             <a href="#twin">Climate</a><a href="#tradeoffs">Trade-offs</a><a href="#carbon">Carbon and water</a><a href="#method">Method</a>
           </nav>
+          {r && <Agent key={rid} region={r} />}
           <div className="seg" role="group" aria-label="Region">
             <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>East Kazakhstan</button>
             <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>Arizona</button>
@@ -126,7 +127,7 @@ function Page({ r }: { r: Region }) {
                 </select>
               </Field>
               <div className="legend-ramp"><span>worse</span><i /><span>better, within this region</span></div>
-              <h3 className="h-sm">Cell {selected.slice(0, 7)}{selected === r.rep_cell ? ', the reference field' : ''}</h3>
+              <h3 className="h-sm">{selected === r.rep_cell ? 'Reference field' : `Field cell ${r.cells.findIndex((c) => c.h3 === selected) + 1} of ${r.cells.length}`}</h3>
               <p className="small muted mono">
                 clay {cell.soil.clay.toFixed(0)}% · sand {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} g/kg · {cell.soc0} t C/ha in 0–30 cm
               </p>
@@ -172,7 +173,6 @@ function Page({ r }: { r: Region }) {
       <Tradeoffs r={r} />
       <CarbonWater r={r} />
       <Method r={r} />
-      <Agent region={r} />
     </>
   )
 }

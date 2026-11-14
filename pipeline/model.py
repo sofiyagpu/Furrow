@@ -319,10 +319,11 @@ def _season_result(crop, s, prev, crops, prev_same, irrigation, region):
             y *= 1.10  # nitrogen and rotation credit after a legume
         if prev == "fallow":
             y *= 1.05  # fallow also mineralises N
-        if prev and crops[prev]["family"] == crop["family"] == "cereal" and prev != crop:
-            y *= 0.92  # cereal after cereal: root disease, weeds
-        if prev == crop and crop["family"] == "cereal":
-            y *= 0.88
+        same_family = prev and crops[prev]["family"] == crop["family"] and crop["family"] != "forage"
+        if prev and crops[prev] is crop and not crop.get("perennial"):
+            y *= 0.85  # same crop again: its own diseases and weeds build up
+        elif same_family:
+            y *= 0.92 if crop["family"] == "cereal" else 0.88  # cereal root rots; pulse ascochyta, oilseed sclerotinia
         if crop.get("perennial") and not prev_same:
             y *= 0.35  # establishment year
     cost = crop["cost"] * (0.5 if crop.get("perennial") and prev_same else 1)

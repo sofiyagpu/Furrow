@@ -1,12 +1,12 @@
 {
- "url": "http://localhost:5173/?r=az",
+ "url": "http://localhost:5173/",
  "views": {
-  "mobile": {
-   "width": 390,
-   "height": 844,
+  "desktop": {
+   "width": 1440,
+   "height": 900,
    "navH": 61,
-   "scrollHeight": 12492,
-   "screens": 14.8,
+   "scrollHeight": 7267,
+   "screens": 8.07,
    "sections": [
     {
      "n": 1,
@@ -14,17 +14,13 @@
      "id": "top",
      "cls": "sec hero",
      "top": 61,
-     "h": 992,
-     "hScreens": 1.18,
-     "offGrid": 148,
+     "h": 840,
+     "hScreens": 0.93,
+     "offGrid": 840,
      "tiles": [
       {
-       "file": "mobile-sec-01-a.jpg",
+       "file": "desktop-sec-01-a.jpg",
        "scrollY": 61
-      },
-      {
-       "file": "mobile-sec-01-b.jpg",
-       "scrollY": 209
       }
      ]
     },
@@ -33,14 +29,14 @@
      "tag": "button",
      "id": "",
      "cls": "btn btn-solid agent-fab",
-     "top": 776,
+     "top": 832,
      "h": 48,
-     "hScreens": 0.06,
+     "hScreens": 0.05,
      "offGrid": 48,
      "tiles": [
       {
-       "file": "mobile-sec-02-a.jpg",
-       "scrollY": 776
+       "file": "desktop-sec-02-a.jpg",
+       "scrollY": 832
       }
      ]
     },
@@ -49,18 +45,18 @@
      "tag": "section",
      "id": "map",
      "cls": "sec",
-     "top": 1053,
-     "h": 1485,
-     "hScreens": 1.76,
-     "offGrid": 641,
+     "top": 901,
+     "h": 913,
+     "hScreens": 1.01,
+     "offGrid": 13,
      "tiles": [
       {
-       "file": "mobile-sec-03-a.jpg",
-       "scrollY": 1053
+       "file": "desktop-sec-03-a.jpg",
+       "scrollY": 901
       },
       {
-       "file": "mobile-sec-03-b.jpg",
-       "scrollY": 1694
+       "file": "desktop-sec-03-b.jpg",
+       "scrollY": 914
       }
      ]
     },
@@ -69,22 +65,14 @@
      "tag": "section",
      "id": "strategies",
      "cls": "sec",
-     "top": 2537,
-     "h": 2261,
-     "hScreens": 2.68,
-     "offGrid": 573,
+     "top": 1814,
+     "h": 895,
+     "hScreens": 0.99,
+     "offGrid": 895,
      "tiles": [
       {
-       "file": "mobile-sec-04-a.jpg",
-       "scrollY": 2537
-      },
-      {
-       "file": "mobile-sec-04-b.jpg",
-       "scrollY": 3381
-      },
-      {
-       "file": "mobile-sec-04-c.jpg",
-       "scrollY": 3954
+       "file": "desktop-sec-04-a.jpg",
+       "scrollY": 1814
       }
      ]
     },
@@ -93,18 +81,14 @@
      "tag": "section",
      "id": "time",
      "cls": "sec",
-     "top": 4798,
-     "h": 1419,
-     "hScreens": 1.68,
-     "offGrid": 575,
+     "top": 2709,
+     "h": 848,
+     "hScreens": 0.94,
+     "offGrid": 848,
      "tiles": [
       {
-       "file": "mobile-sec-05-a.jpg",
-       "scrollY": 4798
-      },
-      {
-       "file": "mobile-sec-05-b.jpg",
-       "scrollY": 5373
+       "file": "desktop-sec-05-a.jpg",
+       "scrollY": 2709
       }
      ]
     },
@@ -113,18 +97,14 @@
      "tag": "section",
      "id": "twin",
      "cls": "sec",
-     "top": 6217,
-     "h": 1258,
-     "hScreens": 1.49,
-     "offGrid": 414,
+     "top": 3557,
+     "h": 840,
+     "hScreens": 0.93,
+     "offGrid": 840,
      "tiles": [
       {
-       "file": "mobile-sec-06-a.jpg",
-       "scrollY": 6217
-      },
-      {
-       "file": "mobile-sec-06-b.jpg",
-       "scrollY": 6631
+       "file": "desktop-sec-06-a.jpg",
+       "scrollY": 3557
       }
      ]
     },
@@ -133,22 +113,18 @@
      "tag": "section",
      "id": "tradeoffs",
      "cls": "sec",
-     "top": 7476,
-     "h": 2162,
-     "hScreens": 2.56,
-     "offGrid": 474,
+     "top": 4397,
+     "h": 1046,
+     "hScreens": 1.16,
+     "offGrid": 146,
      "tiles": [
       {
-       "file": "mobile-sec-07-a.jpg",
-       "scrollY": 7476
+       "file": "desktop-sec-07-a.jpg",
+       "scrollY": 4397
       },
       {
-       "file": "mobile-sec-07-b.jpg",
-       "scrollY": 8320
-      },
-      {
-       "file": "mobile-sec-07-c.jpg",
-       "scrollY": 8794
+       "file": "desktop-sec-07-b.jpg",
+       "scrollY": 4543
       }
      ]
     },
@@ -157,18 +133,14 @@
      "tag": "section",
      "id": "carbon",
      "cls": "sec",
-     "top": 9637,
-     "h": 1186,
-     "hScreens": 1.41,
-     "offGrid": 342,
+     "top": 5442,
+     "h": 840,
+     "hScreens": 0.93,
+     "offGrid": 840,
      "tiles": [
       {
-       "file": "mobile-sec-08-a.jpg",
-       "scrollY": 9637
-      },
-      {
-       "file": "mobile-sec-08-b.jpg",
-       "scrollY": 9979
+       "file": "desktop-sec-08-a.jpg",
+       "scrollY": 5442
       }
      ]
     },
@@ -177,18 +149,14 @@
      "tag": "section",
      "id": "method",
      "cls": "sec",
-     "top": 10824,
-     "h": 1449,
-     "hScreens": 1.72,
-     "offGrid": 605,
+     "top": 6282,
+     "h": 840,
+     "hScreens": 0.93,
+     "offGrid": 840,
      "tiles": [
       {
-       "file": "mobile-sec-09-a.jpg",
-       "scrollY": 10824
-      },
-      {
-       "file": "mobile-sec-09-b.jpg",
-       "scrollY": 11429
+       "file": "desktop-sec-09-a.jpg",
+       "scrollY": 6282
       }
      ]
     },
@@ -197,16 +165,16 @@
      "tag": "footer",
      "id": "",
      "cls": "foot",
-     "top": 12273,
-     "h": 219,
-     "hScreens": 0.26,
-     "offGrid": 219,
+     "top": 7122,
+     "h": 145,
+     "hScreens": 0.16,
+     "offGrid": 145,
      "tiles": [
       {
-       "file": "mobile-sec-10-a.jpg",
-       "scrollY": 11648,
-       "cutTop": 625,
-       "height": 219
+       "file": "desktop-sec-10-a.jpg",
+       "scrollY": 6367,
+       "cutTop": 755,
+       "height": 145
       }
      ]
     }
@@ -214,5 +182,5 @@
    "consoleErrors": []
   }
  },
- "at": "2026-11-14T09:12:33.507Z"
+ "at": "2026-11-14T09:21:15.711Z"
 }

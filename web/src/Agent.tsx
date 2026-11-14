@@ -81,13 +81,13 @@ export default function Agent({ region }: { region: Region }) {
   return (
     <>
       <button className="btn btn-solid agent-fab" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        {open ? 'Close the assistant' : 'Ask about this field'}
+        {open ? 'Close' : 'Ask the field'}
       </button>
       {open && (
         <aside className="agent" aria-label="Field assistant">
           <h2 className="h-sm">Field assistant</h2>
           <p className="muted small">Answers come from the model runs on this page, nothing else.</p>
-          <div className="agent-log">
+          <div className="agent-log" data-lenis-prevent>
             {log.map((m, i) => (
               <div key={i}>
                 <p className="agent-q">{m.q}</p>
