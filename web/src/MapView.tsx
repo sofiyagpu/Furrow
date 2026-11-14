@@ -100,7 +100,7 @@ export default function MapView(props: P) {
 
   return (
     <div className="map-wrap">
-      <div ref={box} className="map" data-lenis-prevent role="region" aria-label={`Map of ${props.region.name}`} />
+      <div ref={box} className="map" role="region" aria-label={`Map of ${props.region.name}`} />
       <div className="map-legend">
         <div className="map-legend-bar">{RAMP.map((c) => <i key={c} style={{ background: c }} />)}</div>
         <div className="row-between small"><span>{t('worse', 'хуже')}</span><span>{t('better', 'лучше')}</span></div>
