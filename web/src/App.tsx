@@ -42,10 +42,10 @@ export default function App() {
           <nav aria-label={t('Sections', 'Разделы')} className="nav-links">
             <a href="#map">{t('Map', 'Карта')}</a>
             <a href="#strategies">{t('Strategies', 'Стратегии')}</a>
-            <a href="#time">{t('Time machine', 'Машина времени')}</a>
+            <a href="#time">{t('Time machine', 'По годам')}</a>
             <a href="#twin">{t('Climate', 'Климат')}</a>
-            <a href="#tradeoffs">{t('Trade-offs', 'Компромиссы')}</a>
-            <a href="#carbon">{t('Carbon and water', 'Углерод и вода')}</a>
+            <a href="#tradeoffs">{t('Trade-offs', 'Выбор')}</a>
+            <a href="#carbon">{t('Carbon and water', 'Углерод')}</a>
             <a href="#ml">ML</a>
             <a href="#report">{t('Report', 'Отчёт')}</a>
           </nav>
@@ -227,43 +227,33 @@ function Rotation({ r, s }: { r: Region; s: { rotation: string[] } }) {
   )
 }
 
-function BandBar({ band, lo, hi }: { band: [number, number, number]; lo: number; hi: number }) {
-  const x = (v: number) => `${((v - lo) / (hi - lo)) * 100}%`
-  return (
-    <div className="band" aria-hidden>
-      <i style={{ left: x(band[0]), width: `calc(${x(band[2])} - ${x(band[0])})` }} />
-      <b style={{ left: x(band[1]) }} />
-      {lo < 0 && <em style={{ left: x(0) }} />}
-    </div>
-  )
-}
-
 const irrName = (i: string | undefined, t: (a: string, b: string) => string) => (i ? `, ${i === 'drip' ? t('drip', 'капельный') : t('flood', 'напуск')}` : '')
 
+// card: name, rotation, one idea, the median profit large, three numbers, the risk in one line
 function StrategyCard({ r, s }: { r: Region; s: Strategy }) {
   const l = useLang(), t = useT()
-  const all = r.strategies.flatMap((x) => x.metrics.profit)
-  const lo = Math.min(0, ...all), hi = Math.max(...all)
   const m = s.metrics
+  const name = sname(s, l).split(':')[0]
   return (
     <article className="panel card" style={{ borderTopColor: SC[s.id] }}>
-      <h3 className="h-sm">{sname(s, l)}</h3>
+      <div>
+        <h3 className="h-sm">{name}</h3>
+        <p className="small muted">{s.notill ? 'No-till' : t('Tilled', 'Вспашка')}{irrName(s.irrigation, t)}</p>
+      </div>
       <Rotation r={r} s={s} />
       <p className="small">{(l === 'ru' && s.idea_ru) || s.idea}</p>
-      <p className="small risk">{(l === 'ru' && s.risk_ru) || s.risk}</p>
-      <div className="kv">
-        <span className="label">{t('Profit per ha, 1-in-10 bad year to 1-in-10 good', 'Прибыль на га, от плохого года (1 из 10) до хорошего')}</span>
-        <BandBar band={m.profit} lo={lo} hi={hi} />
-        <span className="mono">{usd(m.profit[0])} · <strong>{usd(m.profit[1])}</strong> · {usd(m.profit[2])}</span>
+      <div className="profit">
+        <strong>{usd(m.profit[1])}</strong><span className="muted">{t(' /ha a year', ' /га в год')}</span>
+        <p className="small muted"><span className="nw">{t('bad year', 'плохой год')} {usd(m.profit[0])}</span> · <span className="nw">{t('good year', 'хороший')} {usd(m.profit[2])}</span></p>
       </div>
       <dl className="stats">
-        <div><dt>{t('Loss years', 'Убыточных лет')}</dt><dd className="mono">{Math.round(m.loss_years * 100)}%</dd></div>
-        <div><dt>{t('Soil loss', 'Эрозия')}</dt><dd className="mono">{m.erosion} {t('t/ha', 'т/га')}</dd></div>
-        <div><dt>{t('Bare days', 'Голых дней')}</dt><dd className="mono">{m.bare_days}</dd></div>
-        <div><dt>{t('Soil C', 'Углерод')}</dt><dd className="mono">{m.dsoc > 0 ? '+' : ''}{m.dsoc} {t('t/ha', 'т/га')}</dd></div>
-        {r.irrigated && <div><dt>{t('Pumped', 'Откачка')}</dt><dd className="mono">{Math.round(m.irr[1])} {t('mm', 'мм')}</dd></div>}
-        <div><dt>{t('Tillage', 'Обработка')}</dt><dd>{s.notill ? 'No-till' : t('Tilled', 'Вспашка')}{irrName(s.irrigation, t)}</dd></div>
+        <div><dt>{t('Soil loss', 'Эрозия')}</dt><dd className="mono">{m.erosion}<small> {t('t/ha', 'т/га')}</small></dd></div>
+        <div><dt>{t('Carbon', 'Углерод')}</dt><dd className="mono">{m.dsoc > 0 ? '+' : ''}{m.dsoc}<small> {t('t/ha', 'т/га')}</small></dd></div>
+        {r.irrigated
+          ? <div><dt>{t('Pumped', 'Откачка')}</dt><dd className="mono">{Math.round(m.irr[1])}<small> {t('mm', 'мм')}</small></dd></div>
+          : <div><dt>{t('Loss years', 'Убыточных лет')}</dt><dd className="mono">{Math.round(m.loss_years * 100)}%</dd></div>}
       </dl>
+      <p className="small risk">{t('Risk', 'Риск')}: {(l === 'ru' && s.risk_ru) || s.risk}</p>
     </article>
   )
 }
