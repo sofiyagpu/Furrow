@@ -108,11 +108,10 @@ a { color: inherit; }
 .map-legend-note { font-size: 11px; color: #5c5c5c; }
 /* pin: white ring with the cell's band colour inside; the value callout shows only on the clicked cell */
 .pin { position: relative; width: 26px; height: 26px; padding: 0; border: 0; background: none; cursor: pointer; }
-.pin .ring { position: absolute; inset: 5px; border: 2.5px solid #fff; border-radius: 50%; background: var(--c); box-shadow: 0 1px 4px rgba(0,0,0,.4); transition: transform .15s; }
-.pin:hover .ring { transform: scale(1.25); }
+.pin .ring { display: none; }
+.pin:not(.on) { pointer-events: none; } /* clicks go to the cell underneath */
 .pin .pill { display: none; }
 .pin.on { z-index: 2; }
-.pin.on .ring { inset: 2px; border-width: 3px; transform: none; }
 .pin.on .pill { position: absolute; left: 50%; bottom: calc(100% + 10px); display: grid; gap: 1px; padding: 7px 11px 8px; border-radius: 6px; background: #fff; color: #232323; text-align: left; white-space: nowrap; box-shadow: 0 6px 18px rgba(0,0,0,.25); transform-origin: 50% 100%; animation: callout .18s ease-out both; }
 .pin.on .pill::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -7px; border: 7px solid transparent; border-top-color: #fff; border-bottom: 0; }
 .pin .pill em { font: 500 10px var(--font); font-style: normal; color: #6a6a6a; text-transform: uppercase; letter-spacing: .05em; }
