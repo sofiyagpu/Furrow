@@ -116,7 +116,7 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
 {
   const s = slide("Opening", null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("crawl.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("stars.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "crawl" });
-  s.addNotes("0:00–1:00. Read the crawl aloud as it scrolls, at a calm pace; the music stays low under your voice. It plays on its own and moves to the next slide when it ends.");
+  s.addNotes("0:00–1:00. Read the crawl aloud as it scrolls, at a calm pace; the music fades out as the story text comes in. It plays on its own and moves to the next slide when it ends.");
   ANIM[s._n] = [{ media: "crawl", dur: 60000 }];
   TRANS[s._n] = "fade";
   ADV[s._n] = 60300;

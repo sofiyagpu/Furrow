@@ -103,12 +103,27 @@ def coeffs(dst, src):
     return np.linalg.solve(np.array(A, float), np.array(B, float)).tolist()
 
 
+T_INTRO, T_LOGO, T_CRAWL, T_END = 3.4, 3.8, 6.5, 60.0  # one minute; ~124 words read aloud at ~140 wpm
+WIN = 1500  # plane length visible between near and far edge
+HEAD_H = 104 + 30 + 150 + 80  # "SPACE APPS 2026", gap, "THE BARE FIELD", gap: the body starts this far down the plane
+
+
+def crawl_total(text_h):
+    return text_h - WIN - int(WIN * 0.72)  # stop with the last lines still on screen
+
+
+def body_time():
+    """Second at which the first line of the story enters the bottom of the screen."""
+    total = crawl_total(plane_text(1500, pad=WIN).height)
+    return T_CRAWL + HEAD_H / total * (T_END - 3 - T_CRAWL)
+
+
 def crawl():
     bg = stars()
     bg.save(OUT / "stars.png")
     bg_a = np.asarray(bg, np.float32)
     pw = 1500
-    win = 1500  # plane length visible between near and far edge
+    win = WIN
     text = plane_text(pw, pad=win)
     text_a = text
     # screen trapezoid: far edge narrow near the top, near edge wider than the screen
@@ -134,7 +149,6 @@ def crawl():
     # outline only: stroke minus glyph interior
     logo = Image.fromarray(np.where(np.asarray(hollow) > 128, 0, np.asarray(lg)).astype(np.uint8))
 
-    T_INTRO, T_LOGO, T_CRAWL, T_END = 3.4, 3.8, 6.5, 60.0  # one minute; ~124 words read aloud at ~140 wpm
     n = int(T_END * FPS)
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     proc = subprocess.Popen([ff, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
@@ -162,7 +176,7 @@ def crawl():
                 full[dy0:dy0 + hv, dx0:dx0 + wv] = la[sy0:sy0 + hv, sx0:sx0 + wv]
                 fr = fr * (1 - full) + full * yel
         if t >= T_CRAWL:
-            total = text_a.height - win - int(win * 0.72)  # stop with the last lines still on screen
+            total = crawl_total(text_a.height)
             s = min(total, (t - T_CRAWL) / (T_END - T_CRAWL - 3) * total)
             src = [(0, s), (pw, s), (pw, s + win), (0, s + win)]
             warped = text_a.transform((W, H), Image.PERSPECTIVE, coeffs(dst, src), Image.BICUBIC)
@@ -174,7 +188,7 @@ def crawl():
             Image.fromarray(frame).save(OUT / "crawl_poster.jpg", quality=90)
     proc.stdin.close()
     proc.wait()
-    add_audio(OUT / "crawl.mp4", T_END)
+    add_audio(OUT / "crawl.mp4", T_END, body_time())
 
 
 # ---------- crawl soundtrack ----------
@@ -281,9 +295,10 @@ def soundtrack(length):
     return (mix / np.abs(mix).max() * 0.85).astype(np.float32)
 
 
-def add_audio(video, length):
+def add_audio(video, length, fade_at):
     """Mux a soundtrack into the crawl. AUDIO=/path/to/track.mp3 uses your own file instead, levelled down
-    to a quiet bed (about -30 LUFS) so the speaker's voice stays on top."""
+    to a quiet bed (about -30 LUFS). Either way the music fades out as the story text comes in (fade_at),
+    so the speaker reads over silence."""
     import os
     import wave
     src = os.environ.get("AUDIO")
@@ -297,9 +312,9 @@ def add_audio(video, length):
             w.writeframes(a.tobytes())
     if os.environ.get("AUDIO"):
         # your track: its opening hit (at the start of the file) lands on the logo at 3.8 s, levelled to a quiet bed
-        af = f"adelay=3600:all=1,loudnorm=I=-30:TP=-9:LRA=11,afade=t=out:st={length - 3}:d=3"
+        af = f"adelay=3600:all=1,loudnorm=I=-30:TP=-9:LRA=11,afade=t=out:st={fade_at:.2f}:d=2.5"
     else:
-        af = f"afade=t=in:d=1,afade=t=out:st={length - 3}:d=3"
+        af = f"afade=t=in:d=1,afade=t=out:st={fade_at:.2f}:d=2.5"
     tmp = OUT / "crawl_av.mp4"
     subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video), "-i", src, "-map", "0:v", "-map", "1:a",
                     "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-t", str(length),
