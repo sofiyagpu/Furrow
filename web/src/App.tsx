@@ -897,8 +897,8 @@ function MlSection({ r }: { r: Region }) {
             <p className="small muted">{t('Classifies the current crop of each cell from HLS / MODIS time series, so "current practice" comes from the field, not a guess.', 'Определяет текущую культуру ячейки по рядам HLS / MODIS, чтобы «текущая практика» бралась с поля, а не из догадки.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Not connected', 'Не подключено')}</span></div>
-            <p className="small muted">{t('SMAP pixels are 9 km wide. The model sharpens root-zone moisture to the cell, with a prediction interval.', 'Пиксель SMAP — 9 км. Модель уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Awaiting model', 'Ждёт модель')}</span></div>
+            <p className="small muted">{t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
