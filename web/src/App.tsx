@@ -888,6 +888,7 @@ function SmapPanel({ r }: { r: Region }) {
 function MlSection({ r }: { r: Region }) {
   const t = useT(), l = useLang()
   const n = mlCells(r).length, nd = mlDetail(r).length
+  const sm = Object.values(r.ml?.detail?.cells ?? {}).filter((c) => c.sm_rootzone != null).length
   return (
     <section className="sec" id="ml">
       <div className="wrap">
@@ -901,8 +902,10 @@ function MlSection({ r }: { r: Region }) {
               : t('Zoom into any field: ~0.7 km² plots show what actually grew, three years of history and when the soil lay bare. Trained and checked on USDA crop maps.', 'Приблизьте поле: участки ~0,7 км² показывают, что на самом деле росло, историю за три года и когда земля стояла голой. Обучено и проверено по картам USDA.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Awaiting model', 'Ждёт модель')}</span></div>
-            <p className="small muted">{t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className={`status ${sm ? 'on' : ''}`}>{sm ? t('Connected', 'Подключено') : t('Awaiting model', 'Ждёт модель')}</span></div>
+            <p className="small muted">{sm
+              ? t(`SMAP 9 km, spread over the fields by the satellite moisture index (NDMI): ${sm} field-scale cells, seasonal median with the 10–90% range over dates. A disaggregation, not a model prediction; no ground check.`, `SMAP 9 км, распределено по полям по спутниковому индексу влажности (NDMI): участков ${sm}, сезонная медиана и разброс 10–90% по датам. Это распределение, а не предсказание модели; наземной проверки нет.`)
+              : t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
@@ -944,6 +947,13 @@ function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; deta
         )}
         {top && c.crop && <p className="small muted">{mlText(c.crop, l)}</p>}
         {c.low_confidence && <span className="ml-flag">{t('low confidence', 'низкая достоверность')}</span>}
+        {c.sm_rootzone != null && (
+          <p className="small">
+            {t('Root-zone moisture', 'Влага корневой зоны')}: <strong>{c.sm_rootzone.toFixed(2)}</strong>
+            {c.sm_rootzone_pi && ` (${c.sm_rootzone_pi[0].toFixed(2)}–${c.sm_rootzone_pi[1].toFixed(2)})`} {t('m³/m³', 'м³/м³')}
+            <span className="muted"> · {t('SMAP, spread by NDMI', 'SMAP, распределено по NDMI')}</span>
+          </p>
+        )}
         {years.length > 0 && (
           <ul className="ml-years">
             {years.map(([y, v]) => (

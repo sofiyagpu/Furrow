@@ -112,6 +112,8 @@ export interface MlCell {
   crop_pixel_share?: number // 0-1, share of the cell's pixels in `crop`
   crop_top?: string // largest class of the cell (other left out), a single key: colours the detail map
   crop_top_share?: number // 0-1, pixel share of crop_top
+  sm_rootzone?: number // m3/m3, SMAP L4 root-zone spread over the cell by NDMI: seasonal median (not a model prediction)
+  sm_rootzone_pi?: [number, number] // m3/m3, 10th-90th percentile over dates
   low_confidence?: boolean
   years?: Record<string, MlYear>
 }

@@ -1,8 +1,8 @@
 {
   "model": "fs_ml RandomForest NDVI+SWIR+history baseline (HLS L30, CDL 2021 labels, CDL 2019-2020 cultivation)",
   "version": "2026-11-14",
-  "validation": "macro F1 0.73 по 5 сельхоз-группам CDL 2021 на сельхоз-пикселях (без small_grains 0.90; на всём bbox 0.70); accuracy bbox 0.86 против 0.25 у самого частого класса; пространственная блочная CV 3x3, буфер 30 px; HLSL30 2021, 22 из 27 дат; признаки: NDVI+SWIR1+SWIR2+NDMI по 22 датам + обработка по CDL 2019, 2020 и их сумма (91); только bbox [-112.07088, 32.87118, -111.88474, 33.0262]; правило решения: argmax; crop — состав ячейки по долям пикселей внутри bbox, other не выводится; (низкая достоверность) — precision по bbox не выше 0.7: small_grains 0.15; crop_p — доля самой большой группы с precision выше 0.7, не вероятность модели; years: 2019–2020 — история USDA CDL (факт), доли пикселей ячейки по группам; 2021* — предсказание модели (source: model); bare_obs_dates — медиана по пикселям ячейки числа чистых дат с NDVI < 0.2; bare_months — месяцы, голые у не менее 50% пикселей ячейки с наблюдениями; месяц пикселя голый, если NDVI < 0.2 на половине его чистых дат или больше, без чистых дат — неизвестно; месяц 07: мало наблюдений (1 чистая дата по bbox: 2021-07-26), в bare_months не входит, см. low_obs_months; detail — те же поля на ячейках H3 res 8 с центром внутри bbox; перенос на 2020 (тот же bbox, другой год; модель NDVI+SWIR без history, обучена на всех пикселях 2021, CDL 2020 как правда): accuracy 0.86 на сельхоз-пикселях, 0.70 по bbox, precision fallow по bbox 0.53; с history не проверено — нет CDL 2018; другие регионы не проверялись",
-  "validation_en": "Checked against USDA CDL 2021 on areas the model did not see: spatial block cross-validation 3x3 with a 30 px buffer; accuracy 0.89 on cropland pixels and 0.86 over the whole window (always guessing the most common class: 0.25); macro F1 over 5 crop groups 0.73, 0.90 without small_grains; inputs: HLSL30 2021, 22 of 27 dates; features: NDVI; SWIR1, SWIR2 and NDMI; whether the pixel was cultivated in USDA CDL 2019, 2020; one window only, bbox [-112.07088, 32.87118, -111.88474, 33.0262]; low confidence: small_grains (precision 0.15); years 2019–2020 are USDA CDL (fact), 2021 is the model's prediction; a month counts as bare when NDVI < 0.2 on at least half of its clear images; too few clear images in month(s) 07; transfer to 2020 (same window, another year; NDVI+SWIR model without history, trained on all 2021 pixels, CDL 2020 as truth): accuracy 0.86 on cropland pixels, 0.70 over the window, fallow precision 0.53; not checked with history (no CDL 2018); other regions not checked",
+  "validation": "macro F1 0.73 по 5 сельхоз-группам CDL 2021 на сельхоз-пикселях (без small_grains 0.90; на всём bbox 0.70); accuracy bbox 0.86 против 0.25 у самого частого класса; пространственная блочная CV 3x3, буфер 30 px; HLSL30 2021, 22 из 27 дат; признаки: NDVI+SWIR1+SWIR2+NDMI по 22 датам + обработка по CDL 2019, 2020 и их сумма (91); только bbox [-112.07088, 32.87118, -111.88474, 33.0262]; правило решения: argmax; crop — состав ячейки по долям пикселей внутри bbox, other не выводится; (низкая достоверность) — precision по bbox не выше 0.7: small_grains 0.15; crop_p — доля самой большой группы с precision выше 0.7, не вероятность модели; years: 2019–2020 — история USDA CDL (факт), доли пикселей ячейки по группам; 2021* — предсказание модели (source: model); bare_obs_dates — медиана по пикселям ячейки числа чистых дат с NDVI < 0.2; bare_months — месяцы, голые у не менее 50% пикселей ячейки с наблюдениями; месяц пикселя голый, если NDVI < 0.2 на половине его чистых дат или больше, без чистых дат — неизвестно; месяц 07: мало наблюдений (1 чистая дата по bbox: 2021-07-26), в bare_months не входит, см. low_obs_months; detail — те же поля на ячейках H3 res 8 с центром внутри bbox; перенос на 2020 (тот же bbox, другой год; модель NDVI+SWIR без history, обучена на всех пикселях 2021, CDL 2020 как правда): accuracy 0.86 на сельхоз-пикселях, 0.70 по bbox, precision fallow по bbox 0.53; с history не проверено — нет CDL 2018; другие регионы не проверялись; sm_rootzone — влага корневой зоны SMAP L4 (9 км, ячейки H3 res 5), распределённая по полям по спутниковому индексу влажности NDMI (HLS 22 дат 2021): sm = SMAP × (1 + k·(NDMI − среднее NDMI ячейки res 5)), k = 0.8546 — наибольший, при котором все пиксели в 0.02–0.5 м³/м³; среднее по ячейке res 5 равно SMAP; облачные пиксели не заполнялись; ближайшая дата SMAP не дальше 5 дней; sm_rootzone — медиана по датам апр–окт 2021, sm_rootzone_pi — 10–90 перцентиль по датам; ячеек detail с влагой 333, медианы 0.069–0.194 м³/м³; проверка правдоподобия: корреляция среднего NDMI ячейки res 5 со SMAP по датам — 8548e943fffffff r = 0.09 (n = 22); соседние ячейки (часть пикселей в bbox): 8548e947fffffff r = -0.14 (n = 19), 8548e94bfffffff r = 0.86 (n = 22), 8548e94ffffffff r = 0.58 (n = 20), 8548e957fffffff r = 0.73 (n = 19); в основной ячейке связь NDMI и SMAP во времени почти нулевая: распределение по NDMI этим не подтверждено; это распределение, а не предсказание модели; наземной проверки влаги нет",
+  "validation_en": "Checked against USDA CDL 2021 on areas the model did not see: spatial block cross-validation 3x3 with a 30 px buffer; accuracy 0.89 on cropland pixels and 0.86 over the whole window (always guessing the most common class: 0.25); macro F1 over 5 crop groups 0.73, 0.90 without small_grains; inputs: HLSL30 2021, 22 of 27 dates; features: NDVI; SWIR1, SWIR2 and NDMI; whether the pixel was cultivated in USDA CDL 2019, 2020; one window only, bbox [-112.07088, 32.87118, -111.88474, 33.0262]; low confidence: small_grains (precision 0.15); years 2019–2020 are USDA CDL (fact), 2021 is the model's prediction; a month counts as bare when NDVI < 0.2 on at least half of its clear images; too few clear images in month(s) 07; transfer to 2020 (same window, another year; NDVI+SWIR model without history, trained on all 2021 pixels, CDL 2020 as truth): accuracy 0.86 on cropland pixels, 0.70 over the window, fallow precision 0.53; not checked with history (no CDL 2018); other regions not checked; root-zone moisture: SMAP L4 (9 km, H3 res 5 cells) spread over the fields by the satellite moisture index NDMI (HLS, 22 dates in 2021), sm = SMAP × (1 + k·(NDMI − cell mean NDMI)), k = 0.8546, the largest that keeps every pixel within 0.02–0.5 m³/m³; the res 5 cell mean equals SMAP; cloudy pixels are left empty; value = median over Apr–Oct 2021 dates, interval = 10th–90th percentile over dates; 333 detail cells, medians 0.069–0.194 m³/m³; plausibility check: correlation of the cell's mean NDMI with SMAP over dates, 8548e943fffffff r = 0.09 (n = 22); neighbouring cells (partly in the window): 8548e947fffffff r = -0.14 (n = 19), 8548e94bfffffff r = 0.86 (n = 22), 8548e94ffffffff r = 0.58 (n = 20), 8548e957fffffff r = 0.73 (n = 19); in the main cell NDMI and SMAP barely move together over time, so this check does not support the NDMI split; a disaggregation, not a model prediction; no ground check of moisture",
   "cells": {
     "8548e943fffffff": {
       "crop": "fallow 29%, alfalfa 20%, corn 19%, cotton 13%",
@@ -68,7 +68,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.143,
+          0.213
+        ]
       },
       "8848e94003fffff": {
         "crop": "corn 87%, fallow 11%, cotton 1%",
@@ -98,7 +103,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.152,
+          0.186
+        ]
       },
       "8848e94005fffff": {
         "crop": "cotton 78%, fallow 14%, alfalfa 1%",
@@ -127,7 +137,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.177,
+        "sm_rootzone_pi": [
+          0.133,
+          0.246
+        ]
       },
       "8848e94007fffff": {
         "crop": "cotton 46%, corn 26%, fallow 22%, alfalfa 5%",
@@ -158,7 +173,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.157,
+        "sm_rootzone_pi": [
+          0.145,
+          0.212
+        ]
       },
       "8848e94009fffff": {
         "crop": "corn 69%, fallow 16%, alfalfa 13%, cotton 1%",
@@ -189,7 +209,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.154,
+          0.183
+        ]
       },
       "8848e9400bfffff": {
         "crop": "corn 32%, alfalfa 25%, fallow 16%",
@@ -218,7 +243,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.15,
+          0.196
+        ]
       },
       "8848e9400dfffff": {
         "crop": "cotton 75%, fallow 16%, corn 9%",
@@ -247,7 +277,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.139,
+          0.245
+        ]
       },
       "8848e94011fffff": {
         "crop": "fallow 19%, corn 16%, alfalfa 16%",
@@ -276,7 +311,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.155,
+        "sm_rootzone_pi": [
+          0.144,
+          0.216
+        ]
       },
       "8848e94013fffff": {
         "crop": "fallow 75%, corn 22%",
@@ -309,7 +349,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.141,
+          0.182
+        ]
       },
       "8848e94015fffff": {
         "crop": "corn 35%, alfalfa 13%, fallow 10%, cotton 3%",
@@ -338,7 +383,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.149,
+          0.208
+        ]
       },
       "8848e94017fffff": {
         "crop": "fallow 47%, corn 21%, cotton 13%, alfalfa 1%",
@@ -371,7 +421,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.144,
+          0.2
+        ]
       },
       "8848e94019fffff": {
         "crop": "fallow 49%, alfalfa 5%, cotton 4%",
@@ -404,7 +459,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.126,
+          0.176
+        ]
       },
       "8848e9401bfffff": {
         "crop": "fallow 85%, cotton 9%, alfalfa 1%",
@@ -437,7 +497,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.127,
+          0.186
+        ]
       },
       "8848e9401dfffff": {
         "crop": "fallow 22%, corn 7%, alfalfa 2%",
@@ -467,7 +532,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.138,
+          0.219
+        ]
       },
       "8848e94021fffff": {
         "crop": "alfalfa 59%, fallow 34%",
@@ -493,7 +563,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.137,
+          0.213
+        ]
       },
       "8848e94023fffff": {
         "crop": "alfalfa 54%, fallow 35%, corn 1%",
@@ -519,7 +594,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.139,
+          0.182
+        ]
       },
       "8848e94025fffff": {
         "crop": "alfalfa 66%, fallow 33%",
@@ -545,7 +625,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.141,
+          0.215
+        ]
       },
       "8848e94027fffff": {
         "crop": "corn 39%, alfalfa 37%, cotton 11%, fallow 10%",
@@ -573,7 +658,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.153,
+          0.2
+        ]
       },
       "8848e94029fffff": {
         "crop": "fallow 52%, alfalfa 19%, cotton 15%",
@@ -605,7 +695,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.135,
+          0.193
+        ]
       },
       "8848e9402bfffff": {
         "crop": "fallow 51%, cotton 27%, alfalfa 6%, corn 3%",
@@ -637,7 +732,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.132,
+          0.197
+        ]
       },
       "8848e9402dfffff": {
         "crop": "alfalfa 70%, fallow 25%",
@@ -663,7 +763,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.172,
+        "sm_rootzone_pi": [
+          0.152,
+          0.215
+        ]
       },
       "8848e94031fffff": {
         "crop": "fallow 52%, corn 45%",
@@ -695,7 +800,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.144,
+          0.177
+        ]
       },
       "8848e94033fffff": {
         "crop": "corn 53%, fallow 18%",
@@ -724,7 +834,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.155,
+        "sm_rootzone_pi": [
+          0.148,
+          0.203
+        ]
       },
       "8848e94035fffff": {
         "crop": "fallow 67%, alfalfa 15%, cotton 4%",
@@ -757,7 +872,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.131,
+          0.183
+        ]
       },
       "8848e94037fffff": {
         "crop": "corn 64%, fallow 29%, alfalfa 1%",
@@ -788,7 +908,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.15,
+          0.177
+        ]
       },
       "8848e94039fffff": {
         "crop": "corn 39%, fallow 29%, cotton 22%, alfalfa 4%",
@@ -820,7 +945,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.145,
+          0.196
+        ]
       },
       "8848e9403bfffff": {
         "crop": "corn 49%, fallow 10%, alfalfa 1%",
@@ -851,7 +981,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.15,
+          0.206
+        ]
       },
       "8848e9403dfffff": {
         "crop": "fallow 49%, cotton 26%, alfalfa 4%, corn 3%",
@@ -884,7 +1019,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.155,
+        "sm_rootzone_pi": [
+          0.132,
+          0.197
+        ]
       },
       "8848e94041fffff": {
         "crop": "fallow 74%, corn 12%, alfalfa 11%",
@@ -917,7 +1057,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.14,
+          0.181
+        ]
       },
       "8848e94043fffff": {
         "crop": "corn 51%, fallow 40%, alfalfa 6%",
@@ -947,7 +1092,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.155,
+          0.177
+        ]
       },
       "8848e94045fffff": {
         "crop": "corn 83%, fallow 9%, cotton 4%, alfalfa 3%",
@@ -978,7 +1128,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.177,
+        "sm_rootzone_pi": [
+          0.15,
+          0.192
+        ]
       },
       "8848e94047fffff": {
         "crop": "corn 82%, fallow 11%, cotton 4%",
@@ -1008,7 +1163,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.173,
+        "sm_rootzone_pi": [
+          0.152,
+          0.186
+        ]
       },
       "8848e94049fffff": {
         "crop": "alfalfa 73%, fallow 27%",
@@ -1034,7 +1194,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.146,
+          0.183
+        ]
       },
       "8848e9404bfffff": {
         "crop": "alfalfa 55%, fallow 22%, corn 19%",
@@ -1060,7 +1225,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.154,
+          0.2
+        ]
       },
       "8848e9404dfffff": {
         "crop": "alfalfa 64%, fallow 31%, corn 3%",
@@ -1086,7 +1256,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.147,
+          0.185
+        ]
       },
       "8848e94051fffff": {
         "crop": "fallow 62%, corn 15%, alfalfa 3%",
@@ -1119,7 +1294,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.133,
+          0.166
+        ]
       },
       "8848e94053fffff": {
         "crop": "fallow 45%, alfalfa 22%, corn 5%, small_grains 2% (низкая достоверность)",
@@ -1152,7 +1332,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.133,
+          0.176
+        ]
       },
       "8848e94055fffff": {
         "crop": "corn 51%, alfalfa 35%, fallow 6%",
@@ -1182,7 +1367,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.163,
+        "sm_rootzone_pi": [
+          0.153,
+          0.176
+        ]
       },
       "8848e94057fffff": {
         "crop": "alfalfa 34%, corn 31%, fallow 24%",
@@ -1213,7 +1403,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.154,
+          0.18
+        ]
       },
       "8848e94059fffff": {
         "crop": "fallow 60%, alfalfa 28%",
@@ -1245,7 +1440,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.13,
+          0.18
+        ]
       },
       "8848e9405bfffff": {
         "crop": "alfalfa 51%, fallow 44%",
@@ -1273,7 +1473,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.132,
+          0.185
+        ]
       },
       "8848e9405dfffff": {
         "crop": "alfalfa 52%, corn 26%, fallow 20%",
@@ -1299,7 +1504,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.151,
+          0.199
+        ]
       },
       "8848e94061fffff": {
         "crop": "alfalfa 55%, cotton 26%, fallow 13%",
@@ -1325,7 +1535,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.176,
+        "sm_rootzone_pi": [
+          0.154,
+          0.223
+        ]
       },
       "8848e94063fffff": {
         "crop": "cotton 96%, fallow 1%, alfalfa 1%",
@@ -1354,7 +1569,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.135,
+          0.264
+        ]
       },
       "8848e94065fffff": {
         "crop": "alfalfa 74%, fallow 21%",
@@ -1380,7 +1600,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.177,
+        "sm_rootzone_pi": [
+          0.14,
+          0.21
+        ]
       },
       "8848e94067fffff": {
         "crop": "alfalfa 71%, fallow 28%",
@@ -1406,7 +1631,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.178,
+        "sm_rootzone_pi": [
+          0.146,
+          0.211
+        ]
       },
       "8848e94069fffff": {
         "crop": "cotton 48%, alfalfa 28%, corn 16%, fallow 4%",
@@ -1435,7 +1665,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.171,
+        "sm_rootzone_pi": [
+          0.152,
+          0.225
+        ]
       },
       "8848e9406bfffff": {
         "crop": "cotton 55%, corn 39%, fallow 4%, alfalfa 1%",
@@ -1464,7 +1699,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.153,
+          0.226
+        ]
       },
       "8848e9406dfffff": {
         "crop": "alfalfa 79%, corn 21%",
@@ -1490,7 +1730,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.148,
+          0.189
+        ]
       },
       "8848e94081fffff": {
         "crop": "cotton 65%, corn 23%, fallow 8%",
@@ -1519,7 +1764,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.146,
+          0.233
+        ]
       },
       "8848e94083fffff": {
         "crop": "corn 53%, cotton 43%, fallow 4%",
@@ -1547,7 +1797,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.151,
+          0.213
+        ]
       },
       "8848e94085fffff": {
         "crop": "cotton 49%, alfalfa 32%, corn 11%, fallow 3%",
@@ -1576,7 +1831,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.149,
+          0.234
+        ]
       },
       "8848e94087fffff": {
         "crop": "corn 55%, cotton 36%, fallow 3%, alfalfa 1%",
@@ -1606,7 +1866,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.153,
+          0.206
+        ]
       },
       "8848e94089fffff": {
         "crop": "fallow 50%, corn 32%, cotton 11%, alfalfa 6%",
@@ -1638,7 +1903,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.144,
+          0.186
+        ]
       },
       "8848e9408bfffff": {
         "crop": "cotton 77%, fallow 17%, corn 2%",
@@ -1667,7 +1937,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.179,
+        "sm_rootzone_pi": [
+          0.138,
+          0.247
+        ]
       },
       "8848e9408dfffff": {
         "crop": "fallow 32%, cotton 26%, corn 17%, alfalfa 2%",
@@ -1699,7 +1974,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.141,
+          0.207
+        ]
       },
       "8848e94091fffff": {
         "crop": "corn 44%, cotton 29%, alfalfa 11%, fallow 2%",
@@ -1727,7 +2007,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.135,
+        "sm_rootzone_pi": [
+          0.125,
+          0.167
+        ]
       },
       "8848e94093fffff": {
         "crop": "cotton 33%, alfalfa 33%, fallow 18%, corn 4%",
@@ -1755,7 +2040,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.085,
+          0.141
+        ]
       },
       "8848e94095fffff": {
         "crop": "cotton 54%, corn 40%, alfalfa 1%, fallow 1%",
@@ -1783,7 +2073,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.167,
+        "sm_rootzone_pi": [
+          0.151,
+          0.221
+        ]
       },
       "8848e94097fffff": {
         "crop": "alfalfa 45%, corn 28%, cotton 23%, fallow 3%",
@@ -1809,7 +2104,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.131,
+        "sm_rootzone_pi": [
+          0.106,
+          0.159
+        ]
       },
       "8848e94099fffff": {
         "crop": "corn 52%, cotton 40%, fallow 5%, alfalfa 3%",
@@ -1838,7 +2138,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.137,
+          0.188
+        ]
       },
       "8848e9409bfffff": {
         "crop": "corn 51%, cotton 39%, fallow 6%, alfalfa 2%",
@@ -1867,7 +2172,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.094,
+        "sm_rootzone_pi": [
+          0.087,
+          0.123
+        ]
       },
       "8848e9409dfffff": {
         "crop": "corn 54%, cotton 40%, fallow 2%",
@@ -1896,7 +2206,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.173,
+        "sm_rootzone_pi": [
+          0.152,
+          0.213
+        ]
       },
       "8848e940a1fffff": {
         "crop": "corn 80%, cotton 14%, alfalfa 4%, fallow 1%",
@@ -1927,7 +2242,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.172,
+        "sm_rootzone_pi": [
+          0.156,
+          0.186
+        ]
       },
       "8848e940a3fffff": {
         "crop": "cotton 91%, alfalfa 4%, corn 3%, fallow 2%",
@@ -1956,7 +2276,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.163,
+        "sm_rootzone_pi": [
+          0.138,
+          0.247
+        ]
       },
       "8848e940a5fffff": {
         "crop": "corn 50%, alfalfa 23%, fallow 16%",
@@ -1986,7 +2311,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.173,
+        "sm_rootzone_pi": [
+          0.16,
+          0.197
+        ]
       },
       "8848e940a7fffff": {
         "crop": "cotton 38%, corn 28%, alfalfa 12%, fallow 12%",
@@ -2014,7 +2344,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.157,
+          0.221
+        ]
       },
       "8848e940a9fffff": {
         "crop": "alfalfa 79%, corn 15%, fallow 4%",
@@ -2042,7 +2377,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.194,
+        "sm_rootzone_pi": [
+          0.164,
+          0.232
+        ]
       },
       "8848e940abfffff": {
         "crop": "corn 95%, alfalfa 3%, fallow 1%, cotton 1%",
@@ -2072,7 +2412,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.149,
+          0.187
+        ]
       },
       "8848e940adfffff": {
         "crop": "corn 45%, cotton 38%, alfalfa 9%, fallow 3%",
@@ -2100,7 +2445,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.152,
+          0.209
+        ]
       },
       "8848e940b1fffff": {
         "crop": "alfalfa 58%, corn 19%, cotton 15%, fallow 3%",
@@ -2126,7 +2476,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.181,
+        "sm_rootzone_pi": [
+          0.157,
+          0.225
+        ]
       },
       "8848e940b3fffff": {
         "crop": "corn 53%, alfalfa 19%, cotton 18%, fallow 4%",
@@ -2155,7 +2510,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.154,
+          0.201
+        ]
       },
       "8848e940b5fffff": {
         "crop": "alfalfa 66%, cotton 29%, fallow 1%",
@@ -2181,7 +2541,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.181,
+        "sm_rootzone_pi": [
+          0.147,
+          0.227
+        ]
       },
       "8848e940b7fffff": {
         "crop": "corn 68%, alfalfa 14%, fallow 10%",
@@ -2211,7 +2576,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.149,
+          0.178
+        ]
       },
       "8848e940b9fffff": {
         "crop": "corn 48%, cotton 48%, alfalfa 2%",
@@ -2239,7 +2609,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.175,
+        "sm_rootzone_pi": [
+          0.154,
+          0.221
+        ]
       },
       "8848e940bbfffff": {
         "crop": "corn 57%, cotton 37%, alfalfa 4%",
@@ -2269,7 +2644,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.174,
+        "sm_rootzone_pi": [
+          0.154,
+          0.212
+        ]
       },
       "8848e940bdfffff": {
         "crop": "cotton 76%, corn 15%, fallow 7%",
@@ -2298,7 +2678,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.142,
+          0.237
+        ]
       },
       "8848e940c1fffff": {
         "crop": "fallow 50%, cotton 30%, alfalfa 9%",
@@ -2330,7 +2715,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.127,
+          0.203
+        ]
       },
       "8848e940c3fffff": {
         "crop": "fallow 82%, alfalfa 12%",
@@ -2362,7 +2752,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.132,
+          0.196
+        ]
       },
       "8848e940c5fffff": {
         "crop": "fallow 49%, cotton 23%, alfalfa 1%",
@@ -2395,7 +2790,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.13,
+          0.2
+        ]
       },
       "8848e940c7fffff": {
         "crop": "fallow 73%, alfalfa 9%, corn 2%",
@@ -2427,7 +2827,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.146,
+        "sm_rootzone_pi": [
+          0.128,
+          0.179
+        ]
       },
       "8848e940c9fffff": {
         "crop": "alfalfa 75%, fallow 7%, corn 2%, small_grains 2% (низкая достоверность)",
@@ -2456,7 +2861,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.15,
+          0.189
+        ]
       },
       "8848e940cbfffff": {
         "crop": "fallow 65%, cotton 19%, alfalfa 6%, corn 1%",
@@ -2488,7 +2898,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.131,
+          0.197
+        ]
       },
       "8848e940cdfffff": {
         "crop": "fallow 77%, alfalfa 3%",
@@ -2521,7 +2936,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.126,
+          0.175
+        ]
       },
       "8848e940d1fffff": {
         "crop": "cotton 85%, fallow 6%, alfalfa 5%, corn 3%",
@@ -2550,7 +2970,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.186,
+        "sm_rootzone_pi": [
+          0.133,
+          0.254
+        ]
       },
       "8848e940d3fffff": {
         "crop": "cotton 45%, corn 42%, fallow 12%",
@@ -2579,7 +3004,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.141,
+          0.207
+        ]
       },
       "8848e940d5fffff": {
         "crop": "corn 70%, alfalfa 16%, fallow 9%, cotton 4%",
@@ -2609,7 +3039,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.173,
+        "sm_rootzone_pi": [
+          0.159,
+          0.187
+        ]
       },
       "8848e940d7fffff": {
         "crop": "cotton 93%, fallow 5%, corn 1%, alfalfa 1%",
@@ -2637,7 +3072,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.144,
+          0.258
+        ]
       },
       "8848e940d9fffff": {
         "crop": "cotton 65%, corn 29%, fallow 5%, alfalfa 1%",
@@ -2666,7 +3106,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.149,
+          0.236
+        ]
       },
       "8848e940dbfffff": {
         "crop": "corn 53%, cotton 38%, fallow 7%",
@@ -2697,7 +3142,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.155,
+          0.206
+        ]
       },
       "8848e940ddfffff": {
         "crop": "corn 74%, fallow 20%, alfalfa 2%, cotton 1%",
@@ -2728,7 +3178,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.146,
+          0.181
+        ]
       },
       "8848e940e1fffff": {
         "crop": "fallow 83%, corn 12%",
@@ -2761,7 +3216,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.134,
+          0.18
+        ]
       },
       "8848e940e3fffff": {
         "crop": "fallow 38%, corn 26%, cotton 9%, alfalfa 8%",
@@ -2792,7 +3252,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.145,
+          0.198
+        ]
       },
       "8848e940e5fffff": {
         "crop": "fallow 50%, corn 34%, cotton 10%, alfalfa 2%",
@@ -2825,7 +3290,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.146,
+          0.186
+        ]
       },
       "8848e940e7fffff": {
         "crop": "fallow 44%, corn 32%, alfalfa 7%, cotton 4%",
@@ -2858,7 +3328,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.146,
+          0.182
+        ]
       },
       "8848e940e9fffff": {
         "crop": "fallow 91%, alfalfa 1%",
@@ -2891,7 +3366,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.129,
+          0.193
+        ]
       },
       "8848e940ebfffff": {
         "crop": "corn 60%, alfalfa 19%, fallow 14%, cotton 2%",
@@ -2922,7 +3402,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.151,
+          0.184
+        ]
       },
       "8848e940edfffff": {
         "crop": "fallow 85%, cotton 5%, corn 2%",
@@ -2955,7 +3440,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.131,
+          0.19
+        ]
       },
       "8848e9410bfffff": {
         "crop": "fallow 52%, alfalfa 42%",
@@ -2985,7 +3475,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.157,
+        "sm_rootzone_pi": [
+          0.134,
+          0.206
+        ]
       },
       "8848e94111fffff": {
         "crop": "fallow 53%, alfalfa 10%",
@@ -3017,7 +3512,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.127,
+          0.189
+        ]
       },
       "8848e94113fffff": {
         "crop": "fallow 55%, corn 12%, alfalfa 5%, cotton 3%",
@@ -3048,7 +3548,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.132,
+          0.188
+        ]
       },
       "8848e94115fffff": {
         "crop": "fallow 48%, cotton 20%, alfalfa 7%",
@@ -3079,7 +3584,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.121,
+          0.208
+        ]
       },
       "8848e94117fffff": {
         "crop": "fallow 20%",
@@ -3110,7 +3620,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.141,
+        "sm_rootzone_pi": [
+          0.121,
+          0.188
+        ]
       },
       "8848e94119fffff": {
         "crop": "fallow 36%, alfalfa 31%",
@@ -3136,7 +3651,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.14,
+          0.189
+        ]
       },
       "8848e9411bfffff": {
         "crop": "corn 31%, cotton 22%, fallow 12%, alfalfa 8%",
@@ -3166,7 +3686,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.155,
+          0.217
+        ]
       },
       "8848e9411dfffff": {
         "crop": "fallow 62%, alfalfa 9%, cotton 3%",
@@ -3198,7 +3723,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.125,
+          0.192
+        ]
       },
       "8848e9413bfffff": {
         "crop": "fallow 2%",
@@ -3229,7 +3759,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.139,
+        "sm_rootzone_pi": [
+          0.117,
+          0.197
+        ]
       },
       "8848e94143fffff": {
         "crop": "fallow 42%, alfalfa 17%",
@@ -3262,7 +3797,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.124,
+          0.172
+        ]
       },
       "8848e9414bfffff": {
         "crop": "fallow 29%",
@@ -3295,7 +3835,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.141,
+        "sm_rootzone_pi": [
+          0.122,
+          0.174
+        ]
       },
       "8848e94151fffff": {
         "crop": "alfalfa 83%, fallow 14%",
@@ -3324,7 +3869,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.167,
+        "sm_rootzone_pi": [
+          0.153,
+          0.205
+        ]
       },
       "8848e94153fffff": {
         "crop": "alfalfa 68%, fallow 31%",
@@ -3350,7 +3900,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.153,
+          0.197
+        ]
       },
       "8848e94155fffff": {
         "crop": "alfalfa 56%, fallow 39%",
@@ -3380,7 +3935,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.136,
+          0.183
+        ]
       },
       "8848e94157fffff": {
         "crop": "alfalfa 57%, fallow 34%",
@@ -3406,7 +3966,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.163,
+        "sm_rootzone_pi": [
+          0.148,
+          0.184
+        ]
       },
       "8848e94159fffff": {
         "crop": "alfalfa 71%, fallow 26%",
@@ -3432,7 +3997,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.175,
+        "sm_rootzone_pi": [
+          0.14,
+          0.21
+        ]
       },
       "8848e9415bfffff": {
         "crop": "alfalfa 67%, fallow 26%",
@@ -3460,7 +4030,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.176,
+        "sm_rootzone_pi": [
+          0.146,
+          0.206
+        ]
       },
       "8848e9415dfffff": {
         "crop": "alfalfa 52%, fallow 31%",
@@ -3489,7 +4064,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.141,
+          0.191
+        ]
       },
       "8848e94181fffff": {
         "crop": "fallow 45%, cotton 4%",
@@ -3521,7 +4101,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.123,
+          0.188
+        ]
       },
       "8848e94183fffff": {
         "crop": "fallow 36%",
@@ -3552,7 +4137,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.144,
+        "sm_rootzone_pi": [
+          0.122,
+          0.183
+        ]
       },
       "8848e94185fffff": {
         "crop": "fallow 20%",
@@ -3583,7 +4173,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.143,
+        "sm_rootzone_pi": [
+          0.121,
+          0.187
+        ]
       },
       "8848e94187fffff": {
         "crop": "fallow 25%",
@@ -3614,7 +4209,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.142,
+        "sm_rootzone_pi": [
+          0.121,
+          0.188
+        ]
       },
       "8848e94189fffff": {
         "crop": "fallow 31%, cotton 30%, corn 27%, alfalfa 7%",
@@ -3644,7 +4244,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.146,
+          0.201
+        ]
       },
       "8848e9418bfffff": {
         "crop": "fallow 62%, cotton 21%, corn 14%, alfalfa 1%",
@@ -3675,7 +4280,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.144,
+        "sm_rootzone_pi": [
+          0.135,
+          0.187
+        ]
       },
       "8848e9418dfffff": {
         "crop": "fallow 27%, cotton 27%",
@@ -3705,7 +4315,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.129,
+          0.212
+        ]
       },
       "8848e94191fffff": {
         "crop": "fallow 32%, corn 29%, alfalfa 21%, cotton 3%",
@@ -3733,7 +4348,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.147,
+          0.189
+        ]
       },
       "8848e94193fffff": {
         "crop": "fallow 53%, cotton 33%, alfalfa 3%",
@@ -3764,7 +4384,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.13,
+          0.208
+        ]
       },
       "8848e94195fffff": {
         "crop": "fallow 46%",
@@ -3795,7 +4420,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.144,
+        "sm_rootzone_pi": [
+          0.123,
+          0.19
+        ]
       },
       "8848e94197fffff": {
         "crop": "fallow 41%, alfalfa 33%, corn 13%",
@@ -3821,7 +4451,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.138,
+          0.19
+        ]
       },
       "8848e94199fffff": {
         "crop": "alfalfa 30%, fallow 27%, cotton 9%, corn 6%",
@@ -3849,7 +4484,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.149,
+          0.214
+        ]
       },
       "8848e9419bfffff": {
         "crop": "alfalfa 24%, cotton 14%, fallow 12%, corn 5%",
@@ -3877,7 +4517,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.158,
+          0.216
+        ]
       },
       "8848e9419dfffff": {
         "crop": "alfalfa 31%, cotton 27%, fallow 26%, corn 1%",
@@ -3906,7 +4551,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.143,
+          0.229
+        ]
       },
       "8848e941a9fffff": {
         "crop": "fallow 1%",
@@ -3937,7 +4587,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.138,
+        "sm_rootzone_pi": [
+          0.116,
+          0.185
+        ]
       },
       "8848e941abfffff": {
         "crop": "fallow 6%",
@@ -3969,7 +4624,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.142,
+        "sm_rootzone_pi": [
+          0.121,
+          0.185
+        ]
       },
       "8848e941b1fffff": {
         "crop": "fallow 88%, alfalfa 5%",
@@ -3999,7 +4659,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.108,
+        "sm_rootzone_pi": [
+          0.095,
+          0.157
+        ]
       },
       "8848e941b3fffff": {
         "crop": "alfalfa 50%, fallow 45%",
@@ -4025,7 +4690,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.087,
+        "sm_rootzone_pi": [
+          0.069,
+          0.106
+        ]
       },
       "8848e941b5fffff": {
         "crop": "fallow 30%",
@@ -4057,7 +4727,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.092,
+        "sm_rootzone_pi": [
+          0.077,
+          0.126
+        ]
       },
       "8848e941b7fffff": {
         "crop": "fallow 39%, alfalfa 22%",
@@ -4088,7 +4763,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.075,
+        "sm_rootzone_pi": [
+          0.064,
+          0.101
+        ]
       },
       "8848e941b9fffff": {
         "crop": "fallow 36%",
@@ -4119,7 +4799,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.14,
+        "sm_rootzone_pi": [
+          0.121,
+          0.184
+        ]
       },
       "8848e941bbfffff": {
         "crop": "alfalfa 66%, fallow 27%",
@@ -4145,7 +4830,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.144,
+        "sm_rootzone_pi": [
+          0.131,
+          0.185
+        ]
       },
       "8848e941bdfffff": {
         "crop": "fallow 26%",
@@ -4176,7 +4866,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.145,
+        "sm_rootzone_pi": [
+          0.124,
+          0.193
+        ]
       },
       "8848e941c1fffff": {
         "crop": "cotton 74%, alfalfa 12%, fallow 8%, corn 4%",
@@ -4205,7 +4900,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.178,
+        "sm_rootzone_pi": [
+          0.138,
+          0.245
+        ]
       },
       "8848e941c3fffff": {
         "crop": "alfalfa 52%, corn 26%, cotton 11%, fallow 8%",
@@ -4231,7 +4931,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.156,
+          0.201
+        ]
       },
       "8848e941c5fffff": {
         "crop": "alfalfa 57%, fallow 37%, corn 3%",
@@ -4257,7 +4962,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.134,
+          0.208
+        ]
       },
       "8848e941c7fffff": {
         "crop": "fallow 48%, cotton 40%, alfalfa 11%",
@@ -4287,7 +4997,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.127,
+          0.225
+        ]
       },
       "8848e941c9fffff": {
         "crop": "cotton 43%, alfalfa 43%, corn 7%, fallow 2%",
@@ -4315,7 +5030,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.142,
+          0.225
+        ]
       },
       "8848e941cbfffff": {
         "crop": "fallow 35%, alfalfa 31%, corn 21%, cotton 9%",
@@ -4344,7 +5064,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.155,
+          0.197
+        ]
       },
       "8848e941cdfffff": {
         "crop": "cotton 43%, corn 36%, alfalfa 18%, fallow 2%",
@@ -4372,7 +5097,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.145,
+          0.222
+        ]
       },
       "8848e941d1fffff": {
         "crop": "alfalfa 69%, cotton 25%, fallow 7%",
@@ -4398,7 +5128,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.182,
+        "sm_rootzone_pi": [
+          0.148,
+          0.245
+        ]
       },
       "8848e941d3fffff": {
         "crop": "alfalfa 73%, fallow 14%, corn 10%",
@@ -4424,7 +5159,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.174,
+        "sm_rootzone_pi": [
+          0.151,
+          0.227
+        ]
       },
       "8848e941d5fffff": {
         "crop": "fallow 39%, corn 39%, cotton 17%, alfalfa 5%",
@@ -4456,7 +5196,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.145,
+          0.185
+        ]
       },
       "8848e941d7fffff": {
         "crop": "corn 42%, alfalfa 29%, cotton 25%, fallow 5%",
@@ -4484,7 +5229,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.154,
+          0.212
+        ]
       },
       "8848e941d9fffff": {
         "crop": "corn 67%, alfalfa 25%, fallow 8%",
@@ -4513,7 +5263,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.175,
+        "sm_rootzone_pi": [
+          0.151,
+          0.19
+        ]
       },
       "8848e941dbfffff": {
         "crop": "corn 39%, alfalfa 31%, fallow 16%, cotton 12%",
@@ -4539,7 +5294,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.16,
+          0.201
+        ]
       },
       "8848e941ddfffff": {
         "crop": "alfalfa 41%, corn 41%, fallow 17%",
@@ -4567,7 +5327,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.167,
+        "sm_rootzone_pi": [
+          0.156,
+          0.184
+        ]
       },
       "8848e941e1fffff": {
         "crop": "fallow 3%",
@@ -4598,7 +5363,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.143,
+        "sm_rootzone_pi": [
+          0.123,
+          0.186
+        ]
       },
       "8848e941e3fffff": {
         "crop": "fallow 7%",
@@ -4629,7 +5399,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.14,
+        "sm_rootzone_pi": [
+          0.118,
+          0.188
+        ]
       },
       "8848e941e5fffff": {
         "crop": "fallow 1%",
@@ -4659,7 +5434,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.139,
+        "sm_rootzone_pi": [
+          0.119,
+          0.184
+        ]
       },
       "8848e941e9fffff": {
         "crop": "fallow 16%",
@@ -4690,7 +5470,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.138,
+        "sm_rootzone_pi": [
+          0.12,
+          0.184
+        ]
       },
       "8848e941ebfffff": {
         "crop": "fallow 38%, alfalfa 22%, cotton 6%",
@@ -4721,7 +5506,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.125,
+          0.203
+        ]
       },
       "8848e941edfffff": {
         "crop": "fallow 3%",
@@ -4752,7 +5542,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.14,
+        "sm_rootzone_pi": [
+          0.12,
+          0.189
+        ]
       },
       "8848e94207fffff": {
         "crop": "corn 61%, fallow 15%, alfalfa 6%, small_grains 2% (низкая достоверность)",
@@ -4782,7 +5577,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.152,
+          0.174
+        ]
       },
       "8848e94211fffff": {
         "crop": "alfalfa 75%, corn 12%, fallow 6%",
@@ -4808,7 +5608,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.14,
+          0.211
+        ]
       },
       "8848e94213fffff": {
         "crop": "corn 23%, fallow 22%, alfalfa 2%",
@@ -4834,7 +5639,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.142,
+        "sm_rootzone_pi": [
+          0.136,
+          0.161
+        ]
       },
       "8848e94215fffff": {
         "crop": "corn 54%, alfalfa 17%, cotton 16%, fallow 7%",
@@ -4865,7 +5675,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.169,
+        "sm_rootzone_pi": [
+          0.156,
+          0.197
+        ]
       },
       "8848e94217fffff": {
         "crop": "fallow 35%, cotton 27%, corn 18%, alfalfa 8%",
@@ -4893,7 +5708,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.14,
+          0.196
+        ]
       },
       "8848e9421bfffff": {
         "crop": "corn 66%, fallow 29%, alfalfa 2%",
@@ -4924,7 +5744,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.153,
+          0.176
+        ]
       },
       "8848e94221fffff": {
         "crop": "alfalfa 39%, corn 35%, fallow 24%",
@@ -4954,7 +5779,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.152,
+          0.178
+        ]
       },
       "8848e94223fffff": {
         "crop": "fallow 39%, alfalfa 2%",
@@ -4986,7 +5816,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.144,
+        "sm_rootzone_pi": [
+          0.127,
+          0.179
+        ]
       },
       "8848e94225fffff": {
         "crop": "fallow 45%, corn 40%, alfalfa 9%",
@@ -5015,7 +5850,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.161,
+        "sm_rootzone_pi": [
+          0.152,
+          0.197
+        ]
       },
       "8848e94227fffff": {
         "crop": "fallow 77%, alfalfa 15%, corn 3%",
@@ -5048,7 +5888,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.134,
+          0.182
+        ]
       },
       "8848e9422bfffff": {
         "crop": "fallow 47%, corn 22%, alfalfa 2%",
@@ -5081,7 +5926,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.14,
+          0.178
+        ]
       },
       "8848e94231fffff": {
         "crop": "fallow 44%, alfalfa 38%, corn 13%",
@@ -5112,7 +5962,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.144,
+          0.19
+        ]
       },
       "8848e94233fffff": {
         "crop": "corn 48%, alfalfa 22%, fallow 19%, cotton 3%",
@@ -5142,7 +5997,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.154,
+          0.187
+        ]
       },
       "8848e94235fffff": {
         "crop": "fallow 81%, alfalfa 10%",
@@ -5174,7 +6034,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.146,
+        "sm_rootzone_pi": [
+          0.127,
+          0.179
+        ]
       },
       "8848e94237fffff": {
         "crop": "alfalfa 49%, fallow 34%, corn 17%",
@@ -5203,7 +6068,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.145,
+          0.18
+        ]
       },
       "8848e94239fffff": {
         "crop": "corn 66%, fallow 11%, alfalfa 10%",
@@ -5233,7 +6103,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.155,
+          0.179
+        ]
       },
       "8848e9423bfffff": {
         "crop": "corn 52%, cotton 24%, alfalfa 18%, fallow 7%",
@@ -5264,7 +6139,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.154,
+          0.208
+        ]
       },
       "8848e9423dfffff": {
         "crop": "fallow 37%, corn 33%, alfalfa 6%",
@@ -5297,7 +6177,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.148,
+          0.176
+        ]
       },
       "8848e94281fffff": {
         "crop": "alfalfa 78%, fallow 17%, cotton 2%",
@@ -5323,7 +6208,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.146,
+          0.216
+        ]
       },
       "8848e94283fffff": {
         "crop": "alfalfa 43%, cotton 29%, fallow 25%",
@@ -5353,7 +6243,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.134,
+          0.214
+        ]
       },
       "8848e94285fffff": {
         "crop": "corn 45%, alfalfa 23%, fallow 23%, cotton 2%",
@@ -5383,7 +6278,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.156,
+          0.191
+        ]
       },
       "8848e94287fffff": {
         "crop": "fallow 40%, alfalfa 39%, corn 20%",
@@ -5412,7 +6312,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.15,
+          0.181
+        ]
       },
       "8848e94289fffff": {
         "crop": "alfalfa 64%, fallow 27%, corn 4%",
@@ -5442,7 +6347,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.15,
+          0.189
+        ]
       },
       "8848e9428bfffff": {
         "crop": "fallow 67%, cotton 25%, alfalfa 5%",
@@ -5475,7 +6385,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.145,
+        "sm_rootzone_pi": [
+          0.127,
+          0.203
+        ]
       },
       "8848e9428dfffff": {
         "crop": "fallow 43%, alfalfa 34%, corn 21%",
@@ -5505,7 +6420,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.158,
+        "sm_rootzone_pi": [
+          0.15,
+          0.182
+        ]
       },
       "8848e94291fffff": {
         "crop": "alfalfa 57%, fallow 33%",
@@ -5534,7 +6454,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.141,
+          0.189
+        ]
       },
       "8848e94293fffff": {
         "crop": "corn 55%, alfalfa 44%, fallow 1%",
@@ -5565,7 +6490,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.146,
+          0.186
+        ]
       },
       "8848e94295fffff": {
         "crop": "fallow 82%, alfalfa 14%, cotton 3%",
@@ -5598,7 +6528,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.126,
+          0.179
+        ]
       },
       "8848e94297fffff": {
         "crop": "alfalfa 48%, fallow 22%, corn 6%",
@@ -5626,7 +6561,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.175,
+        "sm_rootzone_pi": [
+          0.135,
+          0.205
+        ]
       },
       "8848e94299fffff": {
         "crop": "alfalfa 38%, cotton 31%, fallow 26%",
@@ -5656,7 +6596,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.143,
+          0.21
+        ]
       },
       "8848e9429bfffff": {
         "crop": "alfalfa 91%, corn 6%, fallow 3%",
@@ -5682,7 +6627,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.174,
+        "sm_rootzone_pi": [
+          0.147,
+          0.21
+        ]
       },
       "8848e9429dfffff": {
         "crop": "fallow 72%, cotton 28%",
@@ -5715,7 +6665,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.123,
+          0.196
+        ]
       },
       "8848e942a1fffff": {
         "crop": "corn 42%, fallow 30%, alfalfa 17%, cotton 1%",
@@ -5744,7 +6699,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.156,
+          0.189
+        ]
       },
       "8848e942a3fffff": {
         "crop": "corn 40%, alfalfa 28%, fallow 5%, cotton 4%",
@@ -5772,7 +6732,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.157,
+          0.207
+        ]
       },
       "8848e942a5fffff": {
         "crop": "fallow 64%, alfalfa 22%, cotton 7%",
@@ -5805,7 +6770,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.137,
+          0.181
+        ]
       },
       "8848e942a7fffff": {
         "crop": "fallow 57%, alfalfa 19%, corn 18%",
@@ -5838,7 +6808,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.145,
+          0.175
+        ]
       },
       "8848e942a9fffff": {
         "crop": "corn 74%, alfalfa 24%, fallow 1%",
@@ -5867,7 +6842,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.176,
+        "sm_rootzone_pi": [
+          0.155,
+          0.19
+        ]
       },
       "8848e942abfffff": {
         "crop": "corn 58%, fallow 14%, alfalfa 11%, cotton 1%",
@@ -5896,7 +6876,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.167,
+        "sm_rootzone_pi": [
+          0.153,
+          0.189
+        ]
       },
       "8848e942adfffff": {
         "crop": "alfalfa 61%, corn 17%, cotton 12%, fallow 3%",
@@ -5922,7 +6907,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.173,
+        "sm_rootzone_pi": [
+          0.153,
+          0.207
+        ]
       },
       "8848e942b1fffff": {
         "crop": "cotton 41%, corn 22%, fallow 20%, alfalfa 15%",
@@ -5952,7 +6942,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.147,
+          0.213
+        ]
       },
       "8848e942b3fffff": {
         "crop": "corn 78%, fallow 17%, alfalfa 1%",
@@ -5982,7 +6977,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.149,
+          0.179
+        ]
       },
       "8848e942b5fffff": {
         "crop": "alfalfa 34%, cotton 22%, fallow 11%, corn 8%",
@@ -6008,7 +7008,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.148,
+          0.214
+        ]
       },
       "8848e942b7fffff": {
         "crop": "cotton 48%, corn 30%, fallow 13%, alfalfa 7%",
@@ -6037,7 +7042,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.183,
+        "sm_rootzone_pi": [
+          0.15,
+          0.218
+        ]
       },
       "8848e942b9fffff": {
         "crop": "corn 54%, alfalfa 24%, fallow 21%",
@@ -6068,7 +7078,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.162,
+        "sm_rootzone_pi": [
+          0.155,
+          0.176
+        ]
       },
       "8848e942bbfffff": {
         "crop": "fallow 89%, cotton 7%, corn 3%, alfalfa 1%",
@@ -6101,7 +7116,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.145,
+        "sm_rootzone_pi": [
+          0.131,
+          0.176
+        ]
       },
       "8848e942bdfffff": {
         "crop": "corn 62%, alfalfa 22%, fallow 5%, cotton 3%",
@@ -6132,7 +7152,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.168,
+        "sm_rootzone_pi": [
+          0.156,
+          0.191
+        ]
       },
       "8848e942c1fffff": {
         "crop": "fallow 50%, alfalfa 9%",
@@ -6165,7 +7190,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.149,
+        "sm_rootzone_pi": [
+          0.127,
+          0.175
+        ]
       },
       "8848e942c3fffff": {
         "crop": "fallow 53%, alfalfa 23%",
@@ -6196,7 +7226,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.126,
+          0.175
+        ]
       },
       "8848e942c5fffff": {
         "crop": "fallow 34%, corn 21%, alfalfa 15%",
@@ -6224,7 +7259,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.142,
+          0.167
+        ]
       },
       "8848e942c7fffff": {
         "crop": "alfalfa 57%, fallow 30%, corn 2%",
@@ -6253,7 +7293,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.142,
+          0.172
+        ]
       },
       "8848e942c9fffff": {
         "crop": "fallow 53%, alfalfa 6%",
@@ -6286,7 +7331,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.127,
+          0.173
+        ]
       },
       "8848e942cbfffff": {
         "crop": "fallow 8%",
@@ -6318,7 +7368,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.14,
+        "sm_rootzone_pi": [
+          0.122,
+          0.169
+        ]
       },
       "8848e942cdfffff": {
         "crop": "fallow 55%, alfalfa 2%",
@@ -6349,7 +7404,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.15,
+        "sm_rootzone_pi": [
+          0.127,
+          0.168
+        ]
       },
       "8848e942d1fffff": {
         "crop": "cotton 31%, corn 23%, fallow 17%, alfalfa 8%",
@@ -6379,7 +7439,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.126,
+        "sm_rootzone_pi": [
+          0.121,
+          0.176
+        ]
       },
       "8848e942d3fffff": {
         "crop": "cotton 44%, fallow 41%",
@@ -6411,7 +7476,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.114,
+        "sm_rootzone_pi": [
+          0.099,
+          0.168
+        ]
       },
       "8848e942d5fffff": {
         "crop": "fallow 55%, cotton 36%, alfalfa 7%, corn 1%",
@@ -6442,7 +7512,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.155,
+        "sm_rootzone_pi": [
+          0.128,
+          0.19
+        ]
       },
       "8848e942d7fffff": {
         "crop": "cotton 45%, fallow 23%, corn 14%, alfalfa 7%",
@@ -6473,7 +7548,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.137,
+          0.216
+        ]
       },
       "8848e942d9fffff": {
         "crop": "cotton 80%, fallow 11%",
@@ -6502,7 +7582,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.108,
+        "sm_rootzone_pi": [
+          0.089,
+          0.178
+        ]
       },
       "8848e942dbfffff": {
         "crop": "cotton 54%, alfalfa 23%, fallow 19%",
@@ -6530,7 +7615,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.11,
+        "sm_rootzone_pi": [
+          0.095,
+          0.162
+        ]
       },
       "8848e942ddfffff": {
         "crop": "fallow 39%, cotton 18%, alfalfa 9%, corn 2%",
@@ -6563,7 +7653,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.133,
+        "sm_rootzone_pi": [
+          0.122,
+          0.173
+        ]
       },
       "8848e942e1fffff": {
         "crop": "alfalfa 46%, fallow 28%, corn 7%, small_grains 9% (низкая достоверность)",
@@ -6595,7 +7690,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.157,
+        "sm_rootzone_pi": [
+          0.142,
+          0.173
+        ]
       },
       "8848e942e3fffff": {
         "crop": "fallow 52%, corn 19%, alfalfa 8%, small_grains 7% (низкая достоверность)",
@@ -6628,7 +7728,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.138,
+          0.174
+        ]
       },
       "8848e942e5fffff": {
         "crop": "fallow 39%, corn 36%, alfalfa 12%, cotton 4%",
@@ -6659,7 +7764,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.159,
+        "sm_rootzone_pi": [
+          0.147,
+          0.182
+        ]
       },
       "8848e942e7fffff": {
         "crop": "fallow 32%, corn 30%, cotton 10%, alfalfa 7%, small_grains 8% (низкая достоверность)",
@@ -6691,7 +7801,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.151,
+          0.183
+        ]
       },
       "8848e942e9fffff": {
         "crop": "alfalfa 42%, fallow 32%",
@@ -6721,7 +7836,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.131,
+          0.173
+        ]
       },
       "8848e942ebfffff": {
         "crop": "fallow 54%, corn 18%, alfalfa 5%",
@@ -6747,7 +7867,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.147,
+        "sm_rootzone_pi": [
+          0.133,
+          0.163
+        ]
       },
       "8848e942edfffff": {
         "crop": "corn 73%, fallow 11%, alfalfa 6%",
@@ -6778,7 +7903,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.167,
+        "sm_rootzone_pi": [
+          0.151,
+          0.18
+        ]
       },
       "8848e94301fffff": {
         "crop": "fallow 42%, cotton 41%, alfalfa 14%",
@@ -6807,7 +7937,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.132,
+          0.219
+        ]
       },
       "8848e94303fffff": {
         "crop": "fallow 53%, alfalfa 14%",
@@ -6839,7 +7974,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.151,
+        "sm_rootzone_pi": [
+          0.13,
+          0.184
+        ]
       },
       "8848e94305fffff": {
         "crop": "fallow 52%, cotton 36%, alfalfa 6%",
@@ -6869,7 +8009,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.133,
+          0.217
+        ]
       },
       "8848e94307fffff": {
         "crop": "fallow 87%, alfalfa 1%",
@@ -6901,7 +8046,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.126,
+          0.186
+        ]
       },
       "8848e9430bfffff": {
         "crop": "alfalfa 42%, fallow 38%",
@@ -6927,7 +8077,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.156,
+        "sm_rootzone_pi": [
+          0.132,
+          0.182
+        ]
       },
       "8848e94311fffff": {
         "crop": "cotton 50%, corn 28%, fallow 15%, alfalfa 4%",
@@ -6956,7 +8111,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.166,
+        "sm_rootzone_pi": [
+          0.148,
+          0.22
+        ]
       },
       "8848e94313fffff": {
         "crop": "corn 61%, alfalfa 29%, fallow 9%",
@@ -6986,7 +8146,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.172,
+        "sm_rootzone_pi": [
+          0.154,
+          0.188
+        ]
       },
       "8848e94315fffff": {
         "crop": "cotton 50%, fallow 46%",
@@ -7016,7 +8181,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.16,
+        "sm_rootzone_pi": [
+          0.13,
+          0.219
+        ]
       },
       "8848e94317fffff": {
         "crop": "corn 50%, cotton 30%, fallow 14%",
@@ -7046,7 +8216,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.155,
+          0.199
+        ]
       },
       "8848e94319fffff": {
         "crop": "corn 36%, fallow 31%, alfalfa 16%, cotton 5%",
@@ -7079,7 +8254,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.148,
+          0.182
+        ]
       },
       "8848e9431bfffff": {
         "crop": "alfalfa 55%, fallow 25%, corn 19%",
@@ -7108,7 +8288,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.165,
+        "sm_rootzone_pi": [
+          0.147,
+          0.186
+        ]
       },
       "8848e9431dfffff": {
         "crop": "fallow 37%, cotton 25%, alfalfa 9%, corn 1%",
@@ -7137,7 +8322,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.152,
+        "sm_rootzone_pi": [
+          0.129,
+          0.19
+        ]
       },
       "8848e94323fffff": {
         "crop": "fallow 51%",
@@ -7168,7 +8358,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.139,
+        "sm_rootzone_pi": [
+          0.12,
+          0.185
+        ]
       },
       "8848e9432bfffff": {
         "crop": "fallow 65%",
@@ -7199,7 +8394,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.142,
+        "sm_rootzone_pi": [
+          0.122,
+          0.189
+        ]
       },
       "8848e94331fffff": {
         "crop": "alfalfa 70%, fallow 24%",
@@ -7225,7 +8425,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.186,
+        "sm_rootzone_pi": [
+          0.139,
+          0.22
+        ]
       },
       "8848e94333fffff": {
         "crop": "alfalfa 76%, fallow 19%",
@@ -7251,7 +8456,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.177,
+        "sm_rootzone_pi": [
+          0.143,
+          0.203
+        ]
       },
       "8848e94335fffff": {
         "crop": "fallow 42%, alfalfa 18%",
@@ -7282,7 +8492,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.128,
+          0.177
+        ]
       },
       "8848e94337fffff": {
         "crop": "alfalfa 73%, fallow 21%",
@@ -7308,7 +8523,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.17,
+        "sm_rootzone_pi": [
+          0.15,
+          0.217
+        ]
       },
       "8848e94339fffff": {
         "crop": "fallow 55%, cotton 1%",
@@ -7340,7 +8560,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.145,
+        "sm_rootzone_pi": [
+          0.123,
+          0.18
+        ]
       },
       "8848e9433bfffff": {
         "crop": "alfalfa 58%, fallow 18%, cotton 11%, corn 6%",
@@ -7366,7 +8591,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.175,
+        "sm_rootzone_pi": [
+          0.143,
+          0.196
+        ]
       },
       "8848e9433dfffff": {
         "crop": "fallow 50%, alfalfa 4%",
@@ -7397,7 +8627,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.143,
+        "sm_rootzone_pi": [
+          0.123,
+          0.182
+        ]
       },
       "8848e94501fffff": {
         "crop": "alfalfa 84%, cotton 5%, fallow 2%",
@@ -7423,7 +8658,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.104,
+        "sm_rootzone_pi": [
+          0.081,
+          0.116
+        ]
       },
       "8848e94503fffff": {
         "crop": "fallow 44%, alfalfa 11%, cotton 2%",
@@ -7456,7 +8696,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.086,
+        "sm_rootzone_pi": [
+          0.074,
+          0.101
+        ]
       },
       "8848e94505fffff": {
         "crop": "alfalfa 96%, fallow 4%",
@@ -7482,7 +8727,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.113,
+        "sm_rootzone_pi": [
+          0.088,
+          0.137
+        ]
       },
       "8848e94509fffff": {
         "crop": "cotton 74%, alfalfa 10%, fallow 7%, corn 3%",
@@ -7511,7 +8761,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.092,
+        "sm_rootzone_pi": [
+          0.076,
+          0.132
+        ]
       },
       "8848e9450bfffff": {
         "crop": "cotton 42%, alfalfa 40%, fallow 17%",
@@ -7540,7 +8795,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.091,
+        "sm_rootzone_pi": [
+          0.08,
+          0.117
+        ]
       },
       "8848e9450dfffff": {
         "crop": "cotton 46%, alfalfa 40%, fallow 10%, corn 1%",
@@ -7569,7 +8829,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.103,
+        "sm_rootzone_pi": [
+          0.08,
+          0.138
+        ]
       },
       "8848e9451dfffff": {
         "crop": "cotton 60%, fallow 40%",
@@ -7598,7 +8863,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.089,
+        "sm_rootzone_pi": [
+          0.077,
+          0.123
+        ]
       },
       "8848e94529fffff": {
         "crop": "alfalfa 64%, fallow 21%, corn 14%",
@@ -7626,7 +8896,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.088,
+          0.111
+        ]
       },
       "8848e9452dfffff": {
         "crop": "corn 51%, alfalfa 31%, fallow 12%, cotton 1%",
@@ -7656,7 +8931,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.088,
+        "sm_rootzone_pi": [
+          0.083,
+          0.1
+        ]
       },
       "8848e94541fffff": {
         "crop": "corn 61%, alfalfa 26%, cotton 2%, fallow 2%",
@@ -7685,7 +8965,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.1,
+        "sm_rootzone_pi": [
+          0.09,
+          0.106
+        ]
       },
       "8848e94543fffff": {
         "crop": "cotton 45%, alfalfa 28%, corn 16%, fallow 10%",
@@ -7714,7 +8999,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.084,
+          0.121
+        ]
       },
       "8848e94545fffff": {
         "crop": "corn 92%, cotton 3%, alfalfa 2%, fallow 1%",
@@ -7743,7 +9033,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.101,
+        "sm_rootzone_pi": [
+          0.085,
+          0.111
+        ]
       },
       "8848e94547fffff": {
         "crop": "corn 78%, alfalfa 7%, fallow 6%, cotton 1%",
@@ -7774,7 +9069,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.097,
+        "sm_rootzone_pi": [
+          0.086,
+          0.105
+        ]
       },
       "8848e94549fffff": {
         "crop": "alfalfa 53%, corn 28%, fallow 5%, cotton 4%",
@@ -7800,7 +9100,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.092,
+          0.108
+        ]
       },
       "8848e9454bfffff": {
         "crop": "alfalfa 59%, corn 36%, fallow 5%",
@@ -7826,7 +9131,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.098,
+        "sm_rootzone_pi": [
+          0.095,
+          0.111
+        ]
       },
       "8848e9454dfffff": {
         "crop": "cotton 56%, corn 39%, alfalfa 5%",
@@ -7855,7 +9165,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.098,
+        "sm_rootzone_pi": [
+          0.088,
+          0.134
+        ]
       },
       "8848e94555fffff": {
         "crop": "corn 80%, cotton 14%, fallow 5%, alfalfa 1%",
@@ -7886,7 +9201,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.094,
+        "sm_rootzone_pi": [
+          0.087,
+          0.1
+        ]
       },
       "8848e94557fffff": {
         "crop": "cotton 94%, fallow 4%, corn 1%",
@@ -7915,7 +9235,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.092,
+        "sm_rootzone_pi": [
+          0.08,
+          0.138
+        ]
       },
       "8848e9455dfffff": {
         "crop": "corn 36%, alfalfa 36%, fallow 22%",
@@ -7944,7 +9269,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.097,
+        "sm_rootzone_pi": [
+          0.087,
+          0.102
+        ]
       },
       "8848e94561fffff": {
         "crop": "corn 49%, alfalfa 45%, fallow 5%",
@@ -7970,7 +9300,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.103,
+        "sm_rootzone_pi": [
+          0.09,
+          0.111
+        ]
       },
       "8848e94563fffff": {
         "crop": "fallow 65%, alfalfa 32%, cotton 2%",
@@ -8003,7 +9338,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.096,
+        "sm_rootzone_pi": [
+          0.075,
+          0.115
+        ]
       },
       "8848e94565fffff": {
         "crop": "corn 92%, fallow 4%, alfalfa 1%",
@@ -8033,7 +9373,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.098,
+        "sm_rootzone_pi": [
+          0.086,
+          0.109
+        ]
       },
       "8848e94567fffff": {
         "crop": "corn 82%, alfalfa 13%, fallow 2%",
@@ -8061,7 +9406,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.106,
+        "sm_rootzone_pi": [
+          0.096,
+          0.112
+        ]
       },
       "8848e94569fffff": {
         "crop": "alfalfa 41%, fallow 27%, corn 5%",
@@ -8087,7 +9437,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.1,
+        "sm_rootzone_pi": [
+          0.086,
+          0.126
+        ]
       },
       "8848e9456bfffff": {
         "crop": "alfalfa 79%, fallow 17%, corn 1%",
@@ -8113,7 +9468,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.106,
+        "sm_rootzone_pi": [
+          0.087,
+          0.123
+        ]
       },
       "8848e9456dfffff": {
         "crop": "corn 31%, cotton 26%, fallow 21%, alfalfa 7%",
@@ -8144,7 +9504,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.094,
+          0.13
+        ]
       },
       "8848e94705fffff": {
         "crop": "corn 58%, fallow 21%, cotton 15%, alfalfa 2%",
@@ -8175,7 +9540,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.089,
+        "sm_rootzone_pi": [
+          0.084,
+          0.104
+        ]
       },
       "8848e94707fffff": {
         "crop": "corn 75%, alfalfa 10%, fallow 10%",
@@ -8206,7 +9576,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.091,
+        "sm_rootzone_pi": [
+          0.084,
+          0.1
+        ]
       },
       "8848e9470dfffff": {
         "crop": "alfalfa 35%, corn 23%, fallow 17%, cotton 16%",
@@ -8234,7 +9609,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.093,
+        "sm_rootzone_pi": [
+          0.086,
+          0.105
+        ]
       },
       "8848e94721fffff": {
         "crop": "alfalfa 26%, cotton 23%, fallow 22%, corn 19%",
@@ -8262,7 +9642,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.095,
+        "sm_rootzone_pi": [
+          0.087,
+          0.115
+        ]
       },
       "8848e94723fffff": {
         "crop": "alfalfa 70%, corn 25%, fallow 5%",
@@ -8292,7 +9677,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.101,
+        "sm_rootzone_pi": [
+          0.089,
+          0.111
+        ]
       },
       "8848e94725fffff": {
         "crop": "corn 88%, cotton 9%, fallow 2%, alfalfa 1%",
@@ -8323,7 +9713,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.089,
+        "sm_rootzone_pi": [
+          0.086,
+          0.104
+        ]
       },
       "8848e94727fffff": {
         "crop": "cotton 49%, corn 31%, alfalfa 12%, fallow 1%",
@@ -8352,7 +9747,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.1,
+        "sm_rootzone_pi": [
+          0.088,
+          0.13
+        ]
       },
       "8848e94729fffff": {
         "crop": "corn 49%, fallow 39%, cotton 6%",
@@ -8383,7 +9783,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.09,
+        "sm_rootzone_pi": [
+          0.084,
+          0.102
+        ]
       },
       "8848e9472bfffff": {
         "crop": "corn 77%, fallow 13%, alfalfa 7%",
@@ -8414,7 +9819,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.091,
+        "sm_rootzone_pi": [
+          0.086,
+          0.099
+        ]
       },
       "8848e9472dfffff": {
         "crop": "cotton 66%, corn 24%, fallow 9%",
@@ -8443,7 +9853,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.108,
+        "sm_rootzone_pi": [
+          0.086,
+          0.144
+        ]
       },
       "8848e94735fffff": {
         "crop": "corn 58%, fallow 23%, alfalfa 9%, cotton 1%",
@@ -8473,7 +9888,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.094,
+        "sm_rootzone_pi": [
+          0.087,
+          0.099
+        ]
       },
       "8848e94737fffff": {
         "crop": "fallow 65%, corn 12%, alfalfa 11%",
@@ -8505,7 +9925,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.084,
+        "sm_rootzone_pi": [
+          0.074,
+          0.092
+        ]
       },
       "8848e9473dfffff": {
         "crop": "corn 46%, alfalfa 37%, fallow 13%",
@@ -8536,7 +9961,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.095,
+        "sm_rootzone_pi": [
+          0.086,
+          0.097
+        ]
       },
       "8848e94745fffff": {
         "crop": "corn 59%, alfalfa 16%, cotton 10%, fallow 7%",
@@ -8567,7 +9997,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.093,
+        "sm_rootzone_pi": [
+          0.089,
+          0.099
+        ]
       },
       "8848e94747fffff": {
         "crop": "corn 71%, fallow 11%, alfalfa 10%",
@@ -8598,7 +10033,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.087,
+        "sm_rootzone_pi": [
+          0.084,
+          0.098
+        ]
       },
       "8848e9474dfffff": {
         "crop": "cotton 37%, fallow 19%, alfalfa 19%, corn 18%",
@@ -8627,7 +10067,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.1,
+        "sm_rootzone_pi": [
+          0.087,
+          0.126
+        ]
       },
       "8848e94761fffff": {
         "crop": "cotton 63%, corn 17%, fallow 10%, alfalfa 2%",
@@ -8655,7 +10100,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.136,
+        "sm_rootzone_pi": [
+          0.113,
+          0.176
+        ]
       },
       "8848e94763fffff": {
         "crop": "cotton 54%, alfalfa 17%, fallow 17%, corn 9%",
@@ -8683,7 +10133,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.103,
+        "sm_rootzone_pi": [
+          0.081,
+          0.132
+        ]
       },
       "8848e94765fffff": {
         "crop": "cotton 48%, corn 47%, fallow 4%, alfalfa 1%",
@@ -8712,7 +10167,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.164,
+        "sm_rootzone_pi": [
+          0.154,
+          0.216
+        ]
       },
       "8848e94767fffff": {
         "crop": "cotton 55%, corn 32%, fallow 3%, alfalfa 3%",
@@ -8741,7 +10201,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.117,
+        "sm_rootzone_pi": [
+          0.105,
+          0.156
+        ]
       },
       "8848e94769fffff": {
         "crop": "corn 37%, cotton 27%, fallow 19%, alfalfa 4%",
@@ -8772,7 +10237,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.148,
+        "sm_rootzone_pi": [
+          0.129,
+          0.171
+        ]
       },
       "8848e9476bfffff": {
         "crop": "alfalfa 74%, cotton 23%, fallow 3%",
@@ -8798,7 +10268,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.1,
+        "sm_rootzone_pi": [
+          0.085,
+          0.123
+        ]
       },
       "8848e9476dfffff": {
         "crop": "fallow 52%, cotton 18%, corn 13%, alfalfa 3%",
@@ -8831,7 +10306,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.154,
+        "sm_rootzone_pi": [
+          0.138,
+          0.193
+        ]
       },
       "8848e94e09fffff": {
         "crop": "alfalfa 65%, fallow 35%",
@@ -8857,7 +10337,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.078,
+        "sm_rootzone_pi": [
+          0.066,
+          0.099
+        ]
       },
       "8848e94e0dfffff": {
         "crop": "fallow 66%, alfalfa 22%, cotton 8%",
@@ -8888,7 +10373,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.074,
+        "sm_rootzone_pi": [
+          0.063,
+          0.102
+        ]
       },
       "8848e94e41fffff": {
         "crop": "corn 48%, fallow 31%",
@@ -8918,7 +10408,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.117,
+        "sm_rootzone_pi": [
+          0.11,
+          0.149
+        ]
       },
       "8848e94e43fffff": {
         "crop": "fallow 40%, alfalfa 2%",
@@ -8951,7 +10446,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.073,
+        "sm_rootzone_pi": [
+          0.061,
+          0.095
+        ]
       },
       "8848e94e45fffff": {
         "crop": "fallow 59%, alfalfa 17%",
@@ -8983,7 +10483,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.093,
+        "sm_rootzone_pi": [
+          0.08,
+          0.121
+        ]
       },
       "8848e94e47fffff": {
         "crop": "fallow 66%, alfalfa 27%, cotton 2%",
@@ -9014,7 +10519,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.073,
+        "sm_rootzone_pi": [
+          0.065,
+          0.103
+        ]
       },
       "8848e94e49fffff": {
         "crop": "alfalfa 48%, fallow 15%, cotton 11%, corn 4%",
@@ -9040,7 +10550,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.171,
+        "sm_rootzone_pi": [
+          0.146,
+          0.224
+        ]
       },
       "8848e94e4bfffff": {
         "crop": "fallow 32%, corn 21%, alfalfa 18%",
@@ -9066,7 +10581,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.131,
+        "sm_rootzone_pi": [
+          0.122,
+          0.155
+        ]
       },
       "8848e94e4dfffff": {
         "crop": "alfalfa 45%, fallow 22%, cotton 20%, corn 8%",
@@ -9092,7 +10612,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.172,
+        "sm_rootzone_pi": [
+          0.141,
+          0.227
+        ]
       },
       "8848e94e51fffff": {
         "crop": "fallow 67%, alfalfa 10%, corn 7%",
@@ -9123,7 +10648,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.073,
+        "sm_rootzone_pi": [
+          0.064,
+          0.105
+        ]
       },
       "8848e94e53fffff": {
         "crop": "fallow 71%, alfalfa 15%",
@@ -9154,7 +10684,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.073,
+        "sm_rootzone_pi": [
+          0.063,
+          0.106
+        ]
       },
       "8848e94e55fffff": {
         "crop": "fallow 69%, cotton 6%, alfalfa 2%",
@@ -9185,7 +10720,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.073,
+        "sm_rootzone_pi": [
+          0.061,
+          0.104
+        ]
       },
       "8848e94e57fffff": {
         "crop": "fallow 64%, alfalfa 13%, cotton 1%",
@@ -9216,7 +10756,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.074,
+        "sm_rootzone_pi": [
+          0.063,
+          0.105
+        ]
       },
       "8848e94e59fffff": {
         "crop": "corn 88%, fallow 5%",
@@ -9244,7 +10789,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.096,
+        "sm_rootzone_pi": [
+          0.084,
+          0.103
+        ]
       },
       "8848e94e5bfffff": {
         "crop": "alfalfa 42%, corn 27%, fallow 27%",
@@ -9272,7 +10822,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.082,
+        "sm_rootzone_pi": [
+          0.076,
+          0.104
+        ]
       },
       "8848e94e5dfffff": {
         "crop": "fallow 67%, corn 20%, alfalfa 2%",
@@ -9303,7 +10858,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.071,
+        "sm_rootzone_pi": [
+          0.065,
+          0.097
+        ]
       },
       "8848e94e61fffff": {
         "crop": "fallow 43%, alfalfa 39%, corn 6%",
@@ -9331,7 +10891,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.078,
+        "sm_rootzone_pi": [
+          0.07,
+          0.109
+        ]
       },
       "8848e94e63fffff": {
         "crop": "fallow 81%, alfalfa 18%",
@@ -9362,7 +10927,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.074,
+        "sm_rootzone_pi": [
+          0.064,
+          0.108
+        ]
       },
       "8848e94e65fffff": {
         "crop": "fallow 57%, alfalfa 26%, corn 3%",
@@ -9393,7 +10963,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.076,
+        "sm_rootzone_pi": [
+          0.066,
+          0.105
+        ]
       },
       "8848e94e67fffff": {
         "crop": "alfalfa 66%, corn 14%",
@@ -9419,7 +10994,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.087,
+        "sm_rootzone_pi": [
+          0.076,
+          0.114
+        ]
       },
       "8848e94e69fffff": {
         "crop": "fallow 77%, corn 9%, alfalfa 8%",
@@ -9449,7 +11029,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.079,
+        "sm_rootzone_pi": [
+          0.07,
+          0.124
+        ]
       },
       "8848e94e6bfffff": {
         "crop": "fallow 49%, alfalfa 46%",
@@ -9475,7 +11060,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.079,
+        "sm_rootzone_pi": [
+          0.066,
+          0.108
+        ]
       },
       "8848e94e6dfffff": {
         "crop": "fallow 51%, alfalfa 46%",
@@ -9505,7 +11095,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.078,
+        "sm_rootzone_pi": [
+          0.071,
+          0.102
+        ]
       },
       "8848e94f4bfffff": {
         "crop": "fallow 2%",
@@ -9537,7 +11132,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.069,
+        "sm_rootzone_pi": [
+          0.059,
+          0.099
+        ]
       },
       "8848e94f59fffff": {
         "crop": "fallow 16%, alfalfa 1%",
@@ -9568,7 +11168,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.069,
+        "sm_rootzone_pi": [
+          0.059,
+          0.104
+        ]
       },
       "8848e94f5bfffff": {
         "crop": "fallow 60%, corn 18%",
@@ -9599,7 +11204,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.07,
+        "sm_rootzone_pi": [
+          0.063,
+          0.109
+        ]
       },
       "8848e95523fffff": {
         "crop": "fallow 38%, alfalfa 2%",
@@ -9632,7 +11242,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.119,
+        "sm_rootzone_pi": [
+          0.104,
+          0.144
+        ]
       },
       "8848e95527fffff": {
         "crop": "fallow 91%, alfalfa 7%",
@@ -9664,7 +11279,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.153,
+        "sm_rootzone_pi": [
+          0.13,
+          0.174
+        ]
       },
       "8848e95531fffff": {
         "crop": "fallow 2%",
@@ -9697,7 +11317,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.095,
+        "sm_rootzone_pi": [
+          0.083,
+          0.124
+        ]
       },
       "8848e95533fffff": {
         "crop": "fallow 29%, cotton 9%, alfalfa 1%",
@@ -9730,7 +11355,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.098,
+        "sm_rootzone_pi": [
+          0.084,
+          0.131
+        ]
       },
       "8848e95535fffff": {
         "crop": "fallow 6%",
@@ -9763,7 +11393,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.099,
+        "sm_rootzone_pi": [
+          0.087,
+          0.128
+        ]
       },
       "8848e95537fffff": {
         "crop": "fallow 13%, cotton 6%, alfalfa 1%",
@@ -9796,7 +11431,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.097,
+        "sm_rootzone_pi": [
+          0.086,
+          0.128
+        ]
       },
       "8848e955a5fffff": {
         "crop": "cotton 46%, alfalfa 30%, fallow 18%, corn 2%",
@@ -9825,7 +11465,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.109,
+        "sm_rootzone_pi": [
+          0.101,
+          0.165
+        ]
       },
       "8848e955a7fffff": {
         "crop": "alfalfa 56%, fallow 18%, cotton 13%, corn 1%",
@@ -9854,7 +11499,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.106,
+        "sm_rootzone_pi": [
+          0.097,
+          0.133
+        ]
       },
       "8848e955adfffff": {
         "crop": "cotton 32%, corn 23%, alfalfa 21%, fallow 17%",
@@ -9884,7 +11534,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.104,
+        "sm_rootzone_pi": [
+          0.097,
+          0.146
+        ]
       },
       "8848e955e5fffff": {
         "crop": "cotton 58%, alfalfa 15%, fallow 10%, corn 6%",
@@ -9912,7 +11567,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.105,
+        "sm_rootzone_pi": [
+          0.093,
+          0.164
+        ]
       },
       "8848e955edfffff": {
         "crop": "fallow 10%",
@@ -9945,7 +11605,12 @@
               7
             ]
           }
-        }
+        },
+        "sm_rootzone": 0.094,
+        "sm_rootzone_pi": [
+          0.082,
+          0.122
+        ]
       }
     }
   }
