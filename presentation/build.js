@@ -100,70 +100,167 @@ function screens(s, back, front, side, facts) {
     { fx: "fade", names: facts.map((_, i) => `f${i}`), dur: 400, stagger: 250 }];
 }
 
-// 1 ─ opening crawl, 60 s, moves on by itself ─────────────────────
+const chartBase = {
+  catAxisLabelColor: HEX.muted, valAxisLabelColor: HEX.muted, catAxisLabelFontFace: "+mn-lt", valAxisLabelFontFace: "+mn-lt",
+  catAxisLabelFontSize: 12, valAxisLabelFontSize: 12, valGridLine: { color: HEX.grid, size: 0.75 }, catGridLine: { style: "none" },
+  catAxisLineColor: HEX.line, valAxisLineShow: false, legendColor: HEX.muted, legendFontFace: "+mn-lt", legendFontSize: 12,
+  titleColor: "FFFFFF", titleFontFace: "+mn-lt", titleFontSize: 14, showTitle: true, dataLabelColor: "FFFFFF",
+  dataLabelFontFace: "+mn-lt", dataLabelFontSize: 11,
+};
+const QR_TEXT = "Scan to try Furrow"; // the code in img/qr.png opens https://myqrcode.mobi/860affa3
+const NAMES = ["Current", "Strategy A", "Strategy B", "Strategy C"];
+const ROT = [["Current", "wheat, wheat, black fallow"], ["A", "wheat, lentil, flax, wheat"], ["B", "wheat, pea, 2 years sainfoin"], ["C", "wheat, chickpea, millet"]];
+const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
+
+// 0 ─ title: a still frame, no builds ─────────────────────────────
+{
+  const s = slide("Title", null, null, "Starfield blank");
+  s.background = { path: B("globe_poster.png") };
+  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 0.55, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
+  s.addText("NASA SPACE APPS 2026  ·  CHALLENGE", T({ objectName: "kick", x: M, y: 1.75, w: 6.3, h: 0.35, fontSize: 13, bold: true, color: C.accent2, charSpacing: 3, valign: "top" }));
+  s.addText("Field Shift: Adapting Farms with NASA Data", T({ objectName: "case", x: M, y: 2.15, w: 6.3, h: 1.0, fontSize: 24, color: C.background1, valign: "top" }));
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 3.35, w: 7.0, h: 1.15, fontSize: 66, color: C.accent1, charSpacing: 3, fontFace: THEME.headFontFace, valign: "top", wrap: false }));
+  s.addText("Crop rotation planner on NASA data", T({ objectName: "sub", x: M, y: 4.6, w: 6.3, h: 0.45, fontSize: 20, color: C.background1, valign: "top" }));
+  s.addText([{ text: "TEAM  ", options: { color: C.background2, charSpacing: 4, fontSize: 13, bold: true } }, { text: "Rogue One", options: { color: C.accent1, fontSize: 22, bold: true } }],
+    T({ objectName: "team", x: M, y: 5.55, w: 6.3, h: 0.55, valign: "middle" }));
+  s.addNotes("0:00–0:10. Introduce the team and the challenge, then click: the crawl starts.");
+  TRANS[s._n] = "fade";
+}
+
+// 1 ─ opening crawl with its soundtrack, 60 s, moves on by itself ──
 {
   const s = slide("Opening", null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("crawl.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("stars.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "crawl" });
-  s.addNotes("0:00–1:00. Read the crawl aloud as it scrolls, at a calm pace. It plays on its own and moves to the next slide when it ends. It carries the problem and why it matters now: shifting seasons, bare fields, soil blowing away in Kazakhstan, an aquifer draining in Arizona, and farmers without proof from their own field.");
+  s.addNotes("0:10–1:10. Read the crawl aloud as it scrolls, at a calm pace; the music fades out as the story text comes in. It plays on its own and moves to the next slide when it ends.");
   ANIM[s._n] = [{ media: "crawl", dur: 60000 }];
   TRANS[s._n] = "fade";
   ADV[s._n] = 60300;
 }
 
-// 2 ─ the app: map and time machine (≈30 s) ───────────────────────
+// 2 ─ the app: live screenshots (≈20 s) ───────────────────────────
 {
-  const s = slide("Product", "EPISODE I  ·  THE APP", "Pick a field, replay four rotations over 22 real seasons");
-  const cur = S(V, "current"), c = S(V, "C");
-  anim(s, screens(s, "vko_map", "vko_time", "left", [
-    [`${V.cells} + ${AZ.cells} cells`, "in East Kazakhstan and Arizona, each with its own soil and NASA POWER weather"],
-    ["4 NASA layers", "MODIS NDVI, SMAP, GPM IMERG and GRACE-FO under the map"],
-    [`${Math.round(cur.m.loss_years * 100)}% → ${Math.round(c.m.loss_years * 100)}%`, "of seasons losing money: wheat, wheat, fallow against wheat, chickpea, millet"],
+  const s = slide("Product", "EPISODE I  ·  THE APP", "Pick a field, set what matters on your farm");
+  anim(s, screens(s, "vko_map", "vko_strategies", "left", [
+    [`${V.cells} + ${AZ.cells} cells`, "in East Kazakhstan and Arizona, each with its own soil and 22 years of NASA POWER weather"],
+    ["Your priorities", "weigh profit, water, market and nitrogen; the best-fit rotation updates as you move them"],
+    ["Ask the field", "an assistant that answers in plain words, in English or Russian"],
   ]));
-  s.addNotes("1:00–1:30. This is Furrow. Pick a cell on the map: each carries its own soil and 22 years of NASA POWER weather, with NASA layers underneath. Four rotations, today's and three hypotheses for the agronomist, are replayed over every season since 2002. In the 2008 drought every rotation suffers, but wheat, chickpea, millet stays positive.");
+  s.addNotes("1:10–1:28. This is Furrow. Pick a cell on the map: it carries its own soil and 22 years of NASA POWER weather, with NASA layers underneath. Set what matters on your farm, profit, water, market or nitrogen, and the best-fit rotation updates. The assistant answers from the results.");
 }
 
-// 3 ─ what if (≈30 s) ─────────────────────────────────────────────
+// 3 ─ time machine: native chart (≈25 s) ──────────────────────────
 {
-  const s = slide(null, "EPISODE II  ·  WHAT IF", "Warm the climate, then search hundreds of rotations");
-  const cur = S(V, "current"), c = S(V, "C"), a = S(AZ, "A"), azc = S(AZ, "current");
-  anim(s, screens(s, "vko_tradeoffs", "vko_twin", "right", [
-    [`${usd(c.twin)} vs ${usd(cur.twin)}`, "median per hectare at +2 °C and 10% less rain: rotation C against today"],
-    [`${V.pareto} of ${V.searched}`, "rotations NSGA-II found that nothing beats on every count"],
-    [`+${usd(a.m.profit[1] - azc.m.profit[1])}, −${Math.round(a.water_saved)} mm`, "in Arizona: durum and guar on drip against today, per hectare, less groundwater pumped"],
-  ]));
-  s.addNotes("1:30–2:00. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative. The trade-off cockpit searched hundreds of rotations; the farmer sets limits and the list keeps only what fits. In Arizona the same tools answer the water question: the water-wise rotation earns more and pumps less.");
+  const s = slide(null, "EPISODE II  ·  THE TIME MACHINE", "Four rotations, replayed over 22 real seasons");
+  const st = V.strategies;
+  s.addChart(pres.charts.LINE, st.map((x, i) => ({ name: NAMES[i], labels: st[0].years.map(String), values: x.median })),
+    { ...chartBase, objectName: "chart", x: M, y: TOP, w: 7.9, h: 4.85, chartColors: SC, lineSize: 2.5, lineDataSymbol: "none",
+      title: "Median profit per hectare by harvest year, East Kazakhstan", valAxisLabelFormatCode: "$#,##0;−$#,##0",
+      showLegend: true, legendPos: "b", catAxisLabelFrequency: 2 });
+  const x = 8.85, w = 3.88;
+  ROT.forEach(([id, rot], i) => {
+    const y = TOP + i * 0.92;
+    s.addShape(pres.shapes.OVAL, { objectName: `d${i}`, x, y: y + 0.07, w: 0.2, h: 0.2, fill: { color: DOT[i] }, line: { type: "none" } });
+    s.addText([{ text: `${id} · ${rot}`, options: { fontSize: 15, bold: true, color: C.background1, breakLine: true } },
+      { text: `loses money in ${Math.round(st[i].m.loss_years * 100)}% of seasons`, options: { fontSize: 14, color: C.background2 } }],
+      T({ objectName: `r${i}`, x: x + 0.35, y, w: w - 0.35, h: 0.8, valign: "top", paraSpaceAfter: 2 }));
+  });
+  const v08 = (z) => z.median[z.years.indexOf(2008)];
+  s.addText([{ text: "2008 drought", options: { bold: true, color: C.accent1, breakLine: true } },
+    { text: `current practice ${usd(v08(S(V, "current")))}/ha, rotation C still ${usd(v08(S(V, "C")))}/ha`, options: { color: C.background1 } }],
+    T({ objectName: "y08", x, y: TOP + 3.85, w, h: 0.9, fontSize: 15, valign: "top" }));
+  s.addNotes("1:28–1:48. Today's rotation against three alternatives, each replayed over every season since 2002 on this field's weather. Wheat, wheat, fallow loses money in four seasons out of ten; wheat, chickpea, millet in one in fifty. In the 2008 drought every rotation dips, but C stays positive.");
+  anim(s, [{ fx: "wipeR", names: ["chart"], dur: 1500 }, ...[0, 1, 2, 3].map((i) => ({ fx: "rise", names: [`d${i}`, `r${i}`], dur: 350, gap: i ? -200 : -900 })), { fx: "fade", names: ["y08"], dur: 400 }]);
 }
 
-// 4 ─ the farmer decides (≈25 s) ───────────────────────────────────────────
+// 4 ─ what if: native chart (≈25 s) ───────────────────────────────
 {
-  const s = slide("Close", "EPISODE III  ·  THE FARMER DECIDES", "An assistant that only quotes the model");
-  const mw = 7.2, mh = mw / ASPECT.vko_hero, pw = 3.0, ph = pw / ASPECT.agent;
-  s.addShape(pres.shapes.RECTANGLE, { objectName: "pagef", x: M - 0.02, y: TOP - 0.02, w: mw + 0.04, h: mh + 0.04, fill: { color: "161616" }, line: { color: HEX.line, width: 1 } });
-  s.addImage({ path: B("app_vko_hero.jpg"), objectName: "page", x: M, y: TOP, w: mw, h: mh, transparency: 45, altText: "Furrow app page" });
-  s.addShape(pres.shapes.RECTANGLE, { objectName: "panelf", x: M + mw - pw + 0.4 - 0.02, y: TOP + 0.25 - 0.02, w: pw + 0.04, h: ph + 0.04, fill: { color: "1B1B1B" }, line: { color: HEX.line, width: 1 }, shadow: shadow() });
-  s.addImage({ path: B("app_agent.jpg"), objectName: "panel", x: M + mw - pw + 0.4, y: TOP + 0.25, w: pw, h: ph, altText: "Field assistant answering a drought question and a carbon question" });
-  const g = [["Every number is a range", "Profit runs from a 1-in-10 bad year to a 1-in-10 good one."],
-    ["Only computed numbers", "Answers in plain words, by text or voice, from the model's results."],
-    ["Next: the satellite eye", "carver-ml pulls HLS Landsat scenes from NASA Earthdata; a per-field crop classifier is next."]];
-  const x = 8.95, w = 3.78;
-  g.forEach(([h, t], i) => s.addText([{ text: h, options: { fontSize: 18, bold: true, color: C.accent1, breakLine: true } }, { text: t, options: { fontSize: 14, color: C.background2 } }],
-    T({ objectName: `g${i}`, x, y: TOP + i * 1.62, w, h: 1.5, valign: "top", paraSpaceAfter: 4 })));
-  s.addNotes("2:00–2:25. The assistant answers by text or voice from the computed results and hands the decision back to the farmer and the agronomist. Every number is a range, and the models (FAO-56 water balance, RUSLE and wind erosion, RothC carbon, NSGA-II search) are small and replaceable. Next, the ML repository adds satellite crop history per field.");
-  anim(s, [{ fx: "fade", names: ["pagef", "page"], dur: 500 }, { fx: "rise", names: ["panelf", "panel"], dur: 700, dy: 0.5 },
-    { fx: "fade", names: ["g0", "g1", "g2"], dur: 400, stagger: 250 }]);
+  const s = slide(null, "EPISODE III  ·  WHAT IF", "Two degrees warmer, ten percent less rain");
+  const st = V.strategies, labels = ["Current", "A", "B", "C"];
+  s.addChart(pres.charts.BAR, [
+    { name: "2002–2023 weather", labels, values: st.map((x) => x.today) },
+    { name: "+2 °C, −10% rain", labels, values: st.map((x) => x.twin) },
+  ], { ...chartBase, objectName: "chart", x: M, y: TOP, w: 7.6, h: 4.85, barDir: "col", barGrouping: "clustered", barGapWidthPct: 70,
+    chartColors: [HEX.holo, HEX.red], title: "Median profit per hectare, East Kazakhstan", showValue: true, dataLabelPosition: "outEnd",
+    dataLabelFormatCode: "$#,##0;−$#,##0", valAxisLabelFormatCode: "$#,##0;−$#,##0", showLegend: true, legendPos: "b" });
+  const cur = S(V, "current"), c = S(V, "C"), x = 8.6, w = 4.13;
+  stat(s, "s0", x, TOP, w, `${usd(c.twin)} vs ${usd(cur.twin)}`, "rotation C against today's practice in the warmer, drier climate", { size: 30, h: 1.45 });
+  stat(s, "s1", x, TOP + 1.62, w, `${V.pareto} of ${V.searched}`, "rotations NSGA-II found that nothing beats on profit, bad years, soil and carbon at once", { size: 30, h: 1.45 });
+  stat(s, "s2", x, TOP + 3.24, w, `r = ${V.smap.r.toFixed(2)}`, `model soil water against SMAP root-zone moisture on ${V.smap.n} dates; GPM IMERG rain keeps the same ranking`, { size: 30, h: 1.6 });
+  const a = S(AZ, "A"), azc = S(AZ, "current");
+  s.addNotes(`1:48–2:10. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative, C keeps most of its margin. The trade-off search scored ${V.searched} rotations and keeps the ${V.pareto} nothing beats. Checked against satellites: model soil water follows SMAP, and on GPM IMERG rain C still leads. In Arizona, durum and guar on drip earns ${usd(a.m.profit[1] - azc.m.profit[1])} more per hectare and pumps ${Math.round(a.water_saved)} mm less.`);
+  anim(s, [{ fx: "wipeU", names: ["chart"], dur: 900 }, { fx: "rise", names: ["s0"], dur: 400 }, { fx: "rise", names: ["s1"], dur: 400 }, { fx: "rise", names: ["s2"], dur: 400 }]);
 }
 
-// 5 ─ close: the Earth turning (≈15 s, loops) ─────────────────────
+// 5 ─ the satellite eye: ML plan and first results (≈30 s) ─────────
 {
-  const s = slide(null, null, null, "Starfield blank");
+  const s = slide("Models", "EPISODE IV  ·  THE SATELLITE EYE", "Field Shift ML: crop history from HLS satellite scenes");
+  const ml = D.ml;
+  // the plan, two branches that meet in one comparison
+  const dw = 7.5, gx = 0.3, bw = (dw - gx) / 2, bh = 0.6, gy = 0.17;
+  const rowY = (i) => TOP + i * (bh + gy);
+  const nodes = [];
+  const node = (name, x, y, w, title, sub, tone) => {
+    s.addText([{ text: title, options: { fontSize: 13, bold: true, color: C.background1, breakLine: true } }, { text: sub, options: { fontSize: 10, color: C.background2 } }],
+      T({ objectName: name, shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.08, x, y, w, h: bh, align: "center", valign: "middle", margin: 0.04,
+        fill: { color: tone }, line: { color: HEX.line, width: 1 } }));
+    nodes.push(name);
+  };
+  const arrow = (name, x1, y1, x2, y2) => {
+    s.addShape(pres.shapes.LINE, { objectName: name, x: Math.min(x1, x2), y: y1, w: Math.abs(x2 - x1) || 0.001, h: y2 - y1, flipH: x2 < x1,
+      line: { color: HEX.muted, width: 1.25, endArrowType: "triangle" } });
+  };
+  const L = M, R = M + bw + gx, cx = M + dw / 2, lc = L + bw / 2, rc = R + bw / 2;
+  const IN = "13294B", DONE = "0F3B2E", RUN = "2E2A12", OUTC = "3A2A10";
+  node("n0", M + dw * 0.18, rowY(0), dw * 0.64, `HLS L30 (${ml.dates} dates) and CDL 2021`, "shared inputs for both branches", IN);
+  node("l1", L, rowY(1), bw, "NDVI and clouds", "Fmask, dates over 50% cloud dropped", DONE);
+  node("r1", R, rowY(1), bw, "Chips 224×224", "6 HLS bands, several dates", RUN);
+  node("l2", L, rowY(2), bw, "RandomForest", "per-pixel classification", DONE);
+  node("r2", R, rowY(2), bw, "Prithvi-EO-2.0", "embeddings, Kaggle GPU", RUN);
+  node("l3", L, rowY(3), bw, "Block CV 3×3", "buffer 30, 90, 150 px", DONE);
+  node("r3", R, rowY(3), bw, "Linear classifier", "same CV, same sample", RUN);
+  node("m4", M + dw * 0.2, rowY(4), dw * 0.6, "F1 by crop", "RandomForest against Prithvi, one sample", DONE);
+  node("o5", L, rowY(5), bw, "Map and report", "CDL against prediction", DONE);
+  node("f5", R, rowY(5), bw, "Export for Furrow", "crop shares per H3 cell, fallow flagged", OUTC);
+  const ar = [];
+  const link = (n, x1, y1, x2, y2) => { arrow(n, x1, y1, x2, y2); ar.push(n); };
+  link("a0", lc, rowY(1) - gy, lc, rowY(1)); link("a1", rc, rowY(1) - gy, rc, rowY(1));
+  [1, 2].forEach((i) => { link(`al${i}`, lc, rowY(i) + bh, lc, rowY(i + 1)); link(`ar${i}`, rc, rowY(i) + bh, rc, rowY(i + 1)); });
+  link("am", lc, rowY(3) + bh, cx - 0.4, rowY(4)); link("an", rc, rowY(3) + bh, cx + 0.4, rowY(4));
+  link("ao", cx - 0.4, rowY(4) + bh, lc, rowY(5)); link("ap", cx + 0.4, rowY(4) + bh, rc, rowY(5));
+  // first results: RandomForest, agricultural pixels
+  const x = 8.45, w = 13.333 - M - x;
+  const G = { corn: "Corn", cotton: "Cotton", fallow_idle: "Fallow", alfalfa: "Alfalfa" };
+  const keys = Object.keys(G).filter((k) => k in ml.f1);
+  s.addChart(pres.charts.BAR, [{ name: "F1", labels: keys.map((k) => G[k]), values: keys.map((k) => ml.f1[k]) }],
+    { ...chartBase, objectName: "f1", x, y: TOP, w, h: 2.75, barDir: "bar", barGapWidthPct: 45, chartColors: [HEX.B],
+      title: "RandomForest F1 by crop, Pinal County 2021", showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00",
+      valAxisMinVal: 0, valAxisMaxVal: 1, valAxisLabelFormatCode: "0.0", showLegend: false, catAxisOrientation: "maxMin" });
+  stat(s, "m0", x, TOP + 2.9, w, `${ml.accuracy.toFixed(2)} vs ${ml.baseline.toFixed(2)}`, "accuracy on farm pixels against always guessing the commonest class", { size: 26, h: 1.0 });
+  s.addText([{ text: "TRAINING NOW", options: { fontSize: 11, bold: true, charSpacing: 2, color: C.accent1, breakLine: true } },
+    { text: "Prithvi-EO-2.0 on Kaggle GPU, scored on the same blocks", options: { fontSize: 14, color: C.background2 } }],
+    T({ objectName: "m1", x, y: TOP + 4.05, w, h: 0.8, valign: "top", paraSpaceAfter: 2 }));
+  s.addNotes(`2:10–2:40. The ML repository reads Harmonized Landsat scenes from NASA Earthdata with the USDA Cropland Data Layer as labels. Branch one, a per-pixel random forest on NDVI and SWIR over ${ml.dates_used} clear dates, is done: F1 ${ml.f1.corn} on corn and ${ml.f1.fallow_idle} on fallow under 3×3 block cross-validation, and macro F1 holds at ${ml.sweep["30"]}–${ml.sweep["150"]} as the buffer grows from 30 to 150 pixels. Branch two, NASA and IBM's Prithvi-EO-2.0, is training now on the same blocks. The export gives Furrow crop shares per hexagon, so the current rotation comes from the satellite instead of a guess.`);
+  anim(s, [{ fx: "fade", names: ["n0"], dur: 350 }, { fx: "fade", names: ["a0", "a1", "l1", "r1"], dur: 350 },
+    { fx: "fade", names: ["al1", "ar1", "l2", "r2"], dur: 350 }, { fx: "fade", names: ["al2", "ar2", "l3", "r3"], dur: 350 },
+    { fx: "fade", names: ["am", "an", "m4"], dur: 350 }, { fx: "fade", names: ["ao", "ap", "o5", "f5"], dur: 350 },
+    { fx: "wipeR", names: ["f1"], dur: 800 }, { fx: "rise", names: ["m0"], dur: 400 }, { fx: "fade", names: ["m1"], dur: 400 }]);
+}
+
+// 6 ─ close: the Earth turning, and the link (≈15 s, loops) ────────
+{
+  const s = slide("Close", null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("globe.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("globe_poster.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "globe" });
-  s.addText("FURROW", T({ objectName: "logo", x: M, y: 2.0, w: 6.2, h: 1.1, fontSize: 72, color: C.accent1, charSpacing: 6, fontFace: THEME.headFontFace }));
-  s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 3.3, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
-  s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 4.45, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
-  s.addText("Built on NASA data", T({ objectName: "l3", x: M, y: 5.25, w: 5.6, h: 0.4, fontSize: 14, color: C.background2 }));
-  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 5.85, w: 2.55, h: 2.55 * 600 / 1527, altText: "NASA Space Apps Challenge" });
-  s.addNotes("2:25–2:40. Furrow shows what each choice would have cost and kept. The farmer decides.");
-  anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 600 }, { fx: "fade", names: ["l2"], dur: 600 }, { fx: "fade", names: ["l3", "sa"], dur: 500, stagger: 200 }]);
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 0.8, w: 7.0, h: 1.1, fontSize: 66, color: C.accent1, charSpacing: 3, fontFace: THEME.headFontFace, valign: "top", wrap: false }));
+  s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 2.05, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
+  s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 3.15, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
+  const q = 2.1, qy = 4.15;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { objectName: "qbg", x: M, y: qy, w: q, h: q, rectRadius: 0.1, fill: { color: "FFFFFF" }, line: { type: "none" } });
+  s.addImage({ path: path.join(__dirname, "img/qr.png"), objectName: "qr", x: M + 0.12, y: qy + 0.12, w: q - 0.24, h: q - 0.24, altText: "QR code: open Furrow" });
+  s.addText(QR_TEXT, T({ objectName: "qt", x: M + q + 0.3, y: qy + 0.05, w: 3.2, h: 0.45, fontSize: 16, color: C.accent2, valign: "top" }));
+  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M + q + 0.3, y: qy + q - 2.2 * 600 / 1527, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
+  s.addNotes("2:40–3:00. Furrow shows what each choice would have cost and kept, on real NASA data. Scan the code to try it on your field. The farmer decides.");
+  anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 500 }, { fx: "fade", names: ["l2"], dur: 500 },
+    { fx: "zoom", names: ["qbg", "qr"], dur: 600 }, { fx: "fade", names: ["qt", "sa"], dur: 500, stagger: 200 }]);
   TRANS[s._n] = "fade";
 }
 

@@ -103,12 +103,27 @@ def coeffs(dst, src):
     return np.linalg.solve(np.array(A, float), np.array(B, float)).tolist()
 
 
+T_INTRO, T_LOGO, T_CRAWL, T_END = 3.4, 3.8, 6.5, 60.0  # one minute; ~124 words read aloud at ~140 wpm
+WIN = 1500  # plane length visible between near and far edge
+HEAD_H = 104 + 30 + 150 + 80  # "SPACE APPS 2026", gap, "THE BARE FIELD", gap: the body starts this far down the plane
+
+
+def crawl_total(text_h):
+    return text_h - WIN - int(WIN * 0.72)  # stop with the last lines still on screen
+
+
+def body_time():
+    """Second at which the first line of the story enters the bottom of the screen."""
+    total = crawl_total(plane_text(1500, pad=WIN).height)
+    return T_CRAWL + HEAD_H / total * (T_END - 3 - T_CRAWL)
+
+
 def crawl():
     bg = stars()
     bg.save(OUT / "stars.png")
     bg_a = np.asarray(bg, np.float32)
     pw = 1500
-    win = 1500  # plane length visible between near and far edge
+    win = WIN
     text = plane_text(pw, pad=win)
     text_a = text
     # screen trapezoid: far edge narrow near the top, near edge wider than the screen
@@ -134,7 +149,6 @@ def crawl():
     # outline only: stroke minus glyph interior
     logo = Image.fromarray(np.where(np.asarray(hollow) > 128, 0, np.asarray(lg)).astype(np.uint8))
 
-    T_INTRO, T_LOGO, T_CRAWL, T_END = 3.4, 3.8, 6.5, 60.0  # one minute; ~124 words read aloud at ~140 wpm
     n = int(T_END * FPS)
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     proc = subprocess.Popen([ff, "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
@@ -162,7 +176,7 @@ def crawl():
                 full[dy0:dy0 + hv, dx0:dx0 + wv] = la[sy0:sy0 + hv, sx0:sx0 + wv]
                 fr = fr * (1 - full) + full * yel
         if t >= T_CRAWL:
-            total = text_a.height - win - int(win * 0.72)  # stop with the last lines still on screen
+            total = crawl_total(text_a.height)
             s = min(total, (t - T_CRAWL) / (T_END - T_CRAWL - 3) * total)
             src = [(0, s), (pw, s), (pw, s + win), (0, s + win)]
             warped = text_a.transform((W, H), Image.PERSPECTIVE, coeffs(dst, src), Image.BICUBIC)
@@ -174,6 +188,139 @@ def crawl():
             Image.fromarray(frame).save(OUT / "crawl_poster.jpg", quality=90)
     proc.stdin.close()
     proc.wait()
+    add_audio(OUT / "crawl.mp4", T_END, body_time())
+
+
+# ---------- crawl soundtrack ----------
+SR = 44100
+
+
+def _note(n):  # semitones from A4
+    return 440.0 * 2 ** (n / 12)
+
+
+def _env(n, a, d, sus, r, length):
+    e = np.ones(length) * sus
+    a, d, r = int(a * SR), int(d * SR), int(r * SR)
+    e[:a] = np.linspace(0, 1, a)
+    e[a:a + d] = np.linspace(1, sus, len(e[a:a + d]))
+    if r:
+        e[-r:] *= np.linspace(1, 0, r)
+    return e[:length]
+
+
+def _lowpass(x, cut):
+    """One-pole lowpass; cut may be a per-sample array (brightness that follows the envelope)."""
+    a = np.exp(-2 * np.pi * np.broadcast_to(cut, x.shape) / SR)
+    y = np.empty_like(x)
+    acc = 0.0
+    for i in range(len(x)):  # ponytail: plain loop, ~1 s per minute of audio
+        acc = (1 - a[i]) * x[i] + a[i] * acc
+        y[i] = acc
+    return y
+
+
+def _brass(freq, dur, vel=1.0):
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    vib = 1 + 0.004 * np.sin(2 * np.pi * 5.2 * t) * np.clip(t / 0.4, 0, 1)
+    ph = 2 * np.pi * freq * np.cumsum(vib) / SR
+    saw = sum(np.sin(k * ph) / k for k in range(1, 14))
+    env = _env(n, 0.06, 0.25, 0.75, min(0.35, dur / 3), n)
+    return _lowpass(saw * env, 600 + 3200 * env * vel) * vel
+
+
+def _strings(freqs, dur):
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    out = np.zeros(n)
+    for f in freqs:
+        for det in (-0.12, 0.0, 0.13):
+            ph = 2 * np.pi * f * 2 ** (det / 12) * t + np.random.default_rng(int(f)).uniform(0, 6)
+            out += sum(np.sin(k * ph) / k for k in range(1, 8))
+    env = _env(n, 0.9, 0.1, 1.0, 0.9, n)
+    return _lowpass(out * env / (3 * len(freqs)), 1400)
+
+
+def _timpani(freq, vel=1.0, dur=2.5):
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    f = freq * (1 + 0.15 * np.exp(-t * 30))
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 2.2)
+    hit = np.random.default_rng(3).normal(0, 1, n) * np.exp(-t * 40) * 0.3
+    return (body + hit) * vel
+
+
+def soundtrack(length):
+    """An original space fanfare (not the film's theme): a brass hit with timpani as the logo appears,
+    a short heroic phrase, then a slow string progression under the crawl. Eb major."""
+    out = np.zeros(int(length * SR) + SR * 3)
+
+    def put(x, at, gain=1.0):
+        i = int(at * SR)
+        out[i:i + len(x)] += x[:len(out) - i] * gain
+
+    Eb2, Bb2, Eb3, G3, Bb3, Eb4 = -30, -23, -18, -14, -11, -6
+    put(_strings([_note(Eb3), _note(Bb3)], 3.6), 0.0, 0.25)  # low hush before the logo
+    t0 = 3.8
+    for n_ in (Eb3, G3, Bb3, Eb4, Eb2 + 12):
+        put(_brass(_note(n_), 2.6, 1.0), t0, 0.22)
+    put(_timpani(_note(Eb2)), t0, 0.9)
+    # heroic phrase: original, stepwise, dotted rhythm
+    phrase = [(Eb4, 0.45), (-4, 0.15), (-2, 0.6), (1, 0.6), (-1, 0.45), (-2, 0.15), (-4, 0.6), (-6, 1.2),
+              (-2, 0.45), (-1, 0.15), (1, 0.6), (3, 0.6), (1, 0.45), (-1, 0.15), (1, 0.6), (Eb4 + 12, 1.6)]
+    t = 6.2
+    for n_, d in phrase:
+        put(_brass(_note(n_), d + 0.12, 0.8), t, 0.3)
+        t += d
+    put(_timpani(_note(Bb2), 0.6), 6.2, 0.6)
+    put(_timpani(_note(Eb2), 0.8), t - 1.6, 0.8)
+    # strings under the crawl: Eb, Cm, Ab, Bb, 4 s each
+    chords = [(Eb3, G3, Bb3), (-21, Eb3, G3), (-25, -21, Eb3), (-23, -19, -16)]
+    k, tc = 0, t - 0.5
+    while tc < length - 2:
+        ch = chords[k % 4]
+        put(_strings([_note(n_) for n_ in ch] + [_note(ch[0] - 12)], 4.6), tc, 0.5)
+        if k % 2 == 1:  # a soft horn answer every other bar
+            put(_brass(_note(ch[-1] + 12), 1.8, 0.45), tc + 1.0, 0.18)
+        k += 1
+        tc += 4
+    # room: exponentially decaying noise as a cheap reverb
+    ir = np.random.default_rng(9).normal(0, 1, int(1.8 * SR)) * np.exp(-np.arange(int(1.8 * SR)) / SR * 3.5)
+    ir[0] = 25
+    nfft = 1 << int(np.ceil(np.log2(len(out) + len(ir))))
+    wet = np.fft.irfft(np.fft.rfft(out, nfft) * np.fft.rfft(ir, nfft), nfft)[:len(out)]
+    mix = wet[:int(length * SR)]
+    mix *= np.minimum(1, (length - np.arange(len(mix)) / SR) / 3)  # fade out over the last 3 s
+    return (mix / np.abs(mix).max() * 0.85).astype(np.float32)
+
+
+def add_audio(video, length, fade_at):
+    """Mux a soundtrack into the crawl. AUDIO=/path/to/track.mp3 uses your own file instead, levelled down
+    to a quiet bed (about -30 LUFS). Either way the music fades out as the story text comes in (fade_at),
+    so the speaker reads over silence."""
+    import os
+    import wave
+    src = os.environ.get("AUDIO")
+    if not src:
+        src = str(OUT / "crawl_audio.wav")
+        a = (soundtrack(length) * 32767).astype(np.int16)
+        with wave.open(src, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(SR)
+            w.writeframes(a.tobytes())
+    if os.environ.get("AUDIO"):
+        # your track: its opening hit (at the start of the file) lands on the logo at 3.8 s, levelled to a quiet bed
+        af = f"adelay=3600:all=1,loudnorm=I=-30:TP=-9:LRA=11,afade=t=out:st={fade_at:.2f}:d=2.5"
+    else:
+        af = f"afade=t=in:d=1,afade=t=out:st={fade_at:.2f}:d=2.5"
+    tmp = OUT / "crawl_av.mp4"
+    subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-loglevel", "error", "-i", str(video), "-i", src, "-map", "0:v", "-map", "1:a",
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "44100", "-t", str(length),
+                    "-af", af,
+                    "-movflags", "+faststart", str(tmp)], check=True)
+    tmp.replace(video)
 
 
 # ---------- closing globe ----------
