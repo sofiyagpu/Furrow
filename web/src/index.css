@@ -114,6 +114,7 @@ a { color: inherit; }
 .ml-src { font-size: 11px; padding: 0 6px; border-radius: 5px; border: 1px solid var(--grid-strong); color: var(--muted, #6b6b6b); margin-left: 6px; }
 .ml-scale { font-size: 12px; font-weight: 500; }
 .ml-validation summary { cursor: pointer; }
+.ml-sm-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .ml-validation p { margin: 4px 0 0; }
 .ml-box.ml-cell { align-items: flex-start; }
 .ml-body { display: grid; gap: 6px; min-width: 0; }

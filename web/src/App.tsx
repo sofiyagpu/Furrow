@@ -902,10 +902,13 @@ function MlSection({ r }: { r: Region }) {
               : t('Zoom into any field: ~0.7 km² plots show what actually grew, three years of history and when the soil lay bare. Trained and checked on USDA crop maps.', 'Приблизьте поле: участки ~0,7 км² показывают, что на самом деле росло, историю за три года и когда земля стояла голой. Обучено и проверено по картам USDA.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className={`status ${sm ? 'on' : ''}`}>{sm ? t('Connected', 'Подключено') : t('Awaiting model', 'Ждёт модель')}</span></div>
-            <p className="small muted">{sm
-              ? t(`SMAP 9 km, spread over the fields by the satellite moisture index (NDMI): ${sm} field-scale cells, seasonal median with the 10–90% range over dates. A disaggregation, not a model prediction; no ground check.`, `SMAP 9 км, распределено по полям по спутниковому индексу влажности (NDMI): участков ${sm}, сезонная медиана и разброс 10–90% по датам. Это распределение, а не предсказание модели; наземной проверки нет.`)
-              : t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3>
+              <span className="status">{sm ? t('Experimental', 'Эксперимент') : t('Awaiting model', 'Ждёт модель')}</span></div>
+            <p className="small muted">{r.id === 'vko' && sm
+              ? t(`SMAP (9 km) spread over ${sm} field-scale cells by the satellite moisture index (NDMI). Off by default: on rainfed cropland the check went the other way (soil is wettest in May while fields are bare, dense crops dry it out), so treat it with care. Turn it on in the cell panel.`, `SMAP (9 км) распределено по ${sm} участкам по спутниковому индексу влажности (NDMI). По умолчанию выключено: на богаре проверка показала обратную связь (почва влажнее всего в мае, пока поле голое, густые посевы её иссушают), поэтому доверять осторожно. Включается в панели ячейки.`)
+              : sm
+                ? t(`SMAP 9 km, spread over ${sm} field-scale cells by the satellite moisture index (NDMI), seasonal median with the 10–90% range over dates. Experimental: a time check against SMAP did not confirm the link, and there is no ground check.`, `SMAP 9 км, распределено по ${sm} участкам по спутниковому индексу влажности (NDMI), сезонная медиана и разброс 10–90% по датам. Эксперимент: проверка по времени против SMAP связь не подтвердила, наземной проверки нет.`)
+                : t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
@@ -924,6 +927,7 @@ const mlTitle = (r: Region) => [r.ml?.model, r.ml?.version].filter(Boolean).join
 // With `detail` set (a finer H3 cell clicked on the map), that cell is shown instead of the whole grid cell.
 function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; detail?: string | null; onWholeCell?: () => void }) {
   const l = useLang(), t = useT()
+  const [showSm, setShowSm] = useState(r.id !== 'vko') // vko: the moisture check went the other way, so off by default
   const fine = detail ? r.ml?.detail?.cells?.[detail] : undefined
   const c = fine && fine.p === h3 ? fine : r.ml?.cells?.[h3]
   const isFine = !!fine && c === fine
@@ -948,10 +952,15 @@ function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; deta
         {top && c.crop && <p className="small muted">{mlText(c.crop, l)}</p>}
         {c.low_confidence && <span className="ml-flag">{t('low confidence', 'низкая достоверность')}</span>}
         {c.sm_rootzone != null && (
+          <label className="small ml-sm-toggle"><input type="checkbox" checked={showSm} onChange={(e) => setShowSm(e.target.checked)} /> {t('Show soil moisture (experimental)', 'Показать влагу почвы (эксперимент)')}</label>
+        )}
+        {showSm && c.sm_rootzone != null && (
           <p className="small">
-            {t('Root-zone moisture', 'Влага корневой зоны')}: <strong>{c.sm_rootzone.toFixed(2)}</strong>
-            {c.sm_rootzone_pi && ` (${c.sm_rootzone_pi[0].toFixed(2)}–${c.sm_rootzone_pi[1].toFixed(2)})`} {t('m³/m³', 'м³/м³')}
-            <span className="muted"> · {t('SMAP, spread by NDMI', 'SMAP, распределено по NDMI')}</span>
+            {t('Root-zone moisture', 'Влага корневой зоны')}: <strong>{c.sm_rootzone.toFixed(3)}</strong>
+            {c.sm_rootzone_pi && ` (${c.sm_rootzone_pi[0].toFixed(3)}–${c.sm_rootzone_pi[1].toFixed(3)})`} {t('m³/m³', 'м³/м³')}
+            <span className="muted"> · {r.id === 'vko'
+              ? t('SMAP spread by NDMI; here the check showed the opposite link', 'SMAP по NDMI; здесь проверка показала обратную связь')
+              : t('SMAP spread by NDMI, link not confirmed', 'SMAP по NDMI, связь не подтверждена')}</span>
           </p>
         )}
         {years.length > 0 && (
