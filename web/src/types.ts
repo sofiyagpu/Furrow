@@ -52,6 +52,14 @@ export interface Farm {
 }
 
 // model soil water against SMAP L4 root zone at the reference field (pipeline/build.py smap_check())
+// the reference field rerun with rain from GPM IMERG monthly totals (pipeline/build.py imerg_check())
+export interface ImergCheck {
+  product: string
+  ratio: number // IMERG / POWER rain over the record
+  years: [number, number, number][] // year, POWER mm, IMERG mm
+  strategies: Record<string, { profit: Band; loss_years: number; erosion: number; irr: number }>
+}
+
 export interface SmapCheck { layer: string; n: number; r: number; r_anom: number; series: [string, number, number][] } // date, m3/m3, mm
 
 export interface Cell {
@@ -85,6 +93,7 @@ export interface Region {
   pareto: ParetoPoint[]
   cloud: ParetoPoint[]
   smap?: SmapCheck | null
+  imerg?: ImergCheck | null
   ml?: MlFile | null
 }
 

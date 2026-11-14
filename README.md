@@ -16,6 +16,7 @@ ML (Prithvi-EO-2.0 crop map, SMAP downscaling) lives in a separate repository. I
 uv venv --python 3.12 .venv && uv pip install --python .venv numpy pymoo h3 pillow pytest
 .venv/bin/python pipeline/fetch.py      # NASA POWER + SoilGrids per H3 cell, ~25 min, cached in data/raw
 .venv/bin/python pipeline/fetch.py --smap   # SMAP L4 root-zone moisture from NASA GIBS, ~1 min, data/raw/*.smap.json
+EARTHDATA_TOKEN=... .venv/bin/python pipeline/fetch.py --imerg   # GPM IMERG monthly, ~3 min, data/raw/*.imerg.json
 .venv/bin/python pipeline/build.py      # simulations, climate twin, NSGA-II -> web/public/data/*.json
 .venv/bin/python pipeline/model.py      # model self-check
 .venv/bin/python -m pytest pipeline     # priority numbers, SMAP check, ML contract
@@ -31,6 +32,7 @@ cd web && npm install && npm run dev    # http://localhost:5173
 | Regions, H3 grid | `pipeline/regions.py` | done |
 | NASA POWER daily weather, SoilGrids topsoil | `pipeline/fetch.py` | runs, no auth |
 | SMAP L4 root-zone moisture (check of the water balance) | `pipeline/fetch.py --smap`, `build.py smap_check()` | runs, no auth |
+| GPM IMERG Final monthly rain (second rain source) | `pipeline/fetch.py --imerg`, `build.py imerg_check()` | runs, Earthdata token |
 | HLS NDVI, SMAP, IMERG, GRACE trend, SRTM slope, NEX-GDDP-CMIP6 deltas | `pipeline/gee_layers.py` | written, needs an Earth Engine project |
 | Crop parameters, prices, strategies, N rates, market depth | `pipeline/crops.py` | assumptions, for an agronomist to replace |
 | Farmer priorities: water, market, nitrogen, crop prices | `build.py farm()`, `web/src/App.tsx` Priorities | done |
@@ -61,9 +63,11 @@ cd web && npm install && npm run dev    # http://localhost:5173
   next day, 2015–2024. SMAP values come from NASA GIBS images decoded through GIBS's published colour table
   (0.003 m³/m³ bins), so no Earthdata login is needed. Correlation is reported raw and with the seasonal cycle
   removed (about 0.6 and 0.55 in both regions). It checks the model; it does not drive it.
-- **GPM IMERG**: map layer only. The GIBS daily image is not a daily total (June 2020 in East Kazakhstan: ~18 mm
-  from the image against ~40 mm in POWER), so it is not used as a number. Real IMERG totals need an Earthdata
-  login (GES DISC) or the Earth Engine script.
+- **GPM IMERG**: IMERG Final monthly totals (GPM_3IMERGM v07, GES DISC OPeNDAP) under the cells of each POWER box.
+  The reference field is rerun with POWER's daily rain scaled to IMERG's monthly totals; the climate section shows
+  both. Headline numbers stay on POWER. At the reference fields IMERG sees 14% more rain in Pinal County and 12%
+  more in East Kazakhstan (up to 30% in other East Kazakhstan boxes); the strategy ranking does not change. The token is read from `EARTHDATA_TOKEN` and never written to the repo. The GIBS IMERG image on the
+  map is a rate snapshot, not a daily total, so it is used only as a picture.
 - **GRACE-FO**: on the map through NASA GIBS. A 300 km mascon cannot see a farm; the Earth Engine script gives the
   cell trend in cm/yr so pumping savings sit on the same scale.
 

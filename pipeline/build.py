@@ -209,6 +209,44 @@ def smap_check(rid, h3_cell, dekads):
     return dict(layer=sm["layer"], n=len(pairs), r=r(a), r_anom=r(anom), series=[[d, o, m] for d, o, m in pairs])
 
 
+def imerg_power(power, monthly):
+    """POWER daily series with each month's rain scaled to the IMERG monthly total (keeps POWER's rain days).
+    ponytail: a month POWER calls dry (< 1 mm) stays as POWER has it; IMERG daily would fill those, at 30x the downloads."""
+    months = {m: x for m, x in zip(monthly["months"], monthly["mm"])}
+    tot = {}
+    for d, x in zip(power["dates"], power["PRECTOTCORR"]):
+        if x >= 0:
+            tot[d[:6]] = tot.get(d[:6], 0.0) + x
+    scale = {k: months[f"{k[:4]}-{k[4:]}"] / v for k, v in tot.items() if v >= 1 and f"{k[:4]}-{k[4:]}" in months}
+    return {**power, "PRECTOTCORR": [x * scale.get(d[:6], 1.0) if x >= 0 else x for d, x in zip(power["dates"], power["PRECTOTCORR"])]}
+
+
+def imerg_check(rid, raw, c, strategies, years):
+    """Same strategies, same field, rain from GPM IMERG instead of NASA POWER. The headline numbers stay on POWER."""
+    path = ROOT / "data" / "raw" / f"{rid}.imerg.json"
+    if not path.exists():
+        return None
+    im = json.loads(path.read_text())
+    monthly = dict(months=im["months"], mm=im["power"][c["power"]])
+    power = raw["power"][c["power"]]
+    wx = Weather(imerg_power(power, monthly), c["lat"])
+    out = {}
+    for s in strategies:
+        rows, _, _, dsoc, _ = run_strategy(s, wx, c["soil"], rid)
+        m = summarise(rows, dsoc)
+        out[s["id"]] = dict(profit=m["profit"], loss_years=m["loss_years"], erosion=m["erosion"], irr=m["irr"][1])
+    rain = {}
+    for d, x in zip(power["dates"], power["PRECTOTCORR"]):
+        if x >= 0:
+            rain.setdefault(int(d[:4]), [0.0, 0.0])[0] += x
+    for mth, x in zip(monthly["months"], monthly["mm"]):
+        if int(mth[:4]) in rain:
+            rain[int(mth[:4])][1] += x
+    yrs = [y for y in sorted(rain) if years[0] <= y <= years[1]]
+    return dict(product=im["product"], strategies=out, years=[[y, r1(rain[y][0]), r1(rain[y][1])] for y in yrs],
+                ratio=round(sum(rain[y][1] for y in yrs) / sum(rain[y][0] for y in yrs), 2))
+
+
 def build(rid):
     t0 = time.time()
     region = REGIONS[rid]
@@ -268,6 +306,7 @@ def build(rid):
         assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION, n_credit=N_CREDIT),
         cells=out_cells, strategies=out_strat, twin=twin, pareto=front, cloud=cloud,
         smap=smap_check(rid, rep, out_strat[0]["dekads"]),
+        imerg=imerg_check(rid, raw, c, strategies, [int(wx.year.min()) + 1, int(wx.year.max()) - 1]),
         ml=load_ml(ML / f"{rid}.json"),
     )
     OUT.mkdir(parents=True, exist_ok=True)

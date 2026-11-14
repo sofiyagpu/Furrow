@@ -1,11 +1,12 @@
 """Download the real inputs: NASA POWER daily weather and ISRIC SoilGrids topsoil, per H3 cell,
-and SMAP L4 root-zone soil moisture to check the model's water balance.
+SMAP L4 root-zone soil moisture to check the model's water balance, and GPM IMERG monthly rain.
 
-No auth needed. Output: data/raw/<region>.json and data/raw/<region>.smap.json. Re-running skips what is cached.
-    .venv/bin/python pipeline/fetch.py            # POWER + SoilGrids
-    .venv/bin/python pipeline/fetch.py --smap     # SMAP, ~350 images per region
+Output: data/raw/<region>.json, <region>.smap.json, <region>.imerg.json. Re-running skips what is cached.
+    .venv/bin/python pipeline/fetch.py            # POWER + SoilGrids, no auth
+    .venv/bin/python pipeline/fetch.py --smap     # SMAP, ~350 images per region, no auth
+    EARTHDATA_TOKEN=... .venv/bin/python pipeline/fetch.py --imerg   # IMERG, 288 months per region, Earthdata login token
 """
-import io, json, re, sys, time, urllib.request, urllib.parse
+import calendar, io, json, os, re, sys, time, urllib.request, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
@@ -72,10 +73,10 @@ SMAP_DATES = [date(y, m, d).isoformat() for y in range(2015, YEARS[1] + 1) for m
               if date(y, m, d) >= date(2015, 4, 1)]
 
 
-def fetch_bytes(url, tries=4):
+def fetch_bytes(url, tries=4, headers=None):
     for i in range(tries):
         try:
-            with urllib.request.urlopen(url, timeout=120) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers or {}), timeout=120) as r:
                 return r.read()
         except Exception as e:
             print("  retry", i + 1, e)
@@ -117,6 +118,43 @@ def fetch_smap(rid, region, db):
     print(rid, "SMAP", len(keep), "dates,", len(px), "cells")
 
 
+# GPM IMERG Final monthly (V07, 0.1 deg, mm/hr) from GES DISC OPeNDAP, one bbox subset per month.
+IMERG = "https://gpm1.gesdisc.eosdis.nasa.gov/opendap/GPM_L3/GPM_3IMERGM.07"
+
+
+def fetch_imerg(rid, region, db):
+    path = RAW / f"{rid}.imerg.json"
+    if path.exists():
+        return
+    token = os.environ.get("EARTHDATA_TOKEN")
+    if not token:
+        raise SystemExit("--imerg needs EARTHDATA_TOKEN (urs.earthdata.nasa.gov -> Generate Token)")
+    (s, w), (n, e) = region["bbox"]
+    i0, i1 = int((w + 180) / 0.1), int((e + 180) / 0.1)  # grid is [time][lon][lat], cell centres at -179.95 + 0.1 i
+    j0, j1 = int((s + 90) / 0.1), int((n + 90) / 0.1)
+    keys = {}  # POWER box -> IMERG pixels under its cells
+    for c, v in db["cells"].items():
+        if v["soil"]:
+            keys.setdefault(v["power"], set()).add((int((v["lon"] + 180) / 0.1) - i0, int((v["lat"] + 90) / 0.1) - j0))
+    months = [(y, m) for y in range(YEARS[0], YEARS[1] + 1) for m in range(1, 13)]
+
+    def one(ym):
+        y, m = ym
+        f = f"3B-MO.MS.MRG.3IMERG.{y}{m:02d}01-S000000-E235959.{m:02d}.V07B.HDF5"
+        q = urllib.parse.quote(f"precipitation[0:0][{i0}:{i1}][{j0}:{j1}]", safe="")
+        txt = fetch_bytes(f"{IMERG}/{y}/{f}.ascii?{q}", headers={"Authorization": f"Bearer {token}"}).decode()
+        grid = [[float(x) for x in line.split(",")[1:]] for line in txt.splitlines() if line.startswith("precipitation[")]
+        hours = 24 * calendar.monthrange(y, m)[1]
+        return {k: round(sum(grid[i][j] for i, j in px) / len(px) * hours, 1) for k, px in keys.items()}
+
+    with ThreadPoolExecutor(6) as ex:
+        out = list(ex.map(one, months))
+    path.write_text(json.dumps({"product": "GPM_3IMERGM.07", "units": "mm/month",
+                                "months": [f"{y}-{m:02d}" for y, m in months],
+                                "power": {k: [o[k] for o in out] for k in keys}}))
+    print(rid, "IMERG", len(months), "months,", len(keys), "POWER boxes")
+
+
 def main():
     RAW.mkdir(parents=True, exist_ok=True)
     for rid, region in REGIONS.items():
@@ -138,6 +176,8 @@ def main():
             path.write_text(json.dumps(db))
         if "--smap" in sys.argv:
             fetch_smap(rid, region, db)
+        if "--imerg" in sys.argv:
+            fetch_imerg(rid, region, db)
 
 
 if __name__ == "__main__":

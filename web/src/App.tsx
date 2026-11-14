@@ -517,8 +517,61 @@ function Twin({ r }: { r: Region }) {
             </ResponsiveContainer>
           </div>
         </div>
+        <ImergPanel r={r} />
       </div>
     </section>
+  )
+}
+
+// headline numbers run on NASA POWER rain; this reruns the reference field with GPM IMERG monthly totals
+function ImergPanel({ r }: { r: Region }) {
+  const l = useLang(), t = useT()
+  const im = r.imerg
+  if (!im) return null
+  const pct = Math.round((im.ratio - 1) * 100)
+  const rows = im.years.map(([year, power, imerg]) => ({ year, power: Math.round(power), imerg: Math.round(imerg) }))
+  return (
+    <div className="two" style={{ marginTop: 16 }}>
+      <div className="panel chart">
+        <h3 className="h-sm">{t('Rain a year: NASA POWER against GPM IMERG', 'Осадки за год: NASA POWER против GPM IMERG')}</h3>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }} barGap={2}>
+            <CartesianGrid stroke="var(--grid)" vertical={false} />
+            <XAxis dataKey="year" tick={{ fontSize: 12 }} stroke="var(--muted)" interval={3} />
+            <YAxis tick={{ fontSize: 12 }} stroke="var(--muted)" unit={t(' mm', ' мм')} width={60} />
+            <Tooltip />
+            <Bar dataKey="power" name="NASA POWER" fill={SC.current} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="imerg" name="GPM IMERG" fill={SC.B} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="legend"><span><i style={{ background: SC.current }} />NASA POWER</span><span><i style={{ background: SC.B }} />GPM IMERG Final</span></div>
+      </div>
+      <div className="panel">
+        <h3 className="h-sm">{t('The same strategies with IMERG rain', 'Те же стратегии с осадками IMERG')}</h3>
+        <table className="tbl">
+          <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Median, POWER', 'Медиана, POWER')}</th><th>{t('Median, IMERG', 'Медиана, IMERG')}</th><th>{t('Loss years', 'Убыточных лет')}</th>{r.irrigated && <th>{t('Pumped', 'Откачка')}</th>}</tr></thead>
+          <tbody>
+            {r.strategies.map((s) => {
+              const x = im.strategies[s.id]
+              if (!x) return null
+              return (
+                <tr key={s.id}>
+                  <td className="nw"><span className="dot" style={{ background: SC[s.id] }} />{short(s, l)}</td>
+                  <td className="mono">{usd(s.metrics.profit[1])}</td>
+                  <td className="mono">{usd(x.profit[1])}</td>
+                  <td className="mono">{Math.round(s.metrics.loss_years * 100)}% → {Math.round(x.loss_years * 100)}%</td>
+                  {r.irrigated && <td className="mono">{Math.round(s.metrics.irr[1])} → {Math.round(x.irr)} {t('mm', 'мм')}</td>}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        <p className="small muted">
+          {t(`Over ${im.years[0][0]}–${im.years[im.years.length - 1][0]} IMERG sees ${Math.abs(pct)}% ${pct >= 0 ? 'more' : 'less'} rain on this field than POWER. POWER's daily rain is scaled to IMERG's monthly totals and the model rerun. The rest of the page stays on POWER; the gap shows how much the answer depends on the rain source.`,
+            `За ${im.years[0][0]}–${im.years[im.years.length - 1][0]} IMERG видит на этом поле на ${Math.abs(pct)}% ${pct >= 0 ? 'больше' : 'меньше'} осадков, чем POWER. Суточный дождь POWER масштабирован до месячных сумм IMERG, модель пересчитана. Остальная страница считает по POWER; разница показывает, насколько ответ зависит от источника осадков.`)}
+        </p>
+      </div>
+    </div>
   )
 }
 
@@ -685,6 +738,7 @@ function Method({ r }: { r: Region }) {
             <ul className="list-plain small">
               <li><strong>NASA POWER</strong> {t('daily weather', 'суточная погода')}, {r.years[0] - 1}–{r.years[1] + 1}</li>
               <li><strong>SoilGrids 2.0</strong> {t('soil, 0–30 cm', 'почва, 0–30 см')}</li>
+              {r.imerg && <li><strong>GPM IMERG Final</strong> {t('monthly rain, second rain source', 'месячные осадки, второй источник дождя')}</li>}
               {r.smap && <li><strong>SMAP L4</strong> {t('root-zone moisture, check of the water balance', 'влага корневой зоны, проверка водного баланса')}</li>}
               <li><strong>NASA GIBS</strong> {t('map layers', 'слои карты')}: MODIS, SMAP, IMERG, GRACE-FO</li>
               {mlCells(r).length > 0 && <li><strong>ML</strong> {mlTitle(r) || t('crop map', 'карта культур')}</li>}
