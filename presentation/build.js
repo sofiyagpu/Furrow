@@ -142,13 +142,13 @@ function screens(s, back, front, side, facts) {
   s.addImage({ path: B("app_vko_hero.jpg"), objectName: "page", x: M, y: TOP, w: mw, h: mh, transparency: 45, altText: "Furrow app page" });
   s.addShape(pres.shapes.RECTANGLE, { objectName: "panelf", x: M + mw - pw + 0.4 - 0.02, y: TOP + 0.25 - 0.02, w: pw + 0.04, h: ph + 0.04, fill: { color: "1B1B1B" }, line: { color: HEX.line, width: 1 }, shadow: shadow() });
   s.addImage({ path: B("app_agent.jpg"), objectName: "panel", x: M + mw - pw + 0.4, y: TOP + 0.25, w: pw, h: ph, altText: "Field assistant answering a drought question and a carbon question" });
-  const g = [["Ranges, never promises", "Profit runs from a 1-in-10 bad year to a 1-in-10 good one."],
+  const g = [["Every number is a range", "Profit runs from a 1-in-10 bad year to a 1-in-10 good one."],
     ["Only computed numbers", "Answers in plain words, by text or voice, from the model's results."],
     ["Next: the satellite eye", "carver-ml pulls HLS Landsat scenes from NASA Earthdata; a per-field crop classifier is next."]];
   const x = 8.95, w = 3.78;
   g.forEach(([h, t], i) => s.addText([{ text: h, options: { fontSize: 18, bold: true, color: C.accent1, breakLine: true } }, { text: t, options: { fontSize: 14, color: C.background2 } }],
     T({ objectName: `g${i}`, x, y: TOP + i * 1.62, w, h: 1.5, valign: "top", paraSpaceAfter: 4 })));
-  s.addNotes("2:00–2:25. The assistant answers by text or voice from the computed results only, never inventing a number, and hands the decision back to the farmer and the agronomist. Every number is a range, and the models (FAO-56 water balance, RUSLE and wind erosion, RothC carbon, NSGA-II search) are small and replaceable. Next, the ML repository adds satellite crop history per field.");
+  s.addNotes("2:00–2:25. The assistant answers by text or voice from the computed results and hands the decision back to the farmer and the agronomist. Every number is a range, and the models (FAO-56 water balance, RUSLE and wind erosion, RothC carbon, NSGA-II search) are small and replaceable. Next, the ML repository adds satellite crop history per field.");
   anim(s, [{ fx: "fade", names: ["pagef", "page"], dur: 500 }, { fx: "rise", names: ["panelf", "panel"], dur: 700, dy: 0.5 },
     { fx: "fade", names: ["g0", "g1", "g2"], dur: 400, stagger: 250 }]);
 }
@@ -162,7 +162,7 @@ function screens(s, back, front, side, facts) {
   s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 4.45, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
   s.addText("Built on NASA data", T({ objectName: "l3", x: M, y: 5.25, w: 5.6, h: 0.4, fontSize: 14, color: C.background2 }));
   s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 5.85, w: 2.55, h: 2.55 * 600 / 1527, altText: "NASA Space Apps Challenge" });
-  s.addNotes("2:25–2:40. Furrow does not tell a farmer what to plant. It shows what each choice would have cost and kept. The farmer decides.");
+  s.addNotes("2:25–2:40. Furrow shows what each choice would have cost and kept. The farmer decides.");
   anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 600 }, { fx: "fade", names: ["l2"], dur: 600 }, { fx: "fade", names: ["l3", "sa"], dur: 500, stagger: 200 }]);
   TRANS[s._n] = "fade";
 }

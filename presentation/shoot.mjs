@@ -34,7 +34,7 @@ const HELPERS = `
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v);
     el.dispatchEvent(new Event('input', { bubbles: true })); };
   window.__body = (id) => { const s = document.getElementById(id); s.scrollIntoView({ block: 'start' });
-    const kids = [...s.querySelectorAll('.wrap > *')].filter((k) => !k.matches('h2, .lead, .eyebrow, p'));
+    const kids = [...s.querySelectorAll('.wrap > *')].filter((k) => !k.matches('h2, .lead, .eyebrow, p, .sec-head'));
     const rs = kids.map((k) => k.getBoundingClientRect()).filter((r) => r.height > 0);
     const x = Math.min(...rs.map((r) => r.left)), y = Math.min(...rs.map((r) => r.top)),
           r = Math.max(...rs.map((r) => r.right)), b = Math.max(...rs.map((r) => r.bottom));
