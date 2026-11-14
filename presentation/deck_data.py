@@ -33,8 +33,8 @@ if rep:
     rows = {r["group"]: r for r in csv.DictReader(open(Path(rep) / "class_metrics_2021.csv"))}
     sweep = list(csv.DictReader(open(Path(rep) / "buffer_sweep_summary_2021.csv")))
     out["ml"] = dict(f1={g: round(float(rows[g]["f1_agri_truth"]), 3) for g in summ["rule_groups"]},
-                     macro_f1=round(summ["macro_f1_rule_agri_truth"], 3), accuracy=round(summ["accuracy_agri_truth"], 3),
-                     baseline=round(summ["majority_baseline_agri_truth"], 3), dates=summ["dates"], dates_used=summ["dates_used"],
+                     macro_f1=round(summ["macro_f1_rule_agri_truth"], 2), accuracy=round(summ["accuracy_agri_truth"], 2),
+                     baseline=round(summ["majority_baseline_agri_truth"], 2), dates=summ["dates"], dates_used=summ["dates_used"],
                      sweep={r["buffer_px"]: round(float(r["macro_f1_rule_on_agri_px"]), 3) for r in sweep})
 (Path(__file__).parent / "deck_data.json").write_text(json.dumps(out))
 print(out.get("ml"))

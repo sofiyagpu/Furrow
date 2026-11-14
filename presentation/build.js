@@ -112,11 +112,26 @@ const NAMES = ["Current", "Strategy A", "Strategy B", "Strategy C"];
 const ROT = [["Current", "wheat, wheat, black fallow"], ["A", "wheat, lentil, flax, wheat"], ["B", "wheat, pea, 2 years sainfoin"], ["C", "wheat, chickpea, millet"]];
 const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
 
+// 0 ─ title: a still frame, no builds ─────────────────────────────
+{
+  const s = slide("Title", null, null, "Starfield blank");
+  s.background = { path: B("globe_poster.png") };
+  s.addImage({ path: path.join(__dirname, "img/spaceapps_logo.png"), objectName: "sa", x: M, y: 0.6, w: 2.2, h: 2.2 * 600 / 1527, altText: "NASA Space Apps Challenge" });
+  s.addText("NASA SPACE APPS 2026  ·  CHALLENGE", T({ objectName: "kick", x: M, y: 2.0, w: 5.6, h: 0.35, fontSize: 13, bold: true, color: C.accent2, charSpacing: 4 }));
+  s.addText("Field Shift: Adapting Farms with NASA Data", T({ objectName: "case", x: M, y: 2.4, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
+  s.addText("FURROW", T({ objectName: "logo", x: M, y: 3.55, w: 5.6, h: 1.2, fontSize: 80, color: C.accent1, charSpacing: 6, fontFace: THEME.headFontFace }));
+  s.addText("Crop rotation planner on NASA data", T({ objectName: "sub", x: M, y: 4.75, w: 5.6, h: 0.5, fontSize: 20, color: C.background1 }));
+  s.addText([{ text: "TEAM  ", options: { color: C.background2, charSpacing: 4, fontSize: 13, bold: true } }, { text: "Rogue One", options: { color: C.accent1, fontSize: 22, bold: true } }],
+    T({ objectName: "team", x: M, y: 5.75, w: 5.6, h: 0.55, valign: "middle" }));
+  s.addNotes("0:00–0:10. Introduce the team and the challenge, then click: the crawl starts.");
+  TRANS[s._n] = "fade";
+}
+
 // 1 ─ opening crawl with its soundtrack, 60 s, moves on by itself ──
 {
   const s = slide("Opening", null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("crawl.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("stars.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "crawl" });
-  s.addNotes("0:00–1:00. Read the crawl aloud as it scrolls, at a calm pace; the music fades out as the story text comes in. It plays on its own and moves to the next slide when it ends.");
+  s.addNotes("0:10–1:10. Read the crawl aloud as it scrolls, at a calm pace; the music fades out as the story text comes in. It plays on its own and moves to the next slide when it ends.");
   ANIM[s._n] = [{ media: "crawl", dur: 60000 }];
   TRANS[s._n] = "fade";
   ADV[s._n] = 60300;
@@ -130,7 +145,7 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
     ["Your priorities", "weigh profit, water, market and nitrogen; the best-fit rotation updates as you move them"],
     ["Ask the field", "an assistant that answers in plain words, in English or Russian"],
   ]));
-  s.addNotes("1:00–1:20. This is Furrow. Pick a cell on the map: it carries its own soil and 22 years of NASA POWER weather, with NASA layers underneath. Set what matters on your farm, profit, water, market or nitrogen, and the best-fit rotation updates. The assistant answers from the results.");
+  s.addNotes("1:10–1:28. This is Furrow. Pick a cell on the map: it carries its own soil and 22 years of NASA POWER weather, with NASA layers underneath. Set what matters on your farm, profit, water, market or nitrogen, and the best-fit rotation updates. The assistant answers from the results.");
 }
 
 // 3 ─ time machine: native chart (≈25 s) ──────────────────────────
@@ -153,7 +168,7 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
   s.addText([{ text: "2008 drought", options: { bold: true, color: C.accent1, breakLine: true } },
     { text: `current practice ${usd(v08(S(V, "current")))}/ha, rotation C still ${usd(v08(S(V, "C")))}/ha`, options: { color: C.background1 } }],
     T({ objectName: "y08", x, y: TOP + 3.85, w, h: 0.9, fontSize: 15, valign: "top" }));
-  s.addNotes("1:20–1:45. Today's rotation against three alternatives, each replayed over every season since 2002 on this field's weather. Wheat, wheat, fallow loses money in four seasons out of ten; wheat, chickpea, millet in one in fifty. In the 2008 drought every rotation dips, but C stays positive.");
+  s.addNotes("1:28–1:48. Today's rotation against three alternatives, each replayed over every season since 2002 on this field's weather. Wheat, wheat, fallow loses money in four seasons out of ten; wheat, chickpea, millet in one in fifty. In the 2008 drought every rotation dips, but C stays positive.");
   anim(s, [{ fx: "wipeR", names: ["chart"], dur: 1500 }, ...[0, 1, 2, 3].map((i) => ({ fx: "rise", names: [`d${i}`, `r${i}`], dur: 350, gap: i ? -200 : -900 })), { fx: "fade", names: ["y08"], dur: 400 }]);
 }
 
@@ -172,7 +187,7 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
   stat(s, "s1", x, TOP + 1.62, w, `${V.pareto} of ${V.searched}`, "rotations NSGA-II found that nothing beats on profit, bad years, soil and carbon at once", { size: 30, h: 1.45 });
   stat(s, "s2", x, TOP + 3.24, w, `r = ${V.smap.r.toFixed(2)}`, `model soil water against SMAP root-zone moisture on ${V.smap.n} dates; GPM IMERG rain keeps the same ranking`, { size: 30, h: 1.6 });
   const a = S(AZ, "A"), azc = S(AZ, "current");
-  s.addNotes(`1:45–2:10. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative, C keeps most of its margin. The trade-off search scored ${V.searched} rotations and keeps the ${V.pareto} nothing beats. Checked against satellites: model soil water follows SMAP, and on GPM IMERG rain C still leads. In Arizona, durum and guar on drip earns ${usd(a.m.profit[1] - azc.m.profit[1])} more per hectare and pumps ${Math.round(a.water_saved)} mm less.`);
+  s.addNotes(`1:48–2:10. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative, C keeps most of its margin. The trade-off search scored ${V.searched} rotations and keeps the ${V.pareto} nothing beats. Checked against satellites: model soil water follows SMAP, and on GPM IMERG rain C still leads. In Arizona, durum and guar on drip earns ${usd(a.m.profit[1] - azc.m.profit[1])} more per hectare and pumps ${Math.round(a.water_saved)} mm less.`);
   anim(s, [{ fx: "wipeU", names: ["chart"], dur: 900 }, { fx: "rise", names: ["s0"], dur: 400 }, { fx: "rise", names: ["s1"], dur: 400 }, { fx: "rise", names: ["s2"], dur: 400 }]);
 }
 
