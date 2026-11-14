@@ -62,10 +62,6 @@ function slide(section, kicker, title, master = "Starfield title only") {
 const anim = (s, steps) => (ANIM[s._n] = steps);
 const T = (o) => ({ isTextBox: true, margin: 0, ...o });
 
-function card(s, name, x, y, w, h, opts = {}) {
-  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { objectName: name, x, y, w, h, rectRadius: 0.08,
-    fill: { color: C.text2, transparency: opts.clear ? 100 : 0 }, line: { color: HEX.line, width: 1 } });
-}
 function stat(s, name, x, y, w, big, label, o = {}) {
   s.addText([
     { text: big, options: { fontSize: o.size || 34, color: o.color || C.accent1, fontFace: THEME.headFontFace, breakLine: true } },
@@ -112,103 +108,50 @@ function screens(s, back, front, side, facts) {
   ADV[s._n] = 60300;
 }
 
-// 2 ─ the app (≈20 s) ─────────────────────────────────────────────
+// 2 ─ the app: map and time machine (≈30 s) ───────────────────────
 {
-  const s = slide("Product", "EPISODE I  ·  THE APP", "Pick a field on the map: every hexagon carries NASA data");
-  anim(s, screens(s, "vko_hero", "vko_map", "left", [
-    [`${V.cells} + ${AZ.cells} cells`, "in East Kazakhstan and Arizona, about 250 km² each"],
-    ["22 seasons", "of NASA POWER daily weather per cell, with SoilGrids soil"],
+  const s = slide("Product", "EPISODE I  ·  THE APP", "Pick a field, replay four rotations over 22 real seasons");
+  const cur = S(V, "current"), c = S(V, "C");
+  anim(s, screens(s, "vko_map", "vko_time", "left", [
+    [`${V.cells} + ${AZ.cells} cells`, "in East Kazakhstan and Arizona, each with its own soil and NASA POWER weather"],
     ["4 NASA layers", "MODIS NDVI, SMAP, GPM IMERG and GRACE-FO under the map"],
-  ]));
-  s.addNotes("1:00–1:20. This is Furrow. Pick a cell on the map: each carries its own soil and 22 years of NASA POWER weather, with NASA GIBS layers underneath. SMAP is 9 km, so the app never calls it your field's moisture.");
-}
-
-// 3 ─ rotations and the time machine (≈20 s) ──────────────────────
-{
-  const s = slide(null, "EPISODE II  ·  THE TIME MACHINE", "Four rotations, replayed over 22 real seasons");
-  const cur = S(V, "current"), c = S(V, "C");
-  anim(s, screens(s, "vko_strategies", "vko_time", "right", [
-    ["4 rotations", "today's practice and three hypotheses, each with its risk written out"],
     [`${Math.round(cur.m.loss_years * 100)}% → ${Math.round(c.m.loss_years * 100)}%`, "of seasons losing money: wheat, wheat, fallow against wheat, chickpea, millet"],
-    ["2008", "the drought year, replayed day by day in the root zone"],
   ]));
-  s.addNotes("1:20–1:40. Four rotations as cards, each a hypothesis for the agronomist with its risk. The time machine replays every season since 2002 on this field's weather. Slide to 2008: every rotation suffers, but wheat, chickpea, millet stays positive.");
+  s.addNotes("1:00–1:30. This is Furrow. Pick a cell on the map: each carries its own soil and 22 years of NASA POWER weather, with NASA layers underneath. Four rotations, today's and three hypotheses for the agronomist, are replayed over every season since 2002. In the 2008 drought every rotation suffers, but wheat, chickpea, millet stays positive.");
 }
 
-// 4 ─ what if (≈20 s) ─────────────────────────────────────────────
+// 3 ─ what if (≈30 s) ─────────────────────────────────────────────
 {
-  const s = slide(null, "EPISODE III  ·  WHAT IF", "Warm the climate, then search hundreds of rotations");
-  const cur = S(V, "current"), c = S(V, "C");
-  anim(s, screens(s, "vko_tradeoffs", "vko_twin", "left", [
+  const s = slide(null, "EPISODE II  ·  WHAT IF", "Warm the climate, then search hundreds of rotations");
+  const cur = S(V, "current"), c = S(V, "C"), a = S(AZ, "A"), azc = S(AZ, "current");
+  anim(s, screens(s, "vko_tradeoffs", "vko_twin", "right", [
     [`${usd(c.twin)} vs ${usd(cur.twin)}`, "median per hectare at +2 °C and 10% less rain: rotation C against today"],
     [`${V.pareto} of ${V.searched}`, "rotations NSGA-II found that nothing beats on every count"],
-    ["Your limits", "the most soil you will lose, the worst year you can take: the list keeps what fits"],
+    [`+${usd(a.m.profit[1] - azc.m.profit[1])}, −${Math.round(a.water_saved)} mm`, "in Arizona: durum and guar on drip against today, per hectare, less groundwater pumped"],
   ]));
-  s.addNotes("1:40–2:00. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative. The trade-off cockpit searched hundreds of rotations; the farmer sets limits and the list keeps only what fits.");
+  s.addNotes("1:30–2:00. The climate twin replays the same record two degrees warmer and ten percent drier: today's rotation goes negative. The trade-off cockpit searched hundreds of rotations; the farmer sets limits and the list keeps only what fits. In Arizona the same tools answer the water question: the water-wise rotation earns more and pumps less.");
 }
 
-// 5 ─ Arizona: water (≈15 s) ──────────────────────────────────────
+// 4 ─ the farmer decides (≈25 s) ───────────────────────────────────────────
 {
-  const s = slide(null, "EPISODE IV  ·  THE AQUIFER", "In Arizona the question is water left in the ground");
-  const a = S(AZ, "A"), cur = S(AZ, "current"), c = S(AZ, "C");
-  anim(s, screens(s, "az_map", "az_carbon", "right", [
-    [`+${usd(a.m.profit[1] - cur.m.profit[1])}/ha`, "median profit for durum and guar on drip against cotton, durum, fallow"],
-    [`−${Math.round(a.water_saved)} mm`, "of groundwater pumped a year by the same rotation"],
-    [`${cur.m.bare_days} → ${a.m.bare_days} days`, "of bare soil a year through the dust season"],
-  ]));
-  s.addNotes(`2:00–2:15. Switch the region to Pinal County. Durum and guar on drip earns more and pumps less than today. Winter-only grain leaves ${Math.round(c.water_saved)} mm a year in the aquifer but needs water-saving payments. The carbon and water budget scales it to the whole farm.`);
-}
-
-// 6 ─ assistant (≈15 s) ───────────────────────────────────────────
-{
-  const s = slide("Close", "EPISODE V  ·  THE FARMER DECIDES", "An assistant that only quotes the model");
+  const s = slide("Close", "EPISODE III  ·  THE FARMER DECIDES", "An assistant that only quotes the model");
   const mw = 7.2, mh = mw / ASPECT.vko_hero, pw = 3.0, ph = pw / ASPECT.agent;
   s.addShape(pres.shapes.RECTANGLE, { objectName: "pagef", x: M - 0.02, y: TOP - 0.02, w: mw + 0.04, h: mh + 0.04, fill: { color: "161616" }, line: { color: HEX.line, width: 1 } });
   s.addImage({ path: B("app_vko_hero.jpg"), objectName: "page", x: M, y: TOP, w: mw, h: mh, transparency: 45, altText: "Furrow app page" });
   s.addShape(pres.shapes.RECTANGLE, { objectName: "panelf", x: M + mw - pw + 0.4 - 0.02, y: TOP + 0.25 - 0.02, w: pw + 0.04, h: ph + 0.04, fill: { color: "1B1B1B" }, line: { color: HEX.line, width: 1 }, shadow: shadow() });
   s.addImage({ path: B("app_agent.jpg"), objectName: "panel", x: M + mw - pw + 0.4, y: TOP + 0.25, w: pw, h: ph, altText: "Field assistant answering a drought question and a carbon question" });
   const g = [["Ranges, never promises", "Profit runs from a 1-in-10 bad year to a 1-in-10 good one."],
-    ["Hypotheses, not advice", "Every rotation carries its risk, written for the agronomist."],
-    ["Only computed numbers", "Answers in plain words, by text or voice, from the model's results."]];
+    ["Only computed numbers", "Answers in plain words, by text or voice, from the model's results."],
+    ["Next: the satellite eye", "carver-ml pulls HLS Landsat scenes from NASA Earthdata; a per-field crop classifier is next."]];
   const x = 8.95, w = 3.78;
   g.forEach(([h, t], i) => s.addText([{ text: h, options: { fontSize: 18, bold: true, color: C.accent1, breakLine: true } }, { text: t, options: { fontSize: 14, color: C.background2 } }],
-    T({ objectName: `g${i}`, x, y: TOP + i * 1.62, w, h: 1.35, valign: "top", paraSpaceAfter: 4 })));
-  s.addNotes("2:15–2:30. The assistant answers by text or voice from the computed results only, never inventing a number, and always hands the decision back to the farmer and the agronomist.");
+    T({ objectName: `g${i}`, x, y: TOP + i * 1.62, w, h: 1.5, valign: "top", paraSpaceAfter: 4 })));
+  s.addNotes("2:00–2:25. The assistant answers by text or voice from the computed results only, never inventing a number, and hands the decision back to the farmer and the agronomist. Every number is a range, and the models (FAO-56 water balance, RUSLE and wind erosion, RothC carbon, NSGA-II search) are small and replaceable. Next, the ML repository adds satellite crop history per field.");
   anim(s, [{ fx: "fade", names: ["pagef", "page"], dur: 500 }, { fx: "rise", names: ["panelf", "panel"], dur: 700, dy: 0.5 },
     { fx: "fade", names: ["g0", "g1", "g2"], dur: 400, stagger: 250 }]);
 }
 
-// 7 ─ engine and ML (≈15 s) ───────────────────────────────────────
-{
-  const s = slide("Models", "EPISODE VI  ·  THE ENGINE", "Simple models now, a satellite ML layer next");
-  const w = 5.9, h = 3.95, xr = M + w + 0.333;
-  card(s, "lbg", M, TOP, w, h);
-  card(s, "rbg", xr, TOP, w, h);
-  const models = [["Water and yield", "FAO-56 bucket, FAO-33 yield response"], ["Erosion", "RWEQ-style wind, RUSLE water"], ["Soil carbon", "RothC-26.3, from SoilGrids carbon"],
-    ["Search", "NSGA-II over rotations of up to 4 crops"], ["Uncertainty", "P10 to P90 over 22 years and every start year"]];
-  s.addText([{ text: "MODELS IN FURROW", options: { fontSize: 12, bold: true, charSpacing: 3, color: C.accent1, breakLine: true } },
-    ...models.flatMap(([a, b], i) => [{ text: `${a}  `, options: { fontSize: 15, bold: true, color: C.background1 } },
-      { text: b, options: { fontSize: 15, color: C.background2, breakLine: i < models.length - 1 } }])],
-    T({ objectName: "lt", x: M + 0.3, y: TOP + 0.3, w: w - 0.6, h: h - 0.6, valign: "top", paraSpaceAfter: 14 }));
-  const ml = [["HLS L30 v2.0 searched with earthaccess", 1], ["Fmask cloud filter ≤ 20%, 8 dates in 2021", 1], ["1.5 GB download guard, lazy band reads", 1],
-    ["NDVI features, under 0.2 counts as bare", 0], ["Crop and bare-soil classifier per field", 0]];
-  s.addText("FIELD SHIFT ML  ·  CARVER-ML REPO", T({ objectName: "rh", x: xr + 0.3, y: TOP + 0.3, w: w - 0.6, h: 0.3, fontSize: 12, bold: true, charSpacing: 3, color: C.accent2 }));
-  ml.forEach(([t, done], i) => {
-    const y = TOP + 0.76 + i * 0.44;
-    s.addText(done ? "DONE" : "NEXT", T({ objectName: `mc${i}`, shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.05, x: xr + 0.3, y: y + 0.02, w: 0.72, h: 0.26,
-      fontSize: 9, bold: true, charSpacing: 1, align: "center", valign: "middle", color: C.text1, fill: { color: done ? C.accent5 : C.accent1 } }));
-    s.addText(t, T({ objectName: `mt${i}`, x: xr + 1.2, y, w: w - 1.5, h: 0.32, fontSize: 15, color: C.background1, valign: "middle" }));
-  });
-  s.addText("Output per field: crop history with probability, bare-soil days with a confidence interval, and a domain-shift flag that tells the agronomist where to check first.",
-    T({ objectName: "out", x: xr + 0.3, y: TOP + 3.0, w: w - 0.6, h: 0.85, fontSize: 13, color: C.background2, valign: "top" }));
-  s.addText("Prices and costs are round assumptions for an agronomist to replace. Erosion and carbon compare rotations; they are not field measurements.",
-    T({ objectName: "lim", x: M, y: TOP + 4.2, w: CW, h: 0.35, fontSize: 12, color: C.background2 }));
-  s.addNotes("2:30–2:45. The models are small and replaceable. The ML repository already pulls Harmonized Landsat scenes from NASA Earthdata with a cloud filter and a size guard; features and the classifier are next, and they plug into the map through a JSON contract per cell.");
-  anim(s, [{ fx: "fade", names: ["lbg", "lt"], dur: 500 }, { fx: "fade", names: ["rbg", "rh"], dur: 400 },
-    ...[0, 1, 2, 3, 4].map((i) => ({ fx: "rise", names: [`mc${i}`, `mt${i}`], dur: 300, gap: i ? -150 : 0 })), { fx: "fade", names: ["out", "lim"], dur: 400 }]);
-}
-
-// 8 ─ close: the Earth turning (≈15 s, loops) ─────────────────────
+// 5 ─ close: the Earth turning (≈15 s, loops) ─────────────────────
 {
   const s = slide(null, null, null, "Starfield blank");
   s.addMedia({ type: "video", path: B("globe.mp4"), cover: "data:image/png;base64," + fs.readFileSync(B("globe_poster.png")).toString("base64"), x: 0, y: 0, w: 13.333, h: 7.5, objectName: "globe" });
@@ -216,7 +159,7 @@ function screens(s, back, front, side, facts) {
   s.addText("It shows what each choice would have cost and kept.", T({ objectName: "l1", x: M, y: 3.3, w: 5.6, h: 1.0, fontSize: 26, color: C.background1, valign: "top" }));
   s.addText("The farmer decides.", T({ objectName: "l2", x: M, y: 4.45, w: 5.6, h: 0.55, fontSize: 26, color: C.accent1 }));
   s.addText("Built on NASA data  ·  NASA Space Apps 2026", T({ objectName: "l3", x: M, y: 5.35, w: 5.6, h: 0.4, fontSize: 14, color: C.background2 }));
-  s.addNotes("2:45–3:00. Furrow does not tell a farmer what to plant. It shows what each choice would have cost and kept. The farmer decides.");
+  s.addNotes("2:25–2:40. Furrow does not tell a farmer what to plant. It shows what each choice would have cost and kept. The farmer decides.");
   anim(s, [{ media: "globe", dur: 20000, loop: true }, { fx: "zoom", names: ["logo"], dur: 800, gap: 300 }, { fx: "fade", names: ["l1"], dur: 600 }, { fx: "fade", names: ["l2"], dur: 600 }, { fx: "fade", names: ["l3"], dur: 500 }]);
   TRANS[s._n] = "fade";
 }

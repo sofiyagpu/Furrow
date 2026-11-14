@@ -1,14 +1,14 @@
-# Furrow pitch deck (3 min, 8 slides, English)
+# Furrow pitch deck (3 min, 5 slides, English)
 
 `Furrow.pptx`:
 
 | Slide | Time | What |
 |---|---|---|
 | 1 | 0:00–1:00 | Opening crawl video: the problem and why it matters. Read it aloud; it moves on by itself |
-| 2–5 | 1:00–2:15 | Live app screenshots: map, rotations and time machine, climate twin and trade-offs, Arizona water |
-| 6 | 2:15–2:30 | The assistant |
-| 7 | 2:30–2:45 | Models and the carver-ml pipeline |
-| 8 | 2:45–3:00 | Close over a looping video of the Earth turning (NASA Blue Marble), both regions marked |
+| 2 | 1:00–1:30 | The app: field map and the time machine |
+| 3 | 1:30–2:00 | What if: climate twin, trade-off search, Arizona water |
+| 4 | 2:00–2:25 | The assistant, and what the ML repo adds next |
+| 5 | 2:25–2:40 | Close over a looping video of the Earth turning (NASA Blue Marble), both regions marked |
 
 Fly Through transitions between slides (PowerPoint 2010+, plain fade elsewhere), auto-playing builds, speaker notes
 with timings. Numbers come from `web/public/data/*.json`.
