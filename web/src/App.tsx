@@ -214,6 +214,7 @@ function StrategyCard({ r, s }: { r: Region; s: Strategy }) {
         <span className="label">Profit per ha, 1-in-10 bad year to 1-in-10 good</span>
         <BandBar band={m.profit} lo={lo} hi={hi} />
         <span className="mono">{usd(m.profit[0])} · <strong>{usd(m.profit[1])}</strong> · {usd(m.profit[2])}</span>
+        <span className="small risk">Prices and costs are assumptions, for an agronomist to check</span>
       </div>
       <dl className="stats">
         <div><dt>Loss years</dt><dd className="mono">{Math.round(m.loss_years * 100)}%</dd></div>
