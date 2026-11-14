@@ -66,7 +66,7 @@ export default function MapView(props: {
       m.addLayer({ id: 'edge', type: 'line', source: 'cells', paint: { 'line-color': '#ffffff', 'line-opacity': 0.6, 'line-width': 1 } })
       m.addLayer({
         id: 'sel', type: 'line', source: 'cells', filter: ['==', ['get', 'h3'], latest.current.selected],
-        paint: { 'line-color': '#a1ffcb', 'line-width': 3.5 },
+        paint: { 'line-color': '#00e5ff', 'line-width': 3.5 },
       })
       m.on('click', 'cells', (e: maplibregl.MapLayerMouseEvent) => e.features?.[0] && latest.current.onSelect(e.features[0].properties!.h3))
       m.on('mouseenter', 'cells', () => (m.getCanvas().style.cursor = 'pointer'))

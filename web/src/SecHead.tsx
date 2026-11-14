@@ -1,12 +1,9 @@
-// numbered section header: the number, what the section is, the one question it answers
-export function SecHead({ n, title, sub }: { n: string; title: string; sub?: string }) {
+// section heading as in the original design: title, optional one-line lead
+export function SecHead({ title, sub }: { n?: string; title: string; sub?: string }) {
   return (
-    <header className="sec-head">
-      <span className="step">{n}</span>
-      <div>
-        <h2 className="h-lg">{title}</h2>
-        {sub && <p className="sub">{sub}</p>}
-      </div>
-    </header>
+    <>
+      <h2 className="h-lg">{title}</h2>
+      {sub && <p className="lead narrow">{sub}</p>}
+    </>
   )
 }

@@ -103,8 +103,8 @@ function Page({ r }: { r: Region }) {
   const [metric, setMetric] = useState<MetricKey>('profit')
   const [layer, setLayer] = useState<NasaLayer>('ndvi')
   const cell = r.cells.find((c) => c.h3 === selected)!
-  const best = [...ref].sort((a, b) => b.metrics.profit[1] - a.metrics.profit[1])[0]
-  const bestCut = Math.round((1 - best.metrics.erosion / Math.max(cur.metrics.erosion, 0.01)) * 100)
+  const low = [...ref].sort((a, b) => a.metrics.erosion - b.metrics.erosion)[0]
+  const lowCut = Math.round((1 - low.metrics.erosion / Math.max(cur.metrics.erosion, 0.01)) * 100)
   const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
   const n = r.years[1] - r.years[0] + 1
   const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
@@ -126,35 +126,21 @@ function Page({ r }: { r: Region }) {
             </div>
           </div>
           <div className="panel hero-card" aria-label={t('Reference field summary', 'Опорное поле, сводка')}>
-            <span className="label">{t('Model result on the reference field', 'Результат модели на опорном поле')}</span>
-            <p className="verdict">
-              <strong>{usd(best.metrics.profit[1])}</strong> {t('per hectare a year instead of', 'с гектара в год вместо')} {usd(cur.metrics.profit[1])}
-            </p>
-            <p className="small muted">
-              {t(`${sname(best, l)}. Soil loss ${Math.abs(bestCut)}% ${bestCut >= 0 ? 'lower' : 'higher'} than now.`, `${sname(best, l)}. Эрозия на ${Math.abs(bestCut)}% ${bestCut >= 0 ? 'ниже' : 'выше'}, чем сейчас.`)}
-            </p>
+            <div className="row-between"><span className="label">{t('Reference field', 'Опорное поле')}</span><span className="mono small">{r.cells.length} {t('soil cells', 'почвенных ячеек')}</span></div>
             {ref.map((s) => (
               <div className="hero-row" key={s.id}>
                 <span className="dot" style={{ background: SC[s.id] }} />
                 <span className="hero-name">{short(s, l)}</span>
-                <span className="hero-bar"><i style={{ width: `${Math.max(2, (s.metrics.profit[1] / Math.max(...ref.map((x) => x.metrics.profit[1]))) * 100)}%`, background: SC[s.id] }} /></span>
+                <Rotation r={r} s={s} />
                 <span className="mono">{usd(s.metrics.profit[1])}</span>
+                <span className="mono muted">{s.metrics.erosion} {t('t', 'т')}</span>
               </div>
             ))}
+            <p className="small muted">
+              {t(`Median profit per hectare a year and soil loss. Lowest soil loss: ${short(low, l)}, ${lowCut}% below current practice.`,
+                `Медианная прибыль на гектар в год и эрозия. Меньше всего эрозии: ${short(low, l)}, на ${lowCut}% ниже текущей практики.`)}
+            </p>
           </div>
-        </div>
-        <div className="wrap steps">
-          {([
-            ['#map', t('Pick a field', 'Выберите поле'), t('NASA layers and soil for each cell', 'Слои NASA и почва по каждой ячейке')],
-            ['#strategies', t('Compare rotations', 'Сравните севообороты'), t(`Profit as a range over ${n} years`, `Прибыль диапазоном за ${n} лет`)],
-            ['#time', t('Stress-test', 'Проверьте на прочность'), t('Worst years and a +2 °C climate', 'Худшие годы и климат +2 °C')],
-            ['#tradeoffs', t('Decide', 'Решите'), t('Trade-offs, carbon, PDF report', 'Компромиссы, углерод, отчёт PDF')],
-          ] as const).map(([href, title, sub], k) => (
-            <a key={href} href={href} className="step-card">
-              <span className="step">{k + 1}</span>
-              <span><strong>{title}</strong><span className="small muted">{sub}</span></span>
-            </a>
-          ))}
         </div>
       </section>
 
@@ -184,12 +170,10 @@ function Page({ r }: { r: Region }) {
               <p className="small muted mono">
                 {t('clay', 'глина')} {cell.soil.clay.toFixed(0)}% · {t('sand', 'песок')} {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} {t('g/kg', 'г/кг')}
               </p>
-              <a className="ml-box" href="#ml">
+              {r.ml?.cells[selected] && <a className="ml-box" href="#ml">
                 <span className="badge">ML</span>
-                {r.ml?.cells[selected]
-                  ? <span>{t('Crop now', 'Культура сейчас')}: <strong>{r.ml.cells[selected].crop}</strong> ({Math.round((r.ml.cells[selected].crop_p ?? 0) * 100)}%){r.ml.cells[selected].sm_rootzone != null && <> · {t('soil moisture', 'влага')} {r.ml.cells[selected].sm_rootzone}</>}</span>
-                  : <span className="muted">{t('Crop map and field-scale moisture: model not connected', 'Карта культур и влага поля: модель не подключена')}</span>}
-              </a>
+                <span>{t('Crop now', 'Культура сейчас')}: <strong>{r.ml.cells[selected].crop}</strong> ({Math.round((r.ml.cells[selected].crop_p ?? 0) * 100)}%){r.ml.cells[selected].sm_rootzone != null && <> · {t('soil moisture', 'влага')} {r.ml.cells[selected].sm_rootzone}</>}</span>
+              </a>}
               <table className="tbl">
                 <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Profit P10–P90', 'Прибыль P10–P90')}</th><th>{t('Soil loss', 'Эрозия')}</th></tr></thead>
                 <tbody>
@@ -265,27 +249,21 @@ function StrategyCard({ r, s }: { r: Region; s: Strategy }) {
     <article className="panel card" style={{ borderTopColor: SC[s.id] }}>
       <h3 className="h-sm">{sname(s, l)}</h3>
       <Rotation r={r} s={s} />
+      <p className="small">{(l === 'ru' && s.idea_ru) || s.idea}</p>
+      <p className="small risk">{(l === 'ru' && s.risk_ru) || s.risk}</p>
       <div className="kv">
-        <span className="label">{t('Profit per ha: bad · median · good year', 'Прибыль на га: плохой · медиана · хороший год')}</span>
+        <span className="label">{t('Profit per ha, 1-in-10 bad year to 1-in-10 good', 'Прибыль на га, от плохого года (1 из 10) до хорошего')}</span>
         <BandBar band={m.profit} lo={lo} hi={hi} />
         <span className="mono">{usd(m.profit[0])} · <strong>{usd(m.profit[1])}</strong> · {usd(m.profit[2])}</span>
       </div>
       <dl className="stats">
-        <div><dt>{t('Soil loss, t/ha', 'Эрозия, т/га')}</dt><dd className="mono">{m.erosion}</dd></div>
-        <div><dt>{t('Carbon, t/ha', 'Углерод, т/га')}</dt><dd className="mono">{m.dsoc > 0 ? '+' : ''}{m.dsoc}</dd></div>
-        {r.irrigated
-          ? <div><dt>{t('Pumped, mm', 'Откачка, мм')}</dt><dd className="mono">{Math.round(m.irr[1])}</dd></div>
-          : <div><dt>{t('Loss years', 'Убыточных лет')}</dt><dd className="mono">{Math.round(m.loss_years * 100)}%</dd></div>}
+        <div><dt>{t('Loss years', 'Убыточных лет')}</dt><dd className="mono">{Math.round(m.loss_years * 100)}%</dd></div>
+        <div><dt>{t('Soil loss', 'Эрозия')}</dt><dd className="mono">{m.erosion} {t('t/ha', 'т/га')}</dd></div>
+        <div><dt>{t('Bare days', 'Голых дней')}</dt><dd className="mono">{m.bare_days}</dd></div>
+        <div><dt>{t('Soil C', 'Углерод')}</dt><dd className="mono">{m.dsoc > 0 ? '+' : ''}{m.dsoc} {t('t/ha', 'т/га')}</dd></div>
+        {r.irrigated && <div><dt>{t('Pumped', 'Откачка')}</dt><dd className="mono">{Math.round(m.irr[1])} {t('mm', 'мм')}</dd></div>}
+        <div><dt>{t('Tillage', 'Обработка')}</dt><dd>{s.notill ? 'No-till' : t('Tilled', 'Вспашка')}{irrName(s.irrigation, t)}</dd></div>
       </dl>
-      <details className="more">
-        <summary>{t('Idea, risk and details', 'Идея, риск и детали')}</summary>
-        <p className="small">{(l === 'ru' && s.idea_ru) || s.idea}</p>
-        <p className="small risk">{(l === 'ru' && s.risk_ru) || s.risk}</p>
-        <p className="small muted">
-          {s.notill ? 'No-till' : t('Tilled', 'Вспашка')}{irrName(s.irrigation, t)} · {t('bare days', 'голых дней')} {m.bare_days}
-          {r.irrigated && <> · {t('loss years', 'убыточных лет')} {Math.round(m.loss_years * 100)}%</>}
-        </p>
-      </details>
     </article>
   )
 }
