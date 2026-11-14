@@ -13,10 +13,12 @@ ML (Prithvi-EO-2.0 crop map, SMAP downscaling) lives in a separate repository. I
 ## Run
 
 ```bash
-uv venv --python 3.12 .venv && uv pip install --python .venv numpy pymoo h3
+uv venv --python 3.12 .venv && uv pip install --python .venv numpy pymoo h3 pillow pytest
 .venv/bin/python pipeline/fetch.py      # NASA POWER + SoilGrids per H3 cell, ~25 min, cached in data/raw
+.venv/bin/python pipeline/fetch.py --smap   # SMAP L4 root-zone moisture from NASA GIBS, ~1 min, data/raw/*.smap.json
 .venv/bin/python pipeline/build.py      # simulations, climate twin, NSGA-II -> web/public/data/*.json
 .venv/bin/python pipeline/model.py      # model self-check
+.venv/bin/python -m pytest pipeline     # priority numbers, SMAP check, ML contract
 cd web && npm install && npm run dev    # http://localhost:5173
 ```
 
@@ -28,8 +30,10 @@ cd web && npm install && npm run dev    # http://localhost:5173
 |---|---|---|
 | Regions, H3 grid | `pipeline/regions.py` | done |
 | NASA POWER daily weather, SoilGrids topsoil | `pipeline/fetch.py` | runs, no auth |
+| SMAP L4 root-zone moisture (check of the water balance) | `pipeline/fetch.py --smap`, `build.py smap_check()` | runs, no auth |
 | HLS NDVI, SMAP, IMERG, GRACE trend, SRTM slope, NEX-GDDP-CMIP6 deltas | `pipeline/gee_layers.py` | written, needs an Earth Engine project |
-| Crop parameters, prices, strategies | `pipeline/crops.py` | assumptions, for an agronomist to replace |
+| Crop parameters, prices, strategies, N rates, market depth | `pipeline/crops.py` | assumptions, for an agronomist to replace |
+| Farmer priorities: water, market, nitrogen, crop prices | `build.py farm()`, `web/src/App.tsx` Priorities | done |
 | Water balance + yield, wind and water erosion, RothC | `pipeline/model.py` | done |
 | Time machine, climate twin, NSGA-II, carbon, water | `pipeline/build.py` | done |
 | Map with NASA GIBS layers, strategy cards, cockpit, assistant | `web/src` | done |
@@ -49,6 +53,17 @@ cd web && npm install && npm run dev    # http://localhost:5173
   shifts the record by ΔT/ΔP; the Earth Engine script computes the NEX-GDDP-CMIP6 SSP2-4.5 and SSP5-8.5 deltas per cell.
 - **Carbon credits**: RothC difference × 44/12, 20% buffer, $15–35/t. Real payment needs measured samples and
   a registry methodology (for example Verra VM0042).
+- **Farmer priorities**: four numbers per strategy, weighted by the farmer's sliders. Profit is the median at the
+  chosen crop prices (±30%, revenue moves, costs stay). Water is pumped mm (Arizona) or the share of crop water
+  demand not met (Kazakhstan). Market is the share of revenue from crops with a deep market. Nitrogen is mineral N
+  bought, kg/ha a year, with 30 kg credited after a legume. N rates and market depth are assumptions in `crops.py`.
+- **SMAP check**: the model's root-zone water at the reference field against SMAP L4 root-zone moisture on the
+  next day, 2015–2024. SMAP values come from NASA GIBS images decoded through GIBS's published colour table
+  (0.003 m³/m³ bins), so no Earthdata login is needed. Correlation is reported raw and with the seasonal cycle
+  removed (about 0.6 and 0.55 in both regions). It checks the model; it does not drive it.
+- **GPM IMERG**: map layer only. The GIBS daily image is not a daily total (June 2020 in East Kazakhstan: ~18 mm
+  from the image against ~40 mm in POWER), so it is not used as a number. Real IMERG totals need an Earthdata
+  login (GES DISC) or the Earth Engine script.
 - **GRACE-FO**: on the map through NASA GIBS. A 300 km mascon cannot see a farm; the Earth Engine script gives the
   cell trend in cm/yr so pumping savings sit on the same scale.
 
