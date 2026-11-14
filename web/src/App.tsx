@@ -8,7 +8,7 @@ import Agent from './Agent'
 import Report from './Report'
 import { SecHead } from './SecHead'
 import type { Region, Strategy } from './types'
-import { SC, usd, short, sname, cropShort, rname, LangCtx, useLang, useT, type Lang } from './fmt'
+import { SC, usd, short, sname, cropShort, rname, mlCrop, mlCells, mlHas, LangCtx, useLang, useT, type Lang } from './fmt'
 
 const METRICS: Record<MetricKey, [string, string]> = {
   profit: ['Median profit, $/ha', 'Медианная прибыль, $/га'],
@@ -169,10 +169,7 @@ function Page({ r }: { r: Region }) {
               <p className="small mono">
                 {t('clay', 'глина')} {cell.soil.clay.toFixed(0)}% · {t('sand', 'песок')} {cell.soil.sand.toFixed(0)}% · SOC {cell.soil.soc.toFixed(1)} {t('g/kg', 'г/кг')}
               </p>
-              {r.ml?.cells[selected] && <a className="ml-box" href="#ml">
-                <span className="badge">ML</span>
-                <span>{t('Crop now', 'Культура сейчас')}: <strong>{r.ml.cells[selected].crop}</strong> ({Math.round((r.ml.cells[selected].crop_p ?? 0) * 100)}%){r.ml.cells[selected].sm_rootzone != null && <> · {t('soil moisture', 'влага')} {r.ml.cells[selected].sm_rootzone}</>}</span>
-              </a>}
+              <MlCellBox r={r} h3={selected} />
               <table className="tbl">
                 <thead><tr><th>{t('Strategy', 'Стратегия')}</th><th>{t('Profit P10–P90', 'Прибыль P10–P90')}</th><th>{t('Soil loss', 'Эрозия')}</th></tr></thead>
                 <tbody>
@@ -579,7 +576,7 @@ function Method({ r }: { r: Region }) {
               <li><strong>NASA POWER</strong> {t('daily weather', 'суточная погода')}, {r.years[0] - 1}–{r.years[1] + 1}</li>
               <li><strong>SoilGrids 2.0</strong> {t('soil, 0–30 cm', 'почва, 0–30 см')}</li>
               <li><strong>NASA GIBS</strong> MODIS, SMAP, IMERG, GRACE-FO</li>
-              {r.ml && <li><strong>ML</strong> {r.ml.model}</li>}
+              {mlCells(r).length > 0 && <li><strong>ML</strong> {mlTitle(r) || t('crop map', 'карта культур')}</li>}
             </ul>
           </div>
           <div className="panel">
@@ -613,7 +610,7 @@ function Method({ r }: { r: Region }) {
 
 function MlSection({ r }: { r: Region }) {
   const t = useT()
-  const n = r.ml ? Object.keys(r.ml.cells).length : 0
+  const n = mlCells(r).length
   return (
     <section className="sec" id="ml">
       <div className="wrap">
@@ -621,20 +618,58 @@ function MlSection({ r }: { r: Region }) {
           sub={t('Satellites see the district; ML brings it down to the field. Results appear in the map panel when you click a cell.', 'Спутник видит район, ML доводит до поля. Результат виден в панели карты при клике на ячейку.')} />
         <div className="two ml-grid">
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Crop map', 'Карта культур')}</h3><span className={`status ${r.ml ? 'on' : ''}`}>{r.ml ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
+            <div className="row-between"><h3 className="h-sm">{t('Crop map', 'Карта культур')}</h3><span className={`status ${n ? 'on' : ''}`}>{n ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
             <p className="small muted">{t('Classifies the current crop of each cell from HLS / MODIS time series, so "current practice" comes from the field, not a guess.', 'Определяет текущую культуру ячейки по рядам HLS / MODIS, чтобы «текущая практика» бралась с поля, а не из догадки.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className={`status ${r.ml ? 'on' : ''}`}>{r.ml ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Not connected', 'Не подключено')}</span></div>
             <p className="small muted">{t('SMAP pixels are 9 km wide. The model sharpens root-zone moisture to the cell, with a prediction interval.', 'Пиксель SMAP — 9 км. Модель уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
-          {r.ml
-            ? `${r.ml.model} ${r.ml.version} · ${n} ${t('cells', 'ячеек')} · ${r.ml.validation}`
-            : t(`The models live in a separate repository. Put its output in data/ml/${r.id}.json and rebuild: the map picks it up.`, `Модели живут в отдельном репозитории. Положите их вывод в data/ml/${r.id}.json и пересоберите: карта подхватит.`)}
+          {n
+            ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), r.ml?.validation].filter(Boolean).join(' · ')
+            : t(`The models live in a separate repository. Put its output in data/ml/${r.id}.json and rebuild: the cell panel picks it up.`, `Модели живут в отдельном репозитории. Положите их вывод в data/ml/${r.id}.json и пересоберите: его покажет панель ячейки.`)}
         </p>
       </div>
     </section>
+  )
+}
+
+const mlTitle = (r: Region) => [r.ml?.model, r.ml?.version].filter(Boolean).join(' ')
+
+// ML block in the cell panel. Every field of the ML file is optional, so each line shows only when its field is there.
+function MlCellBox({ r, h3 }: { r: Region; h3: string }) {
+  const l = useLang(), t = useT()
+  const c = r.ml?.cells?.[h3]
+  const share = c?.crop_pixel_share ?? c?.crop_p
+  const years = Object.entries(c?.years ?? {}).sort(([a], [b]) => a.localeCompare(b))
+  if (!c || !mlHas(c)) {
+    return <div className="ml-box"><span className="badge">ML</span><span className="muted">{t('No ML data for this cell', 'ML-данных для ячейки нет')}</span></div>
+  }
+  return (
+    <div className="ml-box ml-cell">
+      <span className="badge">ML</span>
+      <div className="ml-body">
+        {c.crop && (
+          <p>
+            <strong>{mlCrop(c.crop, l)}</strong>
+            {share != null && <span className="muted"> · {t('pixel share', 'доля пикселей')} {Math.round(share * 100)}%</span>}
+          </p>
+        )}
+        {c.low_confidence && <span className="ml-flag">{t('low confidence', 'низкая достоверность')}</span>}
+        {years.length > 0 && (
+          <ul className="ml-years">
+            {years.map(([y, v]) => (
+              <li key={y}>
+                <span className="mono">{y}</span> {v.crop ? mlCrop(v.crop, l) : '–'}
+                {v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+        {r.ml?.validation && <p className="small muted">{r.ml.validation}</p>}
+      </div>
+    </div>
   )
 }

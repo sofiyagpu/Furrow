@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { Region, Strategy } from './types'
+import type { MlCell, Region, Strategy } from './types'
 
 // categorical slots, fixed order (validated: dataviz palette check, contrast WARN -> direct labels + tables)
 export const SC: Record<string, string> = { current: '#2a78d6', A: '#eb6834', B: '#1baf7a', C: '#eda100' }
@@ -17,3 +17,20 @@ export const sname = (s: Strategy, l: Lang) => (l === 'ru' && s.name_ru) || s.na
 export const cropLabel = (r: Region, c: string, l: Lang) => ((l === 'ru' && r.crops[c].label_ru) || r.crops[c].label)
 export const cropShort = (r: Region, c: string, l: Lang) => cropLabel(r, c, l).split(' (')[0]
 export const rname = (r: Region, l: Lang) => (l === 'ru' && r.name_ru) || r.name
+
+// Display names for crop keys coming from the ML repo. Labels only: model and strategy crops are separate.
+const ML_CROPS: Record<string, [string, string]> = {
+  alfalfa: ['Alfalfa', 'Люцерна'],
+  corn: ['Corn', 'Кукуруза'],
+  cotton: ['Cotton', 'Хлопчатник'],
+  fallow: ['Fallow', 'Пар'],
+  barley: ['Barley', 'Ячмень'],
+  wheat: ['Wheat', 'Пшеница'],
+}
+export const mlCrop = (key: string, l: Lang) => ML_CROPS[key]?.[l === 'ru' ? 1 : 0] ?? key
+
+// a cell counts as having ML data only if it carries something to show
+export const mlHas = (c?: MlCell) => !!c && (!!c.crop || !!c.low_confidence || Object.keys(c.years ?? {}).length > 0)
+
+// region cells with ML data; [] when the file or `cells` is missing or empty
+export const mlCells = (r: Region) => r.cells.filter((c) => mlHas(r.ml?.cells?.[c.h3])).map((c) => c.h3)

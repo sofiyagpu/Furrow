@@ -70,5 +70,26 @@ export interface Region {
   twin: { dT: number[]; dP: number[]; grid: Record<string, TwinCell[][]> }
   pareto: ParetoPoint[]
   cloud: ParetoPoint[]
-  ml: null | { model: string; version: string; validation: string; cells: Record<string, { crop?: string; crop_p?: number; sm_rootzone?: number }> }
+  ml?: MlFile | null
+}
+
+// ML file from the separate carver-ml repo (data/ml/README.md). Every field may be missing.
+export interface MlYear {
+  crop?: string
+  bare_obs_dates?: number // satellite dates the cell was seen bare that year
+}
+
+export interface MlCell {
+  crop?: string // class key: alfalfa, corn, cotton, fallow, barley, ...
+  crop_p?: number // 0-1, older exports; read as a pixel share
+  crop_pixel_share?: number // 0-1, share of the cell's pixels in `crop`
+  low_confidence?: boolean
+  years?: Record<string, MlYear>
+}
+
+export interface MlFile {
+  model?: string
+  version?: string
+  validation?: string
+  cells?: Record<string, MlCell>
 }

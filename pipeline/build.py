@@ -1,5 +1,6 @@
 """Precompute everything the web app shows: web/public/data/<region>.json
     .venv/bin/python pipeline/build.py [az|vko]
+    .venv/bin/python pipeline/build.py --ml-only az [path/to/ml.json]   # re-embed ML only, models untouched
 """
 import json, sys, time
 from pathlib import Path
@@ -20,6 +21,37 @@ from regions import REGIONS
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "web" / "public" / "data"
 ML = ROOT / "data" / "ml"  # contract with the separate ML repo, see data/ml/README.md
+
+
+def load_ml(path):
+    """ML file from the separate repo (data/ml/README.md). Every field is optional: no file -> None,
+    missing or malformed `cells` -> {}. Broken JSON fails loudly so a bad export is not silently dropped."""
+    path = Path(path)
+    if not path.exists():
+        return None
+    try:
+        ml = json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"{path}: not valid JSON ({e})")
+    if not isinstance(ml, dict):
+        raise SystemExit(f"{path}: expected a JSON object")
+    if not isinstance(ml.get("cells"), dict):
+        ml["cells"] = {}
+    return ml
+
+
+def embed_ml(rid, path=None):
+    """Swap the ML block of an already built region file; strategies, model and NSGA-II results stay as they are."""
+    out = OUT / f"{rid}.json"
+    data = json.loads(out.read_text())
+    data["ml"] = load_ml(path or ML / f"{rid}.json")
+    known = {c["h3"] for c in data["cells"]}
+    cells = (data["ml"] or {}).get("cells", {})
+    stray = [h for h in cells if h not in known]
+    if stray:
+        print(f"{rid}: {len(stray)} ML cells are not in the region grid and will not show: {stray[:3]}")
+    out.write_text(json.dumps(data, separators=(",", ":")))
+    print(rid, "ml:", "none" if data["ml"] is None else f"{len(cells)} cells")
 
 
 def r1(x):
@@ -186,7 +218,6 @@ def build(rid):
     front, cloud = pareto(rid, wx, c["soil"])
     print(rid, "pareto", len(front), "of", len(cloud), round(time.time() - t0), "s")
 
-    ml = ML / f"{rid}.json"
     data = dict(
         id=rid, name=region["name"], name_ru=region["name_ru"], bbox=region["bbox"], irrigated=region["irrigated"],
         years=[int(wx.year.min()) + 1, int(wx.year.max()) - 1],
@@ -194,7 +225,7 @@ def build(rid):
         crops={k: dict(label=v["label"], label_ru=v["label_ru"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"]) for k, v in CROPS[rid].items()},
         assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION),
         cells=out_cells, strategies=out_strat, twin=twin, pareto=front, cloud=cloud,
-        ml=json.loads(ml.read_text()) if ml.exists() else None,
+        ml=load_ml(ML / f"{rid}.json"),
     )
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / f"{rid}.json").write_text(json.dumps(data, separators=(",", ":"), default=lambda o: o.item()))
@@ -202,5 +233,8 @@ def build(rid):
 
 
 if __name__ == "__main__":
-    for rid in sys.argv[1:] or list(REGIONS):
-        build(rid)
+    if sys.argv[1:2] == ["--ml-only"]:
+        embed_ml(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
+    else:
+        for rid in sys.argv[1:] or list(REGIONS):
+            build(rid)

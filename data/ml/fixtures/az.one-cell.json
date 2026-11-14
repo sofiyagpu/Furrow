@@ -1,0 +1,18 @@
+{
+  "model": "FIXTURE - not real data",
+  "version": "fixture-1",
+  "validation": "Fixture for the app's ML panel. Not a model result.",
+  "cells": {
+    "8548eb87fffffff": {
+      "crop": "alfalfa",
+      "crop_p": 0.64,
+      "crop_pixel_share": 0.58,
+      "low_confidence": true,
+      "years": {
+        "2021": {"crop": "cotton", "bare_obs_dates": 3},
+        "2022": {"crop": "alfalfa", "bare_obs_dates": 0},
+        "2023": {"crop": "fallow", "bare_obs_dates": 11}
+      }
+    }
+  }
+}
