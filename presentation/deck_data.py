@@ -1,5 +1,5 @@
 """Pull the numbers the deck charts from the app's own build output (web/public/data/*.json) and the ML repo's reports.
-    FURROW_ROOT=<app checkout> ML_REPORTS=<carver-ml/reports/bboxB_2021> python deck_data.py
+    FURROW_ROOT=<app checkout> ML_REPORTS=<carver-ml/reports/azwide_2021> python deck_data.py
 """
 import csv
 import json
@@ -31,8 +31,10 @@ rep = os.environ.get("ML_REPORTS")
 if rep:
     summ = json.loads((Path(rep) / "summary_2021.json").read_text())
     rows = {r["group"]: r for r in csv.DictReader(open(Path(rep) / "class_metrics_2021.csv"))}
-    sweep = list(csv.DictReader(open(Path(rep) / "buffer_sweep_summary_2021.csv")))
-    out["ml"] = dict(f1={g: round(float(rows[g]["f1_agri_truth"]), 3) for g in summ["rule_groups"]},
+    sw = Path(rep) / "buffer_sweep_summary_2021.csv"
+    sweep = list(csv.DictReader(open(sw))) if sw.exists() else []
+    out["ml"] = dict(f1={g: round(float(r["f1_agri_truth"]), 3) for g, r in rows.items() if g != "other"},
+                     n_pixels=summ["n_grid_pixels"], n_features=summ["n_features"],
                      macro_f1=round(summ["macro_f1_rule_agri_truth"], 2), accuracy=round(summ["accuracy_agri_truth"], 2),
                      baseline=round(summ["majority_baseline_agri_truth"], 2), dates=summ["dates"], dates_used=summ["dates_used"],
                      sweep={r["buffer_px"]: round(float(r["macro_f1_rule_on_agri_px"]), 3) for r in sweep})
