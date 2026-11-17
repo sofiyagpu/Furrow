@@ -77,7 +77,8 @@ export interface TwinCell { profit: Band; erosion: number; irr: number; loss_yea
 export interface ParetoPoint { rotation: string[]; notill: boolean; irrigation?: string; metrics: Metrics }
 
 export interface Region {
-  id: 'az' | 'vko'
+  id: 'az' | 'vko' | 'field'
+  template?: 'az' | 'vko' // a user field (POST /field): demo region whose crops and strategies it uses
   name: string
   name_ru?: string
   bbox: [[number, number], [number, number]]

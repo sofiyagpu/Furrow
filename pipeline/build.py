@@ -247,10 +247,10 @@ def imerg_check(rid, raw, c, strategies, years):
                 ratio=round(sum(rain[y][1] for y in yrs) / sum(rain[y][0] for y in yrs), 2))
 
 
-def build(rid):
+def compute(rid, region, raw, checks=True):
+    """The whole region file from raw inputs ({"cells": {h3: {lat, lon, soil, power, b?}}, "power": {key: series}}).
+    rid picks the crops and strategies; checks=False skips SMAP, IMERG and ML, which exist only for the demo regions."""
     t0 = time.time()
-    region = REGIONS[rid]
-    raw = json.loads((ROOT / "data" / "raw" / f"{rid}.json").read_text())
     cells = {k: v for k, v in raw["cells"].items() if v["soil"]}
     wxs = {k: Weather(v, float(k.split(",")[0])) for k, v in raw["power"].items()}
     rep = rep_cell(cells)
@@ -264,7 +264,7 @@ def build(rid):
             m = summarise(rows, dsoc)
             res[s["id"]] = {k: m[k] for k in ("profit", "erosion", "dsoc", "irr", "bare_days", "loss_years")}
         out_cells.append(dict(h3=h, lat=round(c["lat"], 4), lon=round(c["lon"], 4),
-                              b=[[round(lo, 4), round(la, 4)] for la, lo in h3.cell_to_boundary(h)],
+                              b=c.get("b") or [[round(lo, 4), round(la, 4)] for la, lo in h3.cell_to_boundary(h)],
                               soil={k: round(v, 2) for k, v in c["soil"].items()}, soc0=round(soc0, 1), s=res))
     print(rid, "cells", round(time.time() - t0), "s")
 
@@ -297,18 +297,24 @@ def build(rid):
     front, cloud = pareto(rid, wx, c["soil"])
     print(rid, "pareto", len(front), "of", len(cloud), round(time.time() - t0), "s")
 
-    data = dict(
+    yrs = [int(wx.year.min()) + 1, int(wx.year.max()) - 1]
+    return dict(
         id=rid, name=region["name"], name_ru=region["name_ru"], bbox=region["bbox"], irrigated=region["irrigated"],
-        years=[int(wx.year.min()) + 1, int(wx.year.max()) - 1],
+        years=yrs,
         rep_cell=rep, climate=climatology(wx),
         crops={k: dict(label=v["label"], label_ru=v["label_ru"], price=v["price"], cost=v["cost"], ymax=v["ymax"], family=v["family"],
                        n=N_RATE[rid][k], market=MARKET[rid].get(k)) for k, v in CROPS[rid].items()},
         assumptions=dict(co2_price=CO2_PRICE, buffer=0.2, pump_cost_m3=PUMP_COST, irrigation_eff=IRRIGATION, n_credit=N_CREDIT),
         cells=out_cells, strategies=out_strat, twin=twin, pareto=front, cloud=cloud,
-        smap=smap_check(rid, rep, out_strat[0]["dekads"]),
-        imerg=imerg_check(rid, raw, c, strategies, [int(wx.year.min()) + 1, int(wx.year.max()) - 1]),
-        ml=load_ml(ML / f"{rid}.json"),
+        smap=smap_check(rid, rep, out_strat[0]["dekads"]) if checks else None,
+        imerg=imerg_check(rid, raw, c, strategies, yrs) if checks else None,
+        ml=load_ml(ML / f"{rid}.json") if checks else None,
     )
+
+
+def build(rid):
+    t0 = time.time()
+    data = compute(rid, REGIONS[rid], json.loads((ROOT / "data" / "raw" / f"{rid}.json").read_text()))
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / f"{rid}.json").write_text(json.dumps(data, separators=(",", ":"), default=lambda o: o.item()))
     print(rid, "done", round(time.time() - t0), "s", round((OUT / f"{rid}.json").stat().st_size / 1e6, 2), "MB")

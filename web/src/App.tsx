@@ -6,6 +6,7 @@ import {
 import MapView, { NASA_LAYERS, type MetricKey, type NasaLayer } from './MapView'
 import Agent from './Agent'
 import Report from './Report'
+import FieldInput from './FieldInput'
 import { SecHead } from './SecHead'
 import type { Region, Strategy } from './types'
 import { SC, usd, short, sname, cropShort, rname, mlCrop, mlCells, mlHas, LangCtx, useLang, useT, type Lang } from './fmt'
@@ -41,7 +42,7 @@ const viewFromHash = (): View => {
 }
 
 export default function App() {
-  const [rid, setRid] = useState<'vko' | 'az'>(() => (new URLSearchParams(location.search).get('r') === 'az' ? 'az' : 'vko'))
+  const [rid, setRid] = useState<Region['id']>(() => { const q = new URLSearchParams(location.search).get('r'); return q === 'az' || q === 'field' ? q : 'vko' })
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
   const [view, setView] = useState<View>(viewFromHash)
   const [data, setData] = useState<Record<string, Region>>({})
@@ -50,7 +51,7 @@ export default function App() {
   const title = VIEWS.find(([v]) => v === view)!
 
   useEffect(() => {
-    if (data[rid]) return
+    if (data[rid] || rid === 'field') return // a user field comes from POST /field, see FieldInput
     fetch(`${import.meta.env.BASE_URL}data/${rid}.json`).then((x) => x.json()).then((d) => setData((o) => ({ ...o, [rid]: d })))
   }, [rid, data])
   useEffect(() => { document.documentElement.lang = lang; store('lang', lang) }, [lang])
@@ -68,6 +69,7 @@ export default function App() {
     <div className="seg" role="group" aria-label={t('Region', 'Регион')}>
       <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>{t('Kazakhstan', 'ВКО')}</button>
       <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>{t('Arizona', 'Аризона')}</button>
+      <button aria-pressed={rid === 'field'} onClick={() => setRid('field')}>{t('My field', 'Моё поле')}</button>
     </div>
   )
   const langSeg = (
@@ -105,12 +107,15 @@ export default function App() {
             </select>
             <div className="top-tools">
               <span className="top-mobile">{regionSeg}{langSeg}</span>
+              {rid === 'field' && r && <button className="btn btn-ghost btn-sm" onClick={() => setData((o) => Object.fromEntries(Object.entries(o).filter(([k]) => k !== 'field')))}>{t('Another field', 'Другое поле')}</button>}
               <Theme />
-              {r && <Agent key={rid + lang} region={r} />}
+              {r && <Agent key={rid + lang + r.rep_cell} region={r} />}
             </div>
           </header>
-          <main id="main" className={`content view-${view}`}>
-            {r ? <Page key={rid} r={r} view={view} /> : <p className="muted pad">{t('Loading the region', 'Загружаем регион')}</p>}
+          <main id="main" className={`content view-${r ? view : 'input'}`}>
+            {r ? <Page key={`${rid}:${r.rep_cell}`} r={r} view={view} />
+              : rid === 'field' ? <FieldInput onDone={(d) => setData((o) => ({ ...o, field: d }))} />
+              : <p className="muted pad">{t('Loading the region', 'Загружаем регион')}</p>}
           </main>
         </div>
       </div>
@@ -904,6 +909,7 @@ function MlSection({ r }: { r: Region }) {
         <p className="small muted note">
           {n
             ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), r.ml?.validation].filter(Boolean).join(' · ')
+            : r.id === 'field' ? t('ML layers are built for the two demo regions only.', 'ML-слои есть только для двух демо-регионов.')
             : t(`The models live in a separate repository. Put its output in data/ml/${r.id}.json and rebuild: the cell panel picks it up.`, `Модели живут в отдельном репозитории. Положите их вывод в data/ml/${r.id}.json и пересоберите: его покажет панель ячейки.`)}
         </p>
       </div>

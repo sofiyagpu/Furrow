@@ -13,17 +13,37 @@ ML (Prithvi-EO-2.0 crop map, SMAP downscaling) lives in a separate repository. I
 ## Run
 
 ```bash
-uv venv --python 3.12 .venv && uv pip install --python .venv numpy pymoo h3 pillow pytest
+uv venv --python 3.12 .venv && uv pip install --python .venv numpy pymoo h3 pillow pytest fastapi uvicorn httpx
 .venv/bin/python pipeline/fetch.py      # NASA POWER + SoilGrids per H3 cell, ~25 min, cached in data/raw
 .venv/bin/python pipeline/fetch.py --smap   # SMAP L4 root-zone moisture from NASA GIBS, ~1 min, data/raw/*.smap.json
 EARTHDATA_TOKEN=... .venv/bin/python pipeline/fetch.py --imerg   # GPM IMERG monthly, ~3 min, data/raw/*.imerg.json
 .venv/bin/python pipeline/build.py      # simulations, climate twin, NSGA-II -> web/public/data/*.json
 .venv/bin/python pipeline/model.py      # model self-check
 .venv/bin/python -m pytest pipeline     # priority numbers, SMAP check, ML contract
-cd web && npm install && npm run dev    # http://localhost:5173
+.venv/bin/uvicorn --app-dir pipeline api:app --port 8000   # API for "My field": POST /field
+cd web && npm install && npm run dev    # http://localhost:5173, proxies /field to :8000
 ```
 
-`npm run build` makes a static site in `web/dist`, with no backend.
+`npm run build` makes a static site in `web/dist`. The two demo regions work without a backend; "My field" needs the API.
+
+## Your field
+
+Outline a field on the map or load a KML file. `POST /field` takes a GeoJSON Polygon (`[lon, lat]`) and returns the
+same JSON as `web/public/data/<region>.json`, for that one field: NASA POWER and SoilGrids at the field's centre
+(cached in `data/cache`), then the strategies, time machine, climate twin and NSGA-II of `build.py compute()`.
+About a minute for a new field, instant for a repeated one. Crops, prices and strategies come from the nearest demo
+region, so any field in Kazakhstan gets the East Kazakhstan set. SMAP, IMERG and ML checks stay demo-region only.
+
+## Deploy (one server)
+
+```bash
+docker build -t furrow .
+docker run -d --restart unless-stopped -p 8000:8000 -v furrow-cache:/app/data/cache furrow
+```
+
+One container serves the site and the API on port 8000. For HTTPS put a reverse proxy in front, for example
+`caddy reverse-proxy --from furrow.example.org --to :8000`. Allow at least 5 minutes of proxy read timeout,
+because `POST /field` answers only when the model is done. No accounts: anyone with the link can run a field, and at most two run at once.
 
 ## What is where
 
@@ -40,6 +60,7 @@ cd web && npm install && npm run dev    # http://localhost:5173
 | Time machine, climate twin, NSGA-II, carbon, water | `pipeline/build.py` | done |
 | Map with NASA GIBS layers, strategy cards, cockpit, assistant | `web/src` | done |
 | ML layers | separate repo → `data/ml/<region>.json` | contract only |
+| Your field: POST /field, outline on the map or KML | `pipeline/api.py`, `web/src/FieldInput.tsx` | done |
 
 ## Models, honestly
 

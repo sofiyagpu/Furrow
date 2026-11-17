@@ -125,6 +125,9 @@ a { color: inherit; }
 .side { display: flex; flex-direction: column; gap: 14px; }
 .field { display: grid; gap: 6px; }
 .field.inline { min-width: min(260px, 100%); }
+.field-side { display: grid; gap: 14px; align-content: start; }
+.field-side .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn:disabled, .btn:has(input:disabled) { opacity: .45; cursor: default; transform: none; }
 select, input[type="text"], .agent-form input { font: 15px var(--font); min-height: 44px; padding: 0 12px; border-radius: var(--r-sm); border: 1px solid var(--grid-strong); background: var(--bg); color: var(--ink); width: 100%; }
 input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); min-height: 32px; }
 .legend-ramp { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }

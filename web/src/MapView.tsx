@@ -17,6 +17,19 @@ export const NASA_LAYERS = {
 } as const
 export type NasaLayer = keyof typeof NASA_LAYERS
 
+// satellite base map, shared with the field outline map
+export const IMAGERY: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    img: {
+      type: 'raster', tileSize: 256, maxzoom: 17,
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      attribution: 'Imagery Esri, Maxar · NASA GIBS',
+    },
+  },
+  layers: [{ id: 'img', type: 'raster', source: 'img', paint: { 'raster-saturation': -0.2 } }],
+}
+
 export type MetricKey = 'profit' | 'erosion' | 'dsoc' | 'irr'
 
 // value for colouring, higher = better for the farmer/soil
@@ -46,17 +59,7 @@ export default function MapView(props: P) {
     const m = new maplibregl.Map({
       container: box.current!,
       attributionControl: { compact: true },
-      style: {
-        version: 8,
-        sources: {
-          img: {
-            type: 'raster', tileSize: 256, maxzoom: 17,
-            tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-            attribution: 'Imagery Esri, Maxar · NASA GIBS',
-          },
-        },
-        layers: [{ id: 'img', type: 'raster', source: 'img', paint: { 'raster-saturation': -0.2 } }],
-      },
+      style: IMAGERY,
       bounds: flip(props.region.bbox),
       fitBoundsOptions: { padding: 40 },
       cooperativeGestures: true,
