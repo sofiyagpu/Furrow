@@ -21,6 +21,8 @@ const METRICS: Record<MetricKey, [string, string]> = {
 
 const stored = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
 const store = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* private mode: lasts this visit */ } }
+const storedJson = <T,>(k: string, d: T): T => { try { return JSON.parse(stored(k) ?? '') ?? d } catch { return d } }
+const storeJson = (k: string, v: unknown) => store(k, v == null ? '' : JSON.stringify(v))
 
 const METRIC_SHORT: Record<MetricKey, [string, string]> = { profit: ['Profit', 'Прибыль'], erosion: ['Soil loss', 'Эрозия'], dsoc: ['Carbon', 'Углерод'], irr: ['Water', 'Вода'] }
 
@@ -44,12 +46,13 @@ const viewFromHash = (): View => {
 
 export default function App() {
   // Arizona first: it carries the ML crop map; ?r=vko opens Kazakhstan, ?r=field the user's own field
-  const [rid, setRid] = useState<Region['id']>(() => { const q = new URLSearchParams(location.search).get('r'); return q === 'vko' || q === 'field' ? q : 'az' })
+  const [rid, setRid] = useState<Region['id']>(() => { const q = new URLSearchParams(location.search).get('r') ?? stored('rid'); return q === 'vko' || q === 'field' ? q : 'az' })
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
   const [view, setView] = useState<View>(viewFromHash)
-  const [data, setData] = useState<Record<string, Region>>({})
-  const [fields, setFields] = useState<DrawnField[]>([]) // outlined in FieldInput, kept while a result is shown
-  const [farm, setFarm] = useState<FarmResult | null>(null)
+  // the user's field result, outlines and farm plan survive a reload (localStorage, ~250 KB for a field)
+  const [data, setData] = useState<Record<string, Region>>(() => { const f = storedJson<Region | null>('field', null); return f ? { field: f } : {} as Record<string, Region> })
+  const [fields, setFields] = useState<DrawnField[]>(() => storedJson('fields', [])) // outlined in FieldInput, kept while a result is shown
+  const [farm, setFarm] = useState<FarmResult | null>(() => storedJson('farm', null))
   const r = data[rid]
   const t = (en: string, ru: string) => (lang === 'ru' ? ru : en)
   const title = VIEWS.find(([v]) => v === view)!
@@ -59,6 +62,10 @@ export default function App() {
     fetch(`${import.meta.env.BASE_URL}data/${rid}.json`).then((x) => x.json()).then((d) => setData((o) => ({ ...o, [rid]: d })))
   }, [rid, data])
   useEffect(() => { document.documentElement.lang = lang; store('lang', lang) }, [lang])
+  useEffect(() => store('rid', rid), [rid])
+  useEffect(() => storeJson('field', data.field), [data.field])
+  useEffect(() => storeJson('fields', fields), [fields])
+  useEffect(() => storeJson('farm', farm), [farm])
   useEffect(() => {
     const on = () => setView(viewFromHash())
     addEventListener('hashchange', on)
