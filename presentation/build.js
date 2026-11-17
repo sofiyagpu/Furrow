@@ -196,7 +196,7 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
   const s = slide("Models", "EPISODE IV  ·  THE SATELLITE EYE", "Field Shift ML: crop history from HLS satellite scenes");
   const ml = D.ml;
   // the plan, two branches that meet in one comparison
-  const dw = 7.5, gx = 0.3, bw = (dw - gx) / 2, bh = 0.6, gy = 0.17;
+  const dw = 7.5, gx = 0.3, bw = (dw - gx) / 2, bh = 0.66, gy = 0.12;
   const rowY = (i) => TOP + i * (bh + gy);
   const nodes = [];
   const node = (name, x, y, w, title, sub, tone) => {
@@ -210,17 +210,17 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
       line: { color: HEX.muted, width: 1.25, endArrowType: "triangle" } });
   };
   const L = M, R = M + bw + gx, cx = M + dw / 2, lc = L + bw / 2, rc = R + bw / 2;
-  const IN = "13294B", DONE = "0F3B2E", RUN = "2E2A12", OUTC = "3A2A10";
-  node("n0", M + dw * 0.18, rowY(0), dw * 0.64, `HLS L30 (${ml.dates} dates) and CDL 2021`, "shared inputs for both branches", IN);
+  const IN = "13294B", DONE = "0F3B2E", OUTC = "3A2A10";
+  node("n0", M + dw * 0.14, rowY(0), dw * 0.72, `HLS L30 (${ml.dates} dates), CDL 2021 labels`, "CDL 2019–2020 field history", IN);
   node("l1", L, rowY(1), bw, "NDVI and clouds", "Fmask, dates over 50% cloud dropped", DONE);
-  node("r1", R, rowY(1), bw, "Chips 224×224", "6 HLS bands, several dates", RUN);
+  node("r1", R, rowY(1), bw, "Chips 224×224", `6 HLS bands, ${ml.dates_used} dates`, DONE);
   node("l2", L, rowY(2), bw, "RandomForest", "per-pixel classification", DONE);
-  node("r2", R, rowY(2), bw, "Prithvi-EO-2.0", "embeddings, Kaggle GPU", RUN);
+  node("r2", R, rowY(2), bw, "Prithvi-EO-2.0", `fine-tuned on ${ml.dates_used} dates`, DONE);
   node("l3", L, rowY(3), bw, "Block CV 3×3", "buffer 30, 90, 150 px", DONE);
-  node("r3", R, rowY(3), bw, "Linear classifier", "same CV, same sample", RUN);
+  node("r3", R, rowY(3), bw, "Same block CV", "same pixels as RandomForest", DONE);
   node("m4", M + dw * 0.2, rowY(4), dw * 0.6, "F1 by crop", "RandomForest against Prithvi, one sample", DONE);
   node("o5", L, rowY(5), bw, "Map and report", "CDL against prediction", DONE);
-  node("f5", R, rowY(5), bw, "Export for Furrow", "crop shares per H3 cell, fallow flagged", OUTC);
+  node("f5", R, rowY(5), bw, "Export for Furrow", "752 plots of 0.7 km²: crop, 2019–2021 history, bare months", OUTC);
   const ar = [];
   const link = (n, x1, y1, x2, y2) => { arrow(n, x1, y1, x2, y2); ar.push(n); };
   link("a0", lc, rowY(1) - gy, lc, rowY(1)); link("a1", rc, rowY(1) - gy, rc, rowY(1));
@@ -229,17 +229,18 @@ const DOT = [C.accent3, C.accent4, C.accent5, C.accent6];
   link("ao", cx - 0.4, rowY(4) + bh, lc, rowY(5)); link("ap", cx + 0.4, rowY(4) + bh, rc, rowY(5));
   // first results: RandomForest, agricultural pixels
   const x = 8.45, w = 13.333 - M - x;
-  const G = { corn: "Corn", cotton: "Cotton", fallow_idle: "Fallow", alfalfa: "Alfalfa" };
+  const G = { fallow_idle: "Fallow", corn: "Corn", cotton: "Cotton", alfalfa: "Alfalfa", small_grains: "Small grains" };
   const keys = Object.keys(G).filter((k) => k in ml.f1);
   s.addChart(pres.charts.BAR, [{ name: "F1", labels: keys.map((k) => G[k]), values: keys.map((k) => ml.f1[k]) }],
-    { ...chartBase, objectName: "f1", x, y: TOP, w, h: 2.75, barDir: "bar", barGapWidthPct: 45, chartColors: [HEX.B],
-      title: "RandomForest F1 by crop, Pinal County 2021", showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00",
+    { ...chartBase, objectName: "f1", x, y: TOP, w, h: 2.55, barDir: "bar", barGapWidthPct: 45, chartColors: [HEX.B],
+      title: "F1 by crop, RandomForest + field history", showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.00",
       valAxisMinVal: 0, valAxisMaxVal: 1, valAxisLabelFormatCode: "0.0", showLegend: false, catAxisOrientation: "maxMin" });
-  stat(s, "m0", x, TOP + 2.9, w, `${ml.accuracy.toFixed(2)} vs ${ml.baseline.toFixed(2)}`, "accuracy on farm pixels against always guessing the commonest class", { size: 26, h: 1.0 });
-  s.addText([{ text: "TRAINING NOW", options: { fontSize: 11, bold: true, charSpacing: 2, color: C.accent1, breakLine: true } },
-    { text: "Prithvi-EO-2.0 on Kaggle GPU, scored on the same blocks", options: { fontSize: 14, color: C.background2 } }],
-    T({ objectName: "m1", x, y: TOP + 4.05, w, h: 0.8, valign: "top", paraSpaceAfter: 2 }));
-  s.addNotes(`2:10–2:40. The ML repository reads Harmonized Landsat scenes from NASA Earthdata with the USDA Cropland Data Layer as labels. Branch one, a per-pixel random forest on NDVI and SWIR over ${ml.dates_used} clear dates, is done: F1 ${ml.f1.corn} on corn and ${ml.f1.fallow_idle} on fallow under 3×3 block cross-validation, and macro F1 holds at ${ml.sweep["30"]}–${ml.sweep["150"]} as the buffer grows from 30 to 150 pixels. Branch two, NASA and IBM's Prithvi-EO-2.0, is training now on the same blocks. The export gives Furrow crop shares per hexagon, so the current rotation comes from the satellite instead of a guess.`);
+  stat(s, "m0", x, TOP + 2.65, w, `${ml.accuracy.toFixed(2)} vs ${ml.baseline.toFixed(2)}`, "accuracy on farm pixels against always guessing the commonest class", { size: 26, h: 1.0 });
+  s.addText([{ text: "RESULT", options: { fontSize: 11, bold: true, charSpacing: 2, color: C.accent1, breakLine: true } },
+    { text: "Fine-tuned Prithvi-EO-2.0: 0.84, on par with RandomForest on the same images (0.86) and better on rare crops. Best: RandomForest + USDA field history, ", options: { fontSize: 14, color: C.background2 } },
+    { text: ml.accuracy.toFixed(2), options: { fontSize: 14, bold: true, color: C.background1 } }],
+    T({ objectName: "m1", x, y: TOP + 3.65, w, h: 1.4, valign: "top", paraSpaceAfter: 2 }));
+  s.addNotes("2:10–2:40. Harmonized Landsat scenes from NASA Earthdata, USDA Cropland Data Layer as labels, over a 35 km window in Pinal County. A per-pixel random forest on NDVI and SWIR over 22 clear dates, plus whether each pixel was farmed in 2019 and 2020: 0.89 accuracy on farm pixels under 3×3 block cross-validation, F1 0.93 on fallow and 0.91 on corn. Prithvi-EO-2.0, fine-tuned on the same blocks, reaches 0.84 and does better on rare small grains. Furrow gets 752 field-scale plots with three years of history and bare months; in Kazakhstan, with no crop labels, it shows where cropland lay bare all summer.");
   anim(s, [{ fx: "fade", names: ["n0"], dur: 350 }, { fx: "fade", names: ["a0", "a1", "l1", "r1"], dur: 350 },
     { fx: "fade", names: ["al1", "ar1", "l2", "r2"], dur: 350 }, { fx: "fade", names: ["al2", "ar2", "l3", "r3"], dur: 350 },
     { fx: "fade", names: ["am", "an", "m4"], dur: 350 }, { fx: "fade", names: ["ao", "ap", "o5", "f5"], dur: 350 },
