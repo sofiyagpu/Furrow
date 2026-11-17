@@ -30,14 +30,35 @@ def load_ml(path):
     if not path.exists():
         return None
     try:
-        ml = json.loads(path.read_text())
+        ml = json.loads(path.read_text(encoding="utf-8"))  # utf-8 explicitly: validation text may be non-ASCII
     except json.JSONDecodeError as e:
         raise SystemExit(f"{path}: not valid JSON ({e})")
     if not isinstance(ml, dict):
         raise SystemExit(f"{path}: expected a JSON object")
     if not isinstance(ml.get("cells"), dict):
         ml["cells"] = {}
+    _detail_geometry(ml)
     return ml
+
+
+GRID_RES = 5  # H3 resolution of the region grid (fetch.H3_RES); detail cells are finer and point to a grid cell
+
+
+def _detail_geometry(ml):
+    """Optional `detail` layer (finer H3 cells, same cell format): add the outline `b` ([lon, lat] ring, like region
+    cells) and the grid cell `p` it lies in, so the web app needs no H3 library. Malformed detail is dropped."""
+    d = ml.get("detail")
+    if d is None:
+        return
+    if not isinstance(d, dict) or not isinstance(d.get("cells"), dict):
+        ml.pop("detail")
+        return
+    for h, c in list(d["cells"].items()):
+        if not isinstance(c, dict) or not h3.is_valid_cell(h) or h3.get_resolution(h) < GRID_RES:
+            d["cells"].pop(h)
+            continue
+        c["b"] = [[round(lo, 5), round(la, 5)] for la, lo in h3.cell_to_boundary(h)]
+        c["p"] = h3.cell_to_parent(h, GRID_RES)
 
 
 def embed_ml(rid, path=None):
@@ -50,8 +71,12 @@ def embed_ml(rid, path=None):
     stray = [h for h in cells if h not in known]
     if stray:
         print(f"{rid}: {len(stray)} ML cells are not in the region grid and will not show: {stray[:3]}")
+    detail = ((data["ml"] or {}).get("detail") or {}).get("cells", {})
+    off = [h for h, c in detail.items() if c["p"] not in known]
+    if off:
+        print(f"{rid}: {len(off)} ML detail cells lie outside the region grid and will not show: {off[:3]}")
     out.write_text(json.dumps(data, separators=(",", ":")))
-    print(rid, "ml:", "none" if data["ml"] is None else f"{len(cells)} cells")
+    print(rid, "ml:", "none" if data["ml"] is None else f"{len(cells)} cells" + (f", {len(detail)} detail cells" if detail else ""))
 
 
 def r1(x):

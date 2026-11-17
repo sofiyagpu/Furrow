@@ -100,21 +100,37 @@ export interface Region {
 
 // ML file from the separate carver-ml repo (data/ml/README.md). Every field may be missing.
 export interface MlYear {
-  crop?: string
+  crop?: string // class key, or a composition "alfalfa 26%, fallow 23%"
+  source?: string // "USDA CDL" (fact) or "model" (prediction)
   bare_obs_dates?: number // satellite dates the cell was seen bare that year
+  bare_months?: number[] // months (1-12) the cell was bare
+  low_obs_months?: number[] // months with too few clear images to tell
+  lag_months?: number[] // months the crop lagged behind the same crop nearby (NDVI): a signal, not a diagnosis
 }
 
 export interface MlCell {
-  crop?: string // class key: alfalfa, corn, cotton, fallow, barley, ...
+  crop?: string // class key: alfalfa, corn, cotton, fallow, barley, ... or a composition "fallow 29%, corn 19%"
   crop_p?: number // 0-1, older exports; read as a pixel share
   crop_pixel_share?: number // 0-1, share of the cell's pixels in `crop`
+  crop_top?: string // largest class of the cell (other left out), a single key: colours the detail map
+  crop_top_share?: number // 0-1, pixel share of crop_top
+  sm_rootzone?: number // m3/m3, SMAP L4 root-zone spread over the cell by NDMI: seasonal median (not a model prediction)
+  sm_rootzone_pi?: [number, number] // m3/m3, 10th-90th percentile over dates
   low_confidence?: boolean
   years?: Record<string, MlYear>
+}
+
+// detail cell after pipeline/build.py: outline and the grid cell it lies in are added there
+export interface MlDetailCell extends MlCell {
+  b?: [number, number][] // [lon, lat] ring
+  p?: string // region grid cell (H3 res 5)
 }
 
 export interface MlFile {
   model?: string
   version?: string
-  validation?: string
+  validation?: string // full record, may be in Russian
+  validation_en?: string // short English version; the app picks it in English
   cells?: Record<string, MlCell>
+  detail?: { h3_resolution?: number; cells?: Record<string, MlDetailCell> } // finer H3 cells, optional
 }

@@ -1,4 +1,4 @@
-// Screenshots of the live app for the deck, at 2x, through Chrome DevTools. Needs the app running:
+// Screenshots of the live app for the deck, 1440x900 at 2x, through Chrome DevTools. Needs the app running:
 //   (cd ../web && npx vite --port 5199) ; node shoot.mjs   -> build/app_*.jpg
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync, mkdtempSync } from "node:fs";
@@ -29,60 +29,40 @@ const js = async (expr) => (await cmd("Runtime.evaluate", { expression: `(async(
 
 await cmd("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false });
 
-const HELPERS = `
-  window.__set = (sel, i, v) => { const el = document.querySelectorAll(sel)[i];
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, v);
-    el.dispatchEvent(new Event('input', { bubbles: true })); };
-  window.__body = (id) => { const s = document.getElementById(id); s.scrollIntoView({ block: 'start' });
-    const kids = [...s.querySelectorAll('.wrap > *')].filter((k) => !k.matches('h2, .lead, .eyebrow, p, .sec-head'));
-    const rs = kids.map((k) => k.getBoundingClientRect()).filter((r) => r.height > 0);
-    const x = Math.min(...rs.map((r) => r.left)), y = Math.min(...rs.map((r) => r.top)),
-          r = Math.max(...rs.map((r) => r.right)), b = Math.max(...rs.map((r) => r.bottom));
-    return { x: x - 16, y: y + scrollY - 16, width: r - x + 32, height: b - y + 32 }; };
-`;
+const VIEWS = ["map", "strategies", "time", "climate", "tradeoffs", "carbon", "ml"];
 async function open(url) {
   await cmd("Page.navigate", { url });
   await sleep(4500);
-  await js(HELPERS);
 }
-async function shot(name, clip) {
-  const p = { format: "jpeg", quality: 90, captureBeyondViewport: !!clip };
-  if (clip) p.clip = { ...clip, scale: 1 };
-  const { data } = await cmd("Page.captureScreenshot", p);
+async function shot(name) {
+  const { data } = await cmd("Page.captureScreenshot", { format: "jpeg", quality: 90 });
   writeFileSync(path.join(OUT, `app_${name}.jpg`), Buffer.from(data, "base64"));
-  console.log("app_" + name, clip ? `${Math.round(clip.width)}x${Math.round(clip.height)}` : "viewport");
+  console.log("app_" + name);
 }
-const hideChrome = `document.querySelector('.nav').style.visibility='hidden';
-  document.querySelectorAll('.agent-fab').forEach((b) => b.style.visibility='hidden');`;
+const setRange = (sel, v) => js(`const el = document.querySelector('${sel}');
+  if (el) { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, ${v});
+  el.dispatchEvent(new Event('input', { bubbles: true })); }`);
 
-for (const r of process.env.AGENT_ONLY ? [] : ["vko", "az"]) {
-  await open(`${APP}?r=${r}`);
-  await js("scrollTo(0,0)");
-  await sleep(1500);
-  await shot(`${r}_hero`);
-  await js(hideChrome);
-  for (const sec of ["map", "strategies", "time", "twin", "tradeoffs", "carbon"]) {
-    const clip = await js(`return __body('${sec}')`);
-    await sleep(sec === "map" ? 3500 : 900); // map tiles
-    if (sec === "time") { await js(`__set('#time input[type=range]', 0, ${r === "vko" ? 2008 : 2021})`); await sleep(700); }
-    await shot(`${r}_${sec}`, await js(`return __body('${sec}')`));
+// the app is a dashboard now: one full-screen view per section, picked by the hash
+for (const r of ["vko", "az"]) {
+  for (const v of VIEWS) {
+    await open(`${APP}?r=${r}#${v}`);
+    if (v === "map") await sleep(3000); // imagery tiles
+    if (v === "time") { await setRange("#time input[type=range]", r === "vko" ? 2008 : 2021); await sleep(700); }
+    await shot(`${r}_${v}`);
   }
 }
 
 // the assistant, open over the map, with two answers
-await open(`${APP}?r=vko`);
-await js("document.getElementById('map').scrollIntoView({block:'start'}); scrollBy(0,-70);");
-await sleep(3500);
+await open(`${APP}?r=vko#map`);
+await sleep(3000);
 await js(`document.querySelector('.agent-fab').click(); await new Promise(r=>setTimeout(r,400));
   for (const t of ['What about a drought year?', 'How much carbon?']) {
-    [...document.querySelectorAll('.agent .chip')].find((c) => c.textContent === t).click();
+    [...document.querySelectorAll('.agent .chip')].find((c) => c.textContent === t)?.click();
     await new Promise(r=>setTimeout(r,300)); }
   speechSynthesis.cancel();`);
 await sleep(800);
-await shot("agent", await js(`const a = document.querySelector('.agent');
-  a.style.background = '#1b1b1b'; a.style.backdropFilter = 'none'; // the glass panel lets the page show through
-  const r = a.getBoundingClientRect();
-  return { x: r.left, y: r.top + scrollY, width: r.width, height: r.height }`));
+await shot("agent");
 
 ws.close();
 chrome.kill();

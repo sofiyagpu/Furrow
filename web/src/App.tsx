@@ -9,7 +9,7 @@ import Report from './Report'
 import FieldInput from './FieldInput'
 import { SecHead } from './SecHead'
 import type { Region, Strategy } from './types'
-import { SC, usd, short, sname, cropShort, rname, mlCrop, mlCells, mlHas, LangCtx, useLang, useT, type Lang } from './fmt'
+import { SC, usd, short, sname, cropShort, rname, mlCrop, mlText, mlCells, mlHas, mlDetail, mlValidation, months, LangCtx, useLang, useT, type Lang } from './fmt'
 
 const METRICS: Record<MetricKey, [string, string]> = {
   profit: ['Median profit, $/ha', 'Медианная прибыль, $/га'],
@@ -42,7 +42,8 @@ const viewFromHash = (): View => {
 }
 
 export default function App() {
-  const [rid, setRid] = useState<Region['id']>(() => { const q = new URLSearchParams(location.search).get('r'); return q === 'az' || q === 'field' ? q : 'vko' })
+  // Arizona first: it carries the ML crop map; ?r=vko opens Kazakhstan, ?r=field the user's own field
+  const [rid, setRid] = useState<Region['id']>(() => { const q = new URLSearchParams(location.search).get('r'); return q === 'vko' || q === 'field' ? q : 'az' })
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
   const [view, setView] = useState<View>(viewFromHash)
   const [data, setData] = useState<Record<string, Region>>({})
@@ -170,6 +171,7 @@ function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, la
   const ref = r.strategies
   const [tab, setTab] = useState<'summary' | 'cell'>('summary')
   const [panel, setPanel] = useState(true)
+  const [detail, setDetail] = useState<string | null>(null) // ML detail cell (finer H3) inside `selected`
   const cell = r.cells.find((c) => c.h3 === selected)!
   const cellNo = r.cells.findIndex((c) => c.h3 === selected) + 1
   const metricKeys = (Object.keys(METRICS) as MetricKey[]).filter((k) => k !== 'irr' || r.irrigated)
@@ -259,14 +261,14 @@ function Overview({ r, selected, setSelected, sid, setSid, metric, setMetric, la
                       })}
                     </tbody>
                   </table>
-                  <MlCellBox r={r} h3={selected} />
-                  {selected !== r.rep_cell && <button className="btn btn-ghost btn-sm" onClick={() => setSelected(r.rep_cell)}>{t('Back to the reference field', 'Вернуться к опорному полю')}</button>}
+                  <MlCellBox r={r} h3={selected} detail={detail} onWholeCell={() => setDetail(null)} />
+                  {selected !== r.rep_cell && <button className="btn btn-ghost btn-sm" onClick={() => { setSelected(r.rep_cell); setDetail(null) }}>{t('Back to the reference field', 'Вернуться к опорному полю')}</button>}
                 </section>
               )}
             </div>
           </aside>
         )}
-        <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={pick} />
+        <MapView region={r} strategy={sid} metric={metric} layer={layer} selected={selected} onSelect={pick} detail={detail} onSelectDetail={setDetail} />
       </div>
     </div>
   )
@@ -889,8 +891,9 @@ function SmapPanel({ r }: { r: Region }) {
 }
 
 function MlSection({ r }: { r: Region }) {
-  const t = useT()
-  const n = mlCells(r).length
+  const t = useT(), l = useLang()
+  const n = mlCells(r).length, nd = mlDetail(r).length
+  const sm = Object.values(r.ml?.detail?.cells ?? {}).filter((c) => c.sm_rootzone != null).length
   return (
     <section className="sec" id="ml">
       <div className="wrap">
@@ -898,17 +901,24 @@ function MlSection({ r }: { r: Region }) {
           sub={t('Satellites see the district; ML brings it down to the field. Results appear in the map panel when you click a cell.', 'Спутник видит район, ML доводит до поля. Результат виден в панели карты при клике на ячейку.')} />
         <div className="two ml-grid">
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Crop map', 'Карта культур')}</h3><span className={`status ${n ? 'on' : ''}`}>{n ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
-            <p className="small muted">{t('Classifies the current crop of each cell from HLS / MODIS time series, so "current practice" comes from the field, not a guess.', 'Определяет текущую культуру ячейки по рядам HLS / MODIS, чтобы «текущая практика» бралась с поля, а не из догадки.')}</p>
+            <div className="row-between"><h3 className="h-sm">{r.id === 'vko' ? t('Bare-land map', 'Карта голой земли') : t('Crop map', 'Карта культур')}</h3><span className={`status ${n ? 'on' : ''}`}>{n ? t('Connected', 'Подключено') : t('Not connected', 'Не подключено')}</span></div>
+            <p className="small muted">{r.id === 'vko'
+              ? t('No crop labels exist here, so crops are not classified. Landsat (HLS) shows where cropland lay bare through the peak of summer (black fallow) in 2019–2021: bare soil is where erosion starts.', 'Разметки культур здесь нет, поэтому культуры не классифицируются. Landsat (HLS) показывает, где пашня стояла голой в разгар лета (чёрный пар) в 2019–2021: с голой земли начинается эрозия.')
+              : t('Zoom into any field: ~0.7 km² plots show what actually grew, three years of history and when the soil lay bare. Trained and checked on USDA crop maps.', 'Приблизьте поле: участки ~0,7 км² показывают, что на самом деле росло, историю за три года и когда земля стояла голой. Обучено и проверено по картам USDA.')}</p>
           </div>
           <div className="panel">
-            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3><span className="status">{t('Awaiting model', 'Ждёт модель')}</span></div>
-            <p className="small muted">{t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
+            <div className="row-between"><h3 className="h-sm">{t('Soil moisture downscaling', 'Детализация влаги почвы')}</h3>
+              <span className="status">{sm ? t('Experimental', 'Эксперимент') : t('Awaiting model', 'Ждёт модель')}</span></div>
+            <p className="small muted">{r.id === 'vko' && sm
+              ? t(`SMAP (9 km) spread over ${sm} field-scale cells by the satellite moisture index (NDMI). Off by default: on rainfed cropland the check went the other way (soil is wettest in May while fields are bare, dense crops dry it out), so treat it with care. Turn it on in the cell panel.`, `SMAP (9 км) распределено по ${sm} участкам по спутниковому индексу влажности (NDMI). По умолчанию выключено: на богаре проверка показала обратную связь (почва влажнее всего в мае, пока поле голое, густые посевы её иссушают), поэтому доверять осторожно. Включается в панели ячейки.`)
+              : sm
+                ? t(`SMAP 9 km, spread over ${sm} field-scale cells by the satellite moisture index (NDMI), seasonal median with the 10–90% range over dates. Experimental: a time check against SMAP did not confirm the link, and there is no ground check.`, `SMAP 9 км, распределено по ${sm} участкам по спутниковому индексу влажности (NDMI), сезонная медиана и разброс 10–90% по датам. Эксперимент: проверка по времени против SMAP связь не подтвердила, наземной проверки нет.`)
+                : t('SMAP itself is connected (9 km, see Method). This model, from the ML repo, sharpens root-zone moisture to the cell, with a prediction interval.', 'Сам SMAP подключён (9 км, см. «Метод»). Эта модель из ML-репозитория уточняет влагу корневой зоны до ячейки, с интервалом предсказания.')}</p>
           </div>
         </div>
         <p className="small muted note">
           {n
-            ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), r.ml?.validation].filter(Boolean).join(' · ')
+            ? [mlTitle(r), t(`${n} cells`, `ячеек: ${n}`), nd ? t(`${nd} field-scale cells on the map`, `мелких ячеек на карте: ${nd}`) : '', mlValidation(r, l)].filter(Boolean).join(' · ')
             : r.id === 'field' ? t('ML layers are built for the two demo regions only.', 'ML-слои есть только для двух демо-регионов.')
             : t(`The models live in a separate repository. Put its output in data/ml/${r.id}.json and rebuild: the cell panel picks it up.`, `Модели живут в отдельном репозитории. Положите их вывод в data/ml/${r.id}.json и пересоберите: его покажет панель ячейки.`)}
         </p>
@@ -920,36 +930,73 @@ function MlSection({ r }: { r: Region }) {
 const mlTitle = (r: Region) => [r.ml?.model, r.ml?.version].filter(Boolean).join(' ')
 
 // ML block in the cell panel. Every field of the ML file is optional, so each line shows only when its field is there.
-function MlCellBox({ r, h3 }: { r: Region; h3: string }) {
+// With `detail` set (a finer H3 cell clicked on the map), that cell is shown instead of the whole grid cell.
+function MlCellBox({ r, h3, detail, onWholeCell }: { r: Region; h3: string; detail?: string | null; onWholeCell?: () => void }) {
   const l = useLang(), t = useT()
-  const c = r.ml?.cells?.[h3]
-  const share = c?.crop_pixel_share ?? c?.crop_p
+  const [showSm, setShowSm] = useState(r.id !== 'vko') // vko: the moisture check went the other way, so off by default
+  const fine = detail ? r.ml?.detail?.cells?.[detail] : undefined
+  const c = fine && fine.p === h3 ? fine : r.ml?.cells?.[h3]
+  const isFine = !!fine && c === fine
+  const top = c?.crop_top
+  const share = top ? c?.crop_top_share : c?.crop_pixel_share ?? c?.crop_p
   const years = Object.entries(c?.years ?? {}).sort(([a], [b]) => a.localeCompare(b))
   if (!c || !mlHas(c)) {
     return <div className="ml-box"><span className="badge">ML</span><span className="muted">{t('No ML data for this cell', 'ML-данных для ячейки нет')}</span></div>
   }
+  const src = (s?: string) => (s === 'model' ? t('model', 'модель') : s === 'satellite' ? t('satellite', 'спутник') : s)
   return (
     <div className="ml-box ml-cell">
       <span className="badge">ML</span>
       <div className="ml-body">
-        {c.crop && (
+        {isFine && <span className="ml-scale">{t('Field-scale cell (~0.7 km²)', 'Участок ~0,7 км²')}</span>}
+        {(top || c.crop) && (
           <p>
-            <strong>{mlCrop(c.crop, l)}</strong>
+            <strong>{top ? mlCrop(top, l) : mlText(c.crop!, l)}</strong>
             {share != null && <span className="muted"> · {t('pixel share', 'доля пикселей')} {Math.round(share * 100)}%</span>}
           </p>
         )}
+        {top && c.crop && <p className="small muted">{mlText(c.crop, l)}</p>}
         {c.low_confidence && <span className="ml-flag">{t('low confidence', 'низкая достоверность')}</span>}
+        {c.sm_rootzone != null && (
+          <label className="small ml-sm-toggle"><input type="checkbox" checked={showSm} onChange={(e) => setShowSm(e.target.checked)} /> {t('Show soil moisture (experimental)', 'Показать влагу почвы (эксперимент)')}</label>
+        )}
+        {showSm && c.sm_rootzone != null && (
+          <p className="small">
+            {t('Root-zone moisture', 'Влага корневой зоны')}: <strong>{c.sm_rootzone.toFixed(3)}</strong>
+            {c.sm_rootzone_pi && ` (${c.sm_rootzone_pi[0].toFixed(3)}–${c.sm_rootzone_pi[1].toFixed(3)})`} {t('m³/m³', 'м³/м³')}
+            <span className="muted"> · {r.id === 'vko'
+              ? t('SMAP spread by NDMI; here the check showed the opposite link', 'SMAP по NDMI; здесь проверка показала обратную связь')
+              : t('SMAP spread by NDMI, link not confirmed', 'SMAP по NDMI, связь не подтверждена')}</span>
+          </p>
+        )}
         {years.length > 0 && (
           <ul className="ml-years">
             {years.map(([y, v]) => (
               <li key={y}>
-                <span className="mono">{y}</span> {v.crop ? mlCrop(v.crop, l) : '–'}
-                {v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
+                <span><span className="mono">{y}</span> {v.crop ? mlText(v.crop, l) : '–'}{v.source && <span className="ml-src">{src(v.source)}</span>}</span>
+                {v.bare_months && (
+                  <span className="small muted">
+                    {v.bare_months.length ? t(`bare: ${months(v.bare_months, l)}`, `голая почва: ${months(v.bare_months, l)}`) : t('green all season', 'зелёная весь сезон')}
+                    {v.low_obs_months?.length ? t(` · too few images: ${months(v.low_obs_months, l)}`, ` · мало снимков: ${months(v.low_obs_months, l)}`) : ''}
+                  </span>
+                )}
+                {!v.bare_months && v.bare_obs_dates != null && <span className="muted"> · {t(`bare on ${v.bare_obs_dates} dates`, `дат с голой почвой: ${v.bare_obs_dates}`)}</span>}
+                {v.lag_months && v.lag_months.length > 0 && (
+                  <span className="small ml-lag" title={t('NDVI in the bottom 10% of the same crop nearby on the same dates: a signal to check with an agronomist, not a diagnosis', 'NDVI в нижних 10% той же культуры по соседству в те же даты: повод проверить с агрономом, а не диагноз')}>
+                    {t(`lagged behind the same crop nearby: ${months(v.lag_months, l)}`, `отставала от той же культуры по соседству: ${months(v.lag_months, l)}`)}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
         )}
-        {r.ml?.validation && <p className="small muted">{r.ml.validation}</p>}
+        {isFine && onWholeCell && <button className="btn btn-ghost btn-sm" onClick={onWholeCell}>{t('Show the whole cell', 'Показать всю ячейку')}</button>}
+        {mlValidation(r, l) && (
+          <details className="ml-validation small muted">
+            <summary>{t('How the model was checked', 'Как проверяли модель')}</summary>
+            <p>{mlValidation(r, l)}</p>
+          </details>
+        )}
       </div>
     </div>
   )

@@ -5,3 +5,7 @@ dist/
 .DS_Store
 .taste-skill/
 data/cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/cache/
