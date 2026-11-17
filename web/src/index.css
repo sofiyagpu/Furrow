@@ -140,8 +140,28 @@ a { color: inherit; }
 .field.inline { min-width: min(260px, 100%); }
 .field-side { display: grid; gap: 14px; align-content: start; }
 .field-side .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.field-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.field-list li { display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: center; }
+.field-list input { min-height: 34px; font-size: 14px; }
+.field-list .mono { white-space: nowrap; }
+.farm-form { margin-top: 16px; display: grid; gap: 16px; }
+.farm-grid { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr; gap: 20px; }
+.farm-grid fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.contract { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 6px; align-items: center; }
+.contract select, .contract input { min-height: 36px; font-size: 14px; padding: 0 8px; }
+.scroll-x { overflow-x: auto; }
+.warn { border-color: #e0803a; margin-bottom: 16px; }
+.tbl td.over { color: #e0803a; font-weight: 600; }
+.farm-legend { pointer-events: auto; max-width: calc(100% - 24px); }
+.farm-legend p { display: flex; gap: 8px; align-items: center; }
+.farm-legend i { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+#farm .map { height: min(56svh, 520px); min-height: 360px; }
+@media (max-width: 900px) { .farm-grid { grid-template-columns: 1fr; } .field-list li { grid-template-columns: 1fr auto; } }
 .btn:disabled, .btn:has(input:disabled) { opacity: .45; cursor: default; transform: none; }
-select, input[type="text"], .agent-form input { font: 15px var(--font); min-height: 44px; padding: 0 12px; border-radius: var(--r-sm); border: 1px solid var(--grid-strong); background: var(--bg); color: var(--ink); width: 100%; }
+select, input[type="text"], input[type="number"], .agent-form input { font: 15px var(--font); min-height: 44px; padding: 0 12px; border-radius: var(--r-sm); border: 1px solid var(--grid-strong); background: var(--bg); color: var(--ink); width: 100%; }
 input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); min-height: 32px; }
 .legend-ramp { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
 .legend-ramp i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #b4532a, #d98a4e, #ecc58a, #d9e8b0, #8fd6a7, #2f9e6b); }
@@ -210,10 +230,11 @@ input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); 
 .doc-foot { border-top: 1px solid var(--line); padding-top: 10px; }
 @media print {
   :root:not(#_) { --bg: #fff; --surface: #fff; --ink: #000; --muted: #444; --line: #bbb; --grid: #ddd; color-scheme: light; }
-  .rail, .top, .skip, .agent, .no-print, main > section:not(#report) { display: none !important; }
+  .rail, .top, .skip, .agent, .no-print, main > section:not(#report):not(#farm) { display: none !important; }
   .app, .main, .content { display: block !important; height: auto !important; overflow: visible !important; background: #fff !important; }
-  #report { padding: 0; border: 0; min-height: 0; display: block; }
+  #report, #farm { padding: 0; border: 0; min-height: 0; display: block; }
   #report .wrap { width: auto; }
+  .doc-years td, .doc-years th { padding: 2px 6px 2px 0; }
   .print-only { display: grid; }
   .tbl { font-size: 11px; } .tbl td, .tbl th { padding: 4px 6px 4px 0; }
   .doc h4, .tbl tr { break-inside: avoid; }
@@ -288,7 +309,6 @@ input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); 
 .rail-nav a[aria-current="page"] .nav-n { opacity: .8; }
 .rail-foot { margin-top: auto; display: grid; gap: 8px; padding-top: 16px; border-top: 1px solid var(--line); justify-items: start; }
 .rail-foot .label { font-size: 10px; }
-.rail-src { margin-top: 6px; font-size: 11px; line-height: 1.4; color: var(--muted); }
 .main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .top { position: relative; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 8px 24px; border-bottom: 1px solid var(--line); background: var(--bg); }
 .top::before, .top::after { content: ""; position: absolute; bottom: -3px; width: 5px; height: 5px; background: var(--accent); }

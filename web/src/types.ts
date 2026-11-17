@@ -134,3 +134,39 @@ export interface MlFile {
   cells?: Record<string, MlCell>
   detail?: { h3_resolution?: number; cells?: Record<string, MlDetailCell> } // finer H3 cells, optional
 }
+
+// whole-farm plan from POST /farm (pipeline/plan.py). Money in $ for the whole farm a year unless named per ha.
+export interface FarmPlan {
+  key: 'balanced' | 'profit' | 'safe' | 'soil' | 'carbon' | 'water' | 'current' | 'closest'
+  also?: string[] // other goals that picked the same plan
+  feasible: boolean
+  shortfall_t: number // contract tonnes missed in the worst year
+  overload_days: number // drill or combine days over the work days, worst month
+  fields: { rotation: string[]; notill: boolean; irrigation: string | null; id: string | null; phase: number; years: string[][]; profit: Band }[] // profit $/ha
+  profit: Band
+  profit_mean: number
+  loss_years: number
+  worst: [number, number] // year, $
+  erosion: number // t a year
+  dsoc: number // t C a year
+  irr_m3: number
+  years: [number, number, number, number][] // year, profit, revenue, cost
+  stress: { dT: number; dP: number; profit: Band; loss_years: number }
+  contracts: { crop: string; min_t: number | null; max_t: number | null; planned: [number, number]; met_share: number }[]
+  machinery: { work_days: number; sow_peak: number; harvest_peak: number; sow: number[]; harvest: number[] } // days per month, worst year
+  plan_years: { crops: Record<string, number>; tons: Record<string, number> }[] // ha and planned t per crop, year 1..6
+}
+
+export interface FarmResult {
+  template: 'az' | 'vko'
+  area: number
+  years: [number, number]
+  work_days: number
+  machinery: { seed_ha_day: number; harvest_ha_day: number; notill: boolean; drip: boolean }
+  exclude: string[]
+  fields: { name: string; ring: [number, number][]; area: number; soil: { clay: number; sand: number; soc: number; bdod: number } }[]
+  crops: Record<string, { label: string; label_ru?: string; price: number; cost: number; family: string }>
+  baseline: FarmPlan
+  plans: FarmPlan[]
+  options: number
+}

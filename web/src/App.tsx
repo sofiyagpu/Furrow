@@ -7,9 +7,10 @@ import MapView, { NASA_LAYERS, type MetricKey, type NasaLayer } from './MapView'
 import Agent from './Agent'
 import Report from './Report'
 import FieldInput from './FieldInput'
+import FarmPlanView from './Farm'
 import { SecHead } from './SecHead'
-import type { Region, Strategy } from './types'
-import { SC, usd, short, sname, cropShort, rname, mlCrop, mlText, mlCells, mlHas, mlDetail, mlValidation, months, LangCtx, useLang, useT, type Lang } from './fmt'
+import type { FarmResult, Region, Strategy } from './types'
+import { SC, usd, short, sname, cropShort, rname, mlCrop, mlText, mlCells, mlHas, mlDetail, mlValidation, months, LangCtx, useLang, useT, type Lang, type DrawnField } from './fmt'
 
 const METRICS: Record<MetricKey, [string, string]> = {
   profit: ['Median profit, $/ha', 'Медианная прибыль, $/га'],
@@ -47,6 +48,8 @@ export default function App() {
   const [lang, setLang] = useState<Lang>(() => (stored('lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')) as Lang)
   const [view, setView] = useState<View>(viewFromHash)
   const [data, setData] = useState<Record<string, Region>>({})
+  const [fields, setFields] = useState<DrawnField[]>([]) // outlined in FieldInput, kept while a result is shown
+  const [farm, setFarm] = useState<FarmResult | null>(null)
   const r = data[rid]
   const t = (en: string, ru: string) => (lang === 'ru' ? ru : en)
   const title = VIEWS.find(([v]) => v === view)!
@@ -70,7 +73,7 @@ export default function App() {
     <div className="seg" role="group" aria-label={t('Region', 'Регион')}>
       <button aria-pressed={rid === 'vko'} onClick={() => setRid('vko')}>{t('Kazakhstan', 'ВКО')}</button>
       <button aria-pressed={rid === 'az'} onClick={() => setRid('az')}>{t('Arizona', 'Аризона')}</button>
-      <button aria-pressed={rid === 'field'} onClick={() => setRid('field')}>{t('My field', 'Моё поле')}</button>
+      <button aria-pressed={rid === 'field'} onClick={() => setRid('field')}>{t('My fields', 'Мои поля')}</button>
     </div>
   )
   const langSeg = (
@@ -86,20 +89,19 @@ export default function App() {
       <div className="app">
         <aside className="rail">
           <a href="#map" className="mark" aria-label="Furrow"><span className="mark-i" aria-hidden />Furrow</a>
-          <p className="rail-sub">{t('Crop rotation planner on NASA data', 'Планировщик севооборотов на данных NASA')}</p>
+          <p className="rail-sub">{t('Crop rotation planner', 'Планировщик севооборотов')}</p>
           <nav aria-label={t('Sections', 'Разделы')} className="rail-nav">{nav}</nav>
           <div className="rail-foot">
             <span className="label">{t('Region', 'Регион')}</span>
             {regionSeg}
             <span className="label">{t('Language', 'Язык')}</span>
             {langSeg}
-            <p className="rail-src">NASA POWER · SMAP · GPM IMERG · GIBS · SoilGrids</p>
           </div>
         </aside>
         <div className="main">
           <header className="top">
             <div className="top-title">
-              <h1>{t(title[1], title[2])}</h1>
+              <h1>{rid === 'field' && farm && !r ? t('Farm plan', 'План хозяйства') : t(title[1], title[2])}</h1>
               {r && <span className="top-region">{rname(r, lang)}</span>}
             </div>
             {/* narrow screens: one native select instead of a sideways-scrolling tab strip */}
@@ -115,7 +117,8 @@ export default function App() {
           </header>
           <main id="main" className={`content view-${r ? view : 'input'}`}>
             {r ? <Page key={`${rid}:${r.rep_cell}`} r={r} view={view} />
-              : rid === 'field' ? <FieldInput onDone={(d) => setData((o) => ({ ...o, field: d }))} />
+              : rid === 'field' && farm ? <FarmPlanView farm={farm} onBack={() => setFarm(null)} />
+              : rid === 'field' ? <FieldInput fields={fields} setFields={setFields} onField={(d) => setData((o) => ({ ...o, field: d }))} onFarm={setFarm} />
               : <p className="muted pad">{t('Loading the region', 'Загружаем регион')}</p>}
           </main>
         </div>

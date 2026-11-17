@@ -1,10 +1,54 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useState } from 'react'
 import type { MlCell, Region, Strategy } from './types'
 
 // categorical slots, fixed order (validated: dataviz palette check, contrast WARN -> direct labels + tables)
 export const SC: Record<string, string> = { current: '#2a78d6', A: '#eb6834', B: '#1baf7a', C: '#eda100' }
 export const usd = (v: number) => `${v < 0 ? '−' : ''}$${Math.abs(Math.round(v)).toLocaleString('en-US')}`
 export const worstYear = (s: Strategy) => [...s.timeline].sort((a, b) => a.profit[1] - b.profit[1])[0]
+
+// CSV download; BOM so Excel opens Cyrillic as UTF-8
+export function download(name: string, rows: (string | number)[][]) {
+  const q = (v: string | number) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))
+  const url = URL.createObjectURL(new Blob(['\ufeff' + rows.map((r) => r.map(q).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }))
+  const a = Object.assign(document.createElement('a'), { href: url, download: name })
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+// POST to the API (pipeline/api.py) with a seconds counter: busy = seconds since the request went out, 0 = idle
+export function usePost() {
+  const [busy, setBusy] = useState(0)
+  const [err, setErr] = useState('')
+  const run = async <T,>(path: string, body: unknown, onOk: (d: T) => void, fail: string) => {
+    setErr('')
+    setBusy(1)
+    const t0 = Date.now()
+    const tick = setInterval(() => setBusy(Math.max(1, Math.round((Date.now() - t0) / 1000))), 1000)
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+      const d = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(typeof d?.detail === 'string' ? d.detail : `HTTP ${res.status}`)
+      onOk(d)
+    } catch (e) {
+      setErr(`${fail}: ${(e as Error).message}`)
+    } finally {
+      clearInterval(tick)
+      setBusy(0)
+    }
+  }
+  return { busy, err, setErr, run }
+}
+
+export type Pt = [number, number] // lon, lat
+export type DrawnField = { name: string; ring: Pt[] }
+
+// field area, ha: same local projection as pipeline/plan.py area_ha
+export function areaHa(ring: Pt[]) {
+  const k = Math.cos((ring.reduce((s, p) => s + p[1], 0) / ring.length) * (Math.PI / 180)) * 111320
+  let a = 0
+  ring.forEach((p, i) => { const q = ring[(i + 1) % ring.length]; a += (p[0] * q[1] - q[0] * p[1]) * k * 110540 })
+  return Math.abs(a) / 2 / 1e4
+}
 
 export type Lang = 'en' | 'ru'
 export const LangCtx = createContext<Lang>('en')

@@ -30,6 +30,11 @@ export const IMAGERY: maplibregl.StyleSpecification = {
   layers: [{ id: 'img', type: 'raster', source: 'img', paint: { 'raster-saturation': -0.2 } }],
 }
 
+export function fit(m: maplibregl.Map, pts: [number, number][]) {
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1])
+  m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 60, duration: 0 })
+}
+
 export type MetricKey = 'profit' | 'erosion' | 'dsoc' | 'irr'
 
 // value for colouring, higher = better for the farmer/soil

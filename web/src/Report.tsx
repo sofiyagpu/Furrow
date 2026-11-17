@@ -1,17 +1,8 @@
 import type { Region } from './types'
 import { SecHead } from './SecHead'
-import { SC, usd, short, worstYear, cropLabel, cropShort, rname, useLang, useT } from './fmt'
+import { SC, usd, download, short, worstYear, cropLabel, cropShort, rname, useLang, useT } from './fmt'
 
 // Export: a one-page printable report (browser "Save as PDF") and the same numbers as CSV.
-function download(name: string, rows: (string | number)[][]) {
-  const q = (v: string | number) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))
-  // BOM so Excel opens Cyrillic as UTF-8
-  const url = URL.createObjectURL(new Blob(['﻿' + rows.map((r) => r.map(q).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }))
-  const a = Object.assign(document.createElement('a'), { href: url, download: name })
-  a.click()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
-}
-
 const near = (xs: number[], v: number) => xs.findIndex((x) => Math.abs(x - v) < 1e-6)
 
 export default function Report({ r }: { r: Region }) {
