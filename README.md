@@ -20,7 +20,7 @@ EARTHDATA_TOKEN=... .venv/bin/python pipeline/fetch.py --imerg   # GPM IMERG mon
 .venv/bin/python pipeline/build.py      # simulations, climate twin, NSGA-II -> web/public/data/*.json
 .venv/bin/python pipeline/model.py      # model self-check
 .venv/bin/python -m pytest pipeline     # priority numbers, SMAP check, ML contract
-.venv/bin/uvicorn --app-dir pipeline api:app --port 8000   # API for "My field": POST /field
+.venv/bin/uvicorn --app-dir pipeline api:app --port 8000   # API for "My fields": POST /field, POST /farm
 cd web && npm install && npm run dev    # http://localhost:5173, proxies /field to :8000
 ```
 
@@ -33,6 +33,27 @@ same JSON as `web/public/data/<region>.json`, for that one field: NASA POWER and
 (cached in `data/cache`), then the strategies, time machine, climate twin and NSGA-II of `build.py compute()`.
 About a minute for a new field, instant for a repeated one. Crops, prices and strategies come from the nearest demo
 region, so any field in Kazakhstan gets the East Kazakhstan set. SMAP, IMERG and ML checks stay demo-region only.
+
+## Whole farm
+
+Two or more outlined fields open the farm form: drill and combine capacity (ha a day), no-till drill and drip on or
+off, the crops the farm can grow and sell, and sales contracts (tonnes a year, at least and/or at most). `POST /farm`
+(`pipeline/plan.py`) gives every field a rotation and a start year with NSGA-II, for the farm as a whole:
+
+- Candidates per field: current practice, the region's strategies and its NSGA-II front, with every practice the
+  machinery allows. Each is simulated once per start phase over the weather record; the search only adds up these
+  per-year tables, area-weighted, so staggering fields shows up in the farm's yearly totals.
+- Objectives: mean and bad-year (P10) farm margin, soil loss, soil carbon, pumped water (irrigated regions).
+- Constraints: drilling and combining days per calendar month within 20 work days (an assumption), and planned
+  tonnage of a contract crop (area x the field's median yield) within the contract every year. The weather replay
+  then reports how often the real harvest met it.
+- Out: the best plan per goal plus a balanced one, current practice for comparison, field-by-year crops, crop areas
+  and tonnes by year, machinery load by month, a +2 °C / −10% rain stress test.
+
+The farm page prints a report for a lender (browser "Save as PDF", like the region report): cash flow over every
+weather year, debt service coverage for a yearly loan payment, the stress test, contracts, machinery, fields and
+soil. Margin there is revenue less direct crop costs; land rent, overheads, depreciation and taxes are not in it.
+4 fields take about 40 s; time grows with the number of fields (about 3 s each), up to 30.
 
 ## Deploy (one server)
 
@@ -61,6 +82,7 @@ because `POST /field` answers only when the model is done. No accounts: anyone w
 | Map with NASA GIBS layers, strategy cards, cockpit, assistant | `web/src` | done |
 | ML layers | separate repo → `data/ml/<region>.json` | contract only |
 | Your field: POST /field, outline on the map or KML | `pipeline/api.py`, `web/src/FieldInput.tsx` | done |
+| Whole farm: POST /farm, machinery and contracts, bank report | `pipeline/plan.py`, `web/src/Farm.tsx` | done |
 
 ## Models, honestly
 

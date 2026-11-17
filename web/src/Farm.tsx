@@ -105,6 +105,7 @@ const MONTHS: [string, string][] = [['Jan', 'янв'], ['Feb', 'фев'], ['Mar'
 const goal = (p: FarmPlan, l: Lang) => GOALS[p.key][l === 'ru' ? 1 : 0]
 const rotKey = (f: FarmPlan['fields'][number]) => `${f.rotation.join('>')}|${f.notill}|${f.irrigation}`
 const pct = (v: number) => `${Math.round(v * 100)}%`
+const ratio = (v: number) => v.toFixed(2).replace('-', '−')
 const signed = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${num(Math.abs(v))}`
 
 export default function FarmPlanView({ farm, onBack }: { farm: FarmResult; onBack: () => void }) {
@@ -279,7 +280,7 @@ export default function FarmPlanView({ farm, onBack }: { farm: FarmResult; onBac
 
 function debt(p: FarmPlan, payment: number) {
   const r = p.years.map((y) => y[1] / payment).sort((a, b) => a - b)
-  const f = (v: number) => v.toFixed(2)
+  const f = ratio
   return { n: r.length, covered: r.filter((x) => x >= 1).length, min: f(r[0]), median: f(r[Math.floor(r.length / 2)]) }
 }
 
@@ -401,7 +402,7 @@ function BankReport({ farm, p, payment }: { farm: FarmResult; p: FarmPlan; payme
           <table key={k} className="tbl doc-years">
             <thead><tr><th>{t('Weather', 'Погода')}</th><th>{t('Revenue', 'Выручка')}</th><th>{t('Cost', 'Затраты')}</th><th>{t('Margin', 'Маржа')}</th>{payment > 0 && <th>{t('Cover', 'Покр.')}</th>}</tr></thead>
             <tbody>{half.map(([y, pr, rev, c]) => (
-              <tr key={y}><td className="mono">{y}</td><td className="mono">{usd(rev)}</td><td className="mono">{usd(c)}</td><td className="mono">{usd(pr)}</td>{payment > 0 && <td className="mono">{(pr / payment).toFixed(2)}</td>}</tr>
+              <tr key={y}><td className="mono">{y}</td><td className="mono">{usd(rev)}</td><td className="mono">{usd(c)}</td><td className="mono">{usd(pr)}</td>{payment > 0 && <td className="mono">{ratio(pr / payment)}</td>}</tr>
             ))}</tbody>
           </table>
         ))}

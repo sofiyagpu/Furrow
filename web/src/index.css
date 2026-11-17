@@ -234,7 +234,7 @@ input[type="range"] { width: 100%; margin: 0; accent-color: var(--accent-deep); 
   .app, .main, .content { display: block !important; height: auto !important; overflow: visible !important; background: #fff !important; }
   #report, #farm { padding: 0; border: 0; min-height: 0; display: block; }
   #report .wrap { width: auto; }
-  .doc-years td, .doc-years th { padding: 2px 6px 2px 0; }
+  .tbl.doc-years td, .tbl.doc-years th { padding: 1px 6px 1px 0; line-height: 1.25; }
   .print-only { display: grid; }
   .tbl { font-size: 11px; } .tbl td, .tbl th { padding: 4px 6px 4px 0; }
   .doc h4, .tbl tr { break-inside: avoid; }
