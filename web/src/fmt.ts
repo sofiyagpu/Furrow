@@ -21,10 +21,21 @@ export const rname = (r: Region, l: Lang) => (l === 'ru' && r.name_ru) || r.name
 // Display names for crop keys coming from the ML repo. Labels only: model and strategy crops are separate.
 const ML_CROPS: Record<string, [string, string]> = {
   alfalfa: ['Alfalfa', 'Люцерна'],
+  barley: ['Barley', 'Ячмень'],
+  chickpea: ['Chickpea', 'Нут'],
   corn: ['Corn', 'Кукуруза'],
   cotton: ['Cotton', 'Хлопчатник'],
+  cover: ['Cowpea cover', 'Вигна, покровная'],
+  durum: ['Durum wheat', 'Твёрдая пшеница'],
   fallow: ['Fallow', 'Пар'],
-  barley: ['Barley', 'Ячмень'],
+  flax: ['Oilseed flax', 'Лён масличный'],
+  guar: ['Guar', 'Гуар'],
+  lentil: ['Lentil', 'Чечевица'],
+  millet: ['Proso millet', 'Просо'],
+  pea: ['Field pea', 'Горох'],
+  rapeseed: ['Spring rapeseed', 'Яровой рапс'],
+  sainfoin: ['Sainfoin', 'Эспарцет'],
+  sorghum: ['Grain sorghum', 'Зерновое сорго'],
   wheat: ['Wheat', 'Пшеница'],
 }
 export const mlCrop = (key: string, l: Lang) => ML_CROPS[key]?.[l === 'ru' ? 1 : 0] ?? key
